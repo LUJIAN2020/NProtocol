@@ -1,4 +1,4 @@
-﻿using NProtocol.Communication.Enums;
+﻿using NProtocol.Enums;
 using NProtocol.Protocols.Mc;
 
 namespace NProtocol.Demo

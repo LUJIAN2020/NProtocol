@@ -1,8 +1,6 @@
-﻿using NProtocol.Communication.Base;
-using NProtocol.Protocols.S7;
+﻿using NProtocol.Protocols.S7;
 using NProtocol.Protocols.S7.Enums;
 using NProtocol.Protocols.S7.StructType;
-using NProtocol.Protocols.S7.StructType.S7DateTime;
 
 namespace NProtocol.Demo
 {
