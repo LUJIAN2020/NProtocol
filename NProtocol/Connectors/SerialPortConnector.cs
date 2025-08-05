@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO.Ports;
 
-namespace NProtocol.Communication.Connectors
+namespace NProtocol.Connectors
 {
     public class SerialPortConnector : IConnector
     {

@@ -1,6 +1,6 @@
-﻿using NProtocol.Communication.Base;
+﻿using NProtocol.Base;
 
-namespace NProtocol.Communication.Extensions
+namespace NProtocol.Extensions
 {
     public static class ResultExtension
     {

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace NProtocol.Communication.Extensions
+namespace NProtocol.Extensions
 {
     public static class ByteCalculateExtension
     {

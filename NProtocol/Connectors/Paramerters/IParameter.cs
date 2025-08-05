@@ -1,4 +1,4 @@
-﻿namespace NProtocol.Communication.Connectors
+﻿namespace NProtocol.Connectors
 {
     public interface IParameter
     {

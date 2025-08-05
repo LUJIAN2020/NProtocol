@@ -1,4 +1,4 @@
-﻿namespace NProtocol.Communication.Enums
+﻿namespace NProtocol.Enums
 {
     public enum ConnectMode
     {

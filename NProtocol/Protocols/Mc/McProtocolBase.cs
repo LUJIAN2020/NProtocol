@@ -1,6 +1,6 @@
-﻿using NProtocol.Communication.Base;
-using NProtocol.Communication.Connectors;
-using NProtocol.Communication.Enums;
+﻿using NProtocol.Base;
+using NProtocol.Connectors;
+using NProtocol.Enums;
 
 namespace NProtocol.Protocols.Mc
 {

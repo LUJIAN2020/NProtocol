@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Net.Sockets;
 
-namespace NProtocol.Communication.Extensions
+namespace NProtocol.Extensions
 {
     public static class SocketExtension
     {

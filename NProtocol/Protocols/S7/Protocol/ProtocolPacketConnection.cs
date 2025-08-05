@@ -1,7 +1,6 @@
-﻿using NProtocol.Communication.Base;
-using NProtocol.Communication.Extensions;
+﻿using NProtocol.Base;
+using NProtocol.Extensions;
 using NProtocol.Protocols.S7.Enums;
-using Robot.Communication.Extensions;
 using System.ComponentModel;
 
 namespace NProtocol.Protocols.S7

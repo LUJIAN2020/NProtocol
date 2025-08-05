@@ -1,6 +1,5 @@
-﻿using NProtocol.Communication.Extensions;
-using NProtocol.Exceptions;
-using NProtocol.Protocols.Mc;
+﻿using NProtocol.Exceptions;
+using NProtocol.Extensions;
 using System;
 using System.Linq;
 

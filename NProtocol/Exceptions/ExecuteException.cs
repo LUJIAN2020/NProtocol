@@ -1,8 +1,8 @@
-﻿using NProtocol.Communication.Extensions;
+﻿using NProtocol.Extensions;
 using System;
 using System.Text;
 
-namespace NProtocol.Communication.Exceptions
+namespace NProtocol.Exceptions
 {
     public class ExecuteException : Exception
     {
@@ -33,11 +33,11 @@ namespace NProtocol.Communication.Exceptions
             }
             if (sendData is not null)
             {
-                sb.Append($"S:{sendData.ToHexString()};");
+                sb.Append($"[TX]:{sendData.ToHexString()};");
             }
             if (receivedData is not null)
             {
-                sb.Append($"R:{receivedData.ToHexString()};");
+                sb.Append($"[RX]:{receivedData.ToHexString()};");
             }
             if (driverId is not null)
             {

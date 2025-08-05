@@ -1,5 +1,4 @@
-﻿using NProtocol.Communication.Extensions;
-using Robot.Communication.Extensions;
+﻿using NProtocol.Extensions;
 
 namespace NProtocol.Protocols.S7.CpuInfo
 {

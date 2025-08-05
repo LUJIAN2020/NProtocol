@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text;
 
-namespace NProtocol.Communication.Exceptions
+namespace NProtocol.Exceptions
 {
     public class LoopTimeoutException : TimeoutException
     {

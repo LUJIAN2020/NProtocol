@@ -1,9 +1,8 @@
-﻿using NProtocol.Communication.Base;
-using NProtocol.Communication.Connectors;
-using NProtocol.Communication.Enums;
-using NProtocol.Communication.Exceptions;
-using NProtocol.Communication.Extensions;
-using Robot.Communication.Extensions;
+﻿using NProtocol.Base;
+using NProtocol.Connectors;
+using NProtocol.Enums;
+using NProtocol.Exceptions;
+using NProtocol.Extensions;
 using System;
 using System.Linq;
 

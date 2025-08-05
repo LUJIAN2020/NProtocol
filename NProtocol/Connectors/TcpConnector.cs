@@ -1,9 +1,9 @@
-﻿using NProtocol.Communication.Extensions;
+﻿using NProtocol.Extensions;
 using System;
 using System.Net;
 using System.Net.Sockets;
 
-namespace NProtocol.Communication.Connectors
+namespace NProtocol.Connectors
 {
     public class TcpConnector : IConnector
     {
@@ -64,7 +64,7 @@ namespace NProtocol.Communication.Connectors
             }
         }
         public bool Connected => client != null && client.Connected;
-        public string DriverId => $"LocalEndPoint:{client.LocalEndPoint},RemoteEndPoint:{client.RemoteEndPoint}";
+        public string DriverId => $"LocalEndPoint:{Local},RemoteEndPoint:{Remote}";
         public int ReadTimeout
         {
             get { return readTimeout; }

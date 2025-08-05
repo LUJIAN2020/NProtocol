@@ -1,7 +1,7 @@
 ﻿using NProtocol.Enums;
 using System;
 
-namespace NProtocol.Communication.Base
+namespace NProtocol.Base
 {
     public interface IDriver : IDisposable
     {

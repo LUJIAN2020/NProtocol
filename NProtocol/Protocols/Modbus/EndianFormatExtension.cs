@@ -1,4 +1,4 @@
-﻿using NProtocol.Communication.Extensions;
+﻿using NProtocol.Extensions;
 using System;
 
 namespace NProtocol.Protocols.Modbus

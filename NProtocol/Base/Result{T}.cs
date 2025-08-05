@@ -1,7 +1,8 @@
-﻿using NProtocol.Communication.Extensions;
+﻿using NProtocol.Extensions;
 using System;
+using System.Text;
 
-namespace NProtocol.Communication.Base
+namespace NProtocol.Base
 {
     public class Result<T> : Result
     {
@@ -12,20 +13,21 @@ namespace NProtocol.Communication.Base
         public T Value { get; }
         public override string ToString()
         {
-            string value = Value?.ToString() ?? string.Empty;
+            var sb = new StringBuilder();
+            sb.AppendLine($"------------ {StartTime:yyyy-MM-dd HH:mm:ss.fff} [Elapsed={Elapsed.TotalMilliseconds}ms] ------------")
+                .AppendLine($"TX-HEX [{SendData.Length}] : {SendDataHexString}")
+                .AppendLine($"RX-HEX [{ReceivedData.Length}] : {ReceivedDataHexString}")
+                .AppendLine($"TX-ASCII : {SendDataAsciiString}")
+                .AppendLine($"RX-ASCII : {ReceivedDataAsciiString}");
             if (Value is Array array)
             {
-                value = array.ToString() ?? string.Empty;
+                sb.AppendLine($"VALUE : {array.ToFlattenString()}");
             }
-            return string.Concat($"SendData[{SendData.Length}]:{SendDataHexString};",
-            $"ReceivedData[{ReceivedData.Length}]:{ReceivedDataHexString};",
-            $"SendDataAscii:{SendDataAsciiString};",
-            $"ReceivedDataAscii:{ReceivedDataAsciiString};",
-            $"Payload[{Payload.Length}]:{Payload.ToHexString()};",
-            $"Value:{value};",
-            $"StartTime:{StartTime:yyyy-MM-dd HH:mm:ss.fff};",
-            $"EndTime:{EndTime:yyyy-MM-dd HH:mm:ss.fff};",
-            $"Elapsed:{Elapsed.TotalMilliseconds}ms;");
+            else
+            {
+                sb.AppendLine($"VALUE : {Value}");
+            }
+            return sb.ToString();
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using NProtocol.Communication.Exceptions;
+﻿using NProtocol.Exceptions;
 using System.Collections.Generic;
 
 namespace NProtocol.Protocols.Fins

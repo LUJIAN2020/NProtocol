@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace NProtocol.Protocols.S7.StructType.S7DateTime
+namespace NProtocol.Protocols.S7.StructType
 {
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, AllowMultiple = false)]
     public sealed class S7DateTimeAttribute : Attribute

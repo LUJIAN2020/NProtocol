@@ -1,5 +1,4 @@
-﻿using NProtocol.Communication.Exceptions;
-using System;
+﻿using NProtocol.Exceptions;
 using System.Collections.Generic;
 using System.Linq;
 

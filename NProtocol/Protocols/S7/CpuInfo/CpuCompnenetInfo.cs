@@ -1,4 +1,4 @@
-﻿using NProtocol.Communication.Extensions;
+﻿using NProtocol.Extensions;
 using System.Text;
 
 namespace NProtocol.Protocols.S7.CpuInfo

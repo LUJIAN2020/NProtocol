@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace NProtocol.Communication.Extensions
+namespace NProtocol.Extensions
 {
     public static class ArrayExtension
     {
@@ -74,14 +74,14 @@ namespace NProtocol.Communication.Extensions
             FlattenArray(array, result);
             return result;
         }
-        public static string ToString(this Array array)
+        public static string ToFlattenString(this Array array)
         {
             var flattened = array.Flatten();
-            var sb = new StringBuilder("[");
+            var sb = new StringBuilder("[ ");
             for (int i = 0; i < flattened.Count; i++)
             {
                 var type = flattened[i].GetType();
-                if (type.Name == "String")
+                if (type.Name == nameof(String) || type.Name == nameof(TimeSpan) || type.Name == nameof(DateTime))
                 {
                     sb.Append($"'{flattened[i]}'");
                 }
@@ -95,7 +95,7 @@ namespace NProtocol.Communication.Extensions
                     sb.Append(", ");
                 }
             }
-            sb.Append("]");
+            sb.Append(" ]");
             return sb.ToString();
         }
         public static IEnumerable<T[]> ChunkBy<T>(this T[] array, int size)

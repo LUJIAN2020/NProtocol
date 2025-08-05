@@ -1,12 +1,11 @@
-﻿using NProtocol.Communication.Connectors;
-using NProtocol.Communication.Enums;
-using NProtocol.Communication.Exceptions;
-using NProtocol.Communication.Extensions;
+﻿using NProtocol.Connectors;
 using NProtocol.Enums;
+using NProtocol.Exceptions;
+using NProtocol.Extensions;
 using System;
 using System.Threading;
 
-namespace NProtocol.Communication.Base
+namespace NProtocol.Base
 {
     public abstract class DriverBase : IDriver
     {

@@ -1,6 +1,5 @@
-﻿using NProtocol.Communication.Extensions;
+﻿using NProtocol.Extensions;
 using NProtocol.Protocols.S7.Enums;
-using Robot.Communication.Extensions;
 using System;
 
 namespace NProtocol.Protocols.S7.Info

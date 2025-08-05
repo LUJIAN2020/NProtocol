@@ -1,9 +1,6 @@
-﻿using NProtocol.Communication.Extensions;
+﻿using NProtocol.Extensions;
 using NProtocol.Protocols.S7.Extensions;
-using NProtocol.Protocols.S7.StructType.S7DateTime;
-using Robot.Communication.Extensions;
 using System;
-using System.IO;
 using System.Linq;
 using System.Reflection;
 

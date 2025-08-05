@@ -3,7 +3,7 @@ using System.Collections;
 using System.Linq;
 using System.Runtime.InteropServices;
 
-namespace Robot.Communication.Extensions
+namespace NProtocol.Extensions
 {
     /// <summary>
     /// BitConverter扩展方法，实现大小端序方法,默认为小端序

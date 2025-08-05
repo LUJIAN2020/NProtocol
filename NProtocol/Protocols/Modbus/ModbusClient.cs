@@ -1,5 +1,5 @@
-﻿using NProtocol.Communication.Connectors;
-using NProtocol.Communication.Enums;
+﻿using NProtocol.Connectors;
+using NProtocol.Enums;
 using System;
 using System.IO.Ports;
 

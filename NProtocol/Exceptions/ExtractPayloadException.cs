@@ -1,7 +1,7 @@
-﻿using NProtocol.Communication.Extensions;
+﻿using NProtocol.Extensions;
 using System;
 
-namespace NProtocol.Communication.Exceptions
+namespace NProtocol.Exceptions
 {
     public class ExtractPayloadException : Exception
     {
@@ -10,7 +10,7 @@ namespace NProtocol.Communication.Exceptions
         public string DeviceId { get; } = string.Empty;
         public ExtractPayloadException(string message) : base(message) { }
         public ExtractPayloadException(string message, byte[] sendData, byte[] receivedData, string driverId)
-            : base($"{message},DriverId:{driverId},[S]:{sendData.ToHexString()},[R]:{receivedData.ToHexString()}")
+            : base($"{message},DriverId:{driverId},[TX]:{sendData.ToHexString()},[RX]:{receivedData.ToHexString()}")
         {
             SendData = sendData;
             ReceivedData = receivedData;

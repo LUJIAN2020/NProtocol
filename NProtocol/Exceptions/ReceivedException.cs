@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace NProtocol.Communication.Exceptions
+namespace NProtocol.Exceptions
 {
     public class ReceivedException : ExecuteException
     {

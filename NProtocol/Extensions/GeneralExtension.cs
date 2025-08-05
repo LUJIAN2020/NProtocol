@@ -1,9 +1,8 @@
-﻿using Robot.Communication.Extensions;
-using System;
+﻿using System;
 using System.Linq;
 using System.Text;
 
-namespace NProtocol.Communication.Extensions
+namespace NProtocol.Extensions
 {
     public static class GeneralExtension
     {

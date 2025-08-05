@@ -1,9 +1,8 @@
-﻿using NProtocol.Communication.Base;
-using NProtocol.Communication.Extensions;
+﻿using NProtocol.Base;
+using NProtocol.Extensions;
 using NProtocol.Protocols.S7.Enums;
 using NProtocol.Protocols.S7.Extensions;
 using NProtocol.Protocols.S7.StructType;
-using Robot.Communication.Extensions;
 using System;
 using System.Linq;
 using System.Text;

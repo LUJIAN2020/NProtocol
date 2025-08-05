@@ -1,15 +1,9 @@
-﻿using NProtocol.Communication.Base;
-using NProtocol.Communication.Connectors;
-using NProtocol.Communication.Enums;
-using NProtocol.Communication.Exceptions;
-using NProtocol.Communication.Extensions;
+﻿using NProtocol.Base;
+using NProtocol.Connectors;
+using NProtocol.Enums;
+using NProtocol.Exceptions;
 using NProtocol.Protocols.S7.Enums;
-using NProtocol.Protocols.S7.Extensions;
-using NProtocol.Protocols.S7.StructType;
-using Robot.Communication.Extensions;
 using System;
-using System.Linq;
-using System.Text;
 
 namespace NProtocol.Protocols.S7
 {
@@ -61,7 +55,7 @@ namespace NProtocol.Protocols.S7
         public TsapPair TsapPair { get; set; }
         public bool IsLittleEndian { get; } = true;
         protected S7Client(EtherNetParameter parameter) : base(parameter, ConnectMode.Tcp) { }
-        public S7Client(string ip, ushort port = 102, CpuType cpuType = CpuType.S71500, byte rack = 0, byte slot = 1) 
+        public S7Client(string ip, ushort port = 102, CpuType cpuType = CpuType.S71500, byte rack = 0, byte slot = 1)
             : this(EtherNetParameter.Create(ip, port), cpuType, rack, slot)
         {
         }

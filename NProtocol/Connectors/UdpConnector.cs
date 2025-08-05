@@ -1,9 +1,9 @@
-﻿using NProtocol.Communication.Extensions;
+﻿using NProtocol.Extensions;
 using System;
 using System.Net;
 using System.Net.Sockets;
 
-namespace NProtocol.Communication.Connectors
+namespace NProtocol.Connectors
 {
     public class UdpConnector : IConnector
     {
