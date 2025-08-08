@@ -1,7 +1,7 @@
-﻿using NProtocol.Extensions;
-using System;
+﻿using System;
 using System.Net;
 using System.Net.Sockets;
+using NProtocol.Extensions;
 
 namespace NProtocol.Connectors
 {
@@ -13,6 +13,7 @@ namespace NProtocol.Connectors
         public EtherNetParameter Parameter { get; set; }
         public EndPoint? Local { get; private set; }
         public EndPoint? Remote { get; private set; }
+
         public UdpConnector(IParameter parameter)
         {
             if (parameter is EtherNetParameter para)
@@ -22,22 +23,26 @@ namespace NProtocol.Connectors
             }
             else
             {
-                throw new Exception("Type error. The parameter type is not the udp network parameter type");
+                throw new Exception(
+                    "Type error. The parameter type is not the udp network parameter type"
+                );
             }
         }
+
         public void Connect()
         {
             client.SendTimeout = WriteTimeout;
             client.ReceiveTimeout = ReadTimeout;
             Remote = new IPEndPoint(IPAddress.Parse(Parameter.IP), Parameter.Port);
         }
-        public void Close()
-        {
-        }
+
+        public void Close() { }
+
         public void Dispose()
         {
             client.SafeClose();
         }
+
         public byte[] Read()
         {
             var buffer = new byte[1024];
@@ -46,6 +51,7 @@ namespace NProtocol.Connectors
             Local = client.LocalEndPoint;
             return buffer.Slice(0, len);
         }
+
         public int Write(byte[] buffer)
         {
             int len = 0;
@@ -64,9 +70,9 @@ namespace NProtocol.Connectors
             Local = client.LocalEndPoint;
             return len;
         }
-        public void DiscardBuffer(int timeout = 100)
-        {
-        }
+
+        public void DiscardBuffer(int timeout = 100) { }
+
         public bool Connected => false;
         public string DriverId => $"LocalEndPoint:{Local},RemoteEndPoint:{Remote}";
         public int ReadTimeout

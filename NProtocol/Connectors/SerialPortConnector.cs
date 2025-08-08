@@ -35,11 +35,11 @@ namespace NProtocol.Connectors
                 }
             }
         }
+
         public SerialPortConnector(IParameter parameter)
         {
             if (parameter is SerialPortParameter para)
             {
-
                 Parameter = para;
                 serialPort.PortName = para.PortName;
                 serialPort.BaudRate = para.BaudRate;
@@ -51,18 +51,24 @@ namespace NProtocol.Connectors
             }
             else
             {
-                throw new ArgumentException("Type error. The parameter type is not the serial port parameter type.", nameof(parameter));
+                throw new ArgumentException(
+                    "Type error. The parameter type is not the serial port parameter type.",
+                    nameof(parameter)
+                );
             }
         }
+
         public void Connect()
         {
-            if (serialPort.IsOpen) return;
+            if (serialPort.IsOpen)
+                return;
             serialPort.WriteTimeout = WriteTimeout;
             serialPort.ReadTimeout = ReadTimeout;
             serialPort.Open();
             serialPort.DiscardInBuffer();
             serialPort.DiscardOutBuffer();
         }
+
         public void Close()
         {
             if (serialPort.IsOpen)
@@ -70,6 +76,7 @@ namespace NProtocol.Connectors
                 serialPort.Close();
             }
         }
+
         public void Dispose()
         {
             if (serialPort.IsOpen)
@@ -78,6 +85,7 @@ namespace NProtocol.Connectors
             }
             serialPort.Dispose();
         }
+
         public byte[] Read()
         {
             Connect();
@@ -86,12 +94,14 @@ namespace NProtocol.Connectors
             int rlen = serialPort.Read(buffer, 0, len);
             return buffer;
         }
+
         public int Write(byte[] buffer)
         {
             Connect();
             serialPort.Write(buffer, 0, buffer.Length);
             return buffer.Length;
         }
+
         public void DiscardBuffer(int timeout = 100)
         {
             serialPort.DiscardInBuffer();

@@ -58,7 +58,11 @@ namespace NProtocol.Extensions
                 hexString = hexString.Replace(separator, "");
 
             if (hexString.Length % 2 > 0)
-                throw new ArgumentOutOfRangeException(nameof(hexString.Length), hexString.Length, "The string length must be a multiple of 2");
+                throw new ArgumentOutOfRangeException(
+                    nameof(hexString.Length),
+                    hexString.Length,
+                    "The string length must be a multiple of 2"
+                );
 
             var buffer = new byte[hexString.Length / 2];
             for (int i = 0; i < hexString.Length; i += 2)
@@ -90,12 +94,20 @@ namespace NProtocol.Extensions
         /// <param name="separator">separator</param>
         /// <param name="isLittleEndian">LittleEndian</param>
         /// <returns></returns>
-        public static ushort ToUInt16FromHexString(this string hexString, string separator = " ", bool isLittleEndian = true)
+        public static ushort ToUInt16FromHexString(
+            this string hexString,
+            string separator = " ",
+            bool isLittleEndian = true
+        )
         {
             var buffer = hexString.ToBytesFromHexString(separator);
 
             if (buffer.Length > 2)
-                throw new ArgumentOutOfRangeException(nameof(hexString), buffer.Length, "The hex string length is incorrect");
+                throw new ArgumentOutOfRangeException(
+                    nameof(hexString),
+                    buffer.Length,
+                    "The hex string length is incorrect"
+                );
 
             if (buffer.Length < 2)
             {
@@ -107,7 +119,6 @@ namespace NProtocol.Extensions
                 return array.ToUInt16(isLittleEndian);
             }
             return buffer.ToUInt16(isLittleEndian);
-
         }
 
         /// <summary>
@@ -118,12 +129,20 @@ namespace NProtocol.Extensions
         /// <param name="separator">separator</param>
         /// <param name="isLittleEndian">LittleEndian</param>
         /// <returns></returns>
-        public static uint ToUInt32FromHexString(this string hexString, string separator = " ", bool isLittleEndian = true)
+        public static uint ToUInt32FromHexString(
+            this string hexString,
+            string separator = " ",
+            bool isLittleEndian = true
+        )
         {
             var buffer = hexString.ToBytesFromHexString(separator);
 
             if (buffer.Length > 4)
-                throw new ArgumentOutOfRangeException(nameof(hexString), buffer.Length, "The hex string length is incorrect");
+                throw new ArgumentOutOfRangeException(
+                    nameof(hexString),
+                    buffer.Length,
+                    "The hex string length is incorrect"
+                );
 
             if (buffer.Length < 4)
             {
@@ -178,7 +197,11 @@ namespace NProtocol.Extensions
         /// <param name="separator">separator</param>
         /// <param name="isFilterChinese">Whether to filter Chinese characters; true=filter; false=do not filter</param>
         /// <returns></returns>
-        public static string ToAsciiString(this string content, string separator = " ", bool isFilterChinese = true)
+        public static string ToAsciiString(
+            this string content,
+            string separator = " ",
+            bool isFilterChinese = true
+        )
         {
             string text = isFilterChinese ? FilterChinese(content) : ConvertChinese(content);
             return Encoding.ASCII.GetBytes(text).ToHexString(separator);
@@ -190,7 +213,10 @@ namespace NProtocol.Extensions
         /// <param name="asciiString">ASCII string</param>
         /// <param name="separator">separator</param>
         /// <returns></returns>
-        public static string ToContentFromAsciiString(this string asciiString, string separator = " ")
+        public static string ToContentFromAsciiString(
+            this string asciiString,
+            string separator = " "
+        )
         {
             var buffer = asciiString.ToBytesFromHexString(separator);
             return Encoding.ASCII.GetString(buffer);

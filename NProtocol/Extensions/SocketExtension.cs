@@ -31,6 +31,7 @@ namespace NProtocol.Extensions
                 catch { }
             }
         }
+
         /// <summary>
         /// Discard and return the data cache
         /// </summary>

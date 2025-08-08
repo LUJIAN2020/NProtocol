@@ -1,7 +1,7 @@
-﻿using NProtocol.Exceptions;
-using NProtocol.Extensions;
-using System;
+﻿using System;
 using System.Linq;
+using NProtocol.Exceptions;
+using NProtocol.Extensions;
 
 namespace NProtocol.Protocols.Mc
 {
@@ -10,11 +10,17 @@ namespace NProtocol.Protocols.Mc
         public McAddress1E(string address)
         {
             Address = address;
-            ParseMcAddress(address, out PlcMemory1E memory, out uint startAddress, out bool isOctAddress);
+            ParseMcAddress(
+                address,
+                out PlcMemory1E memory,
+                out uint startAddress,
+                out bool isOctAddress
+            );
             Memory = memory;
             StartAddress = startAddress;
             IsOctAddress = isOctAddress;
         }
+
         public McAddress1E(PlcMemory1E memory, uint startAddress)
         {
             Memory = memory;
@@ -22,14 +28,25 @@ namespace NProtocol.Protocols.Mc
             IsOctAddress = HasOctAddress(memory);
             Address = this.ToString();
         }
+
         public string Address { get; }
         public PlcMemory1E Memory { get; }
         public bool IsOctAddress { get; }
         public uint StartAddress { get; }
-        public static void ParseMcAddress(string address, out PlcMemory1E memory, out uint startAddress, out bool isOctAddress)
+
+        public static void ParseMcAddress(
+            string address,
+            out PlcMemory1E memory,
+            out uint startAddress,
+            out bool isOctAddress
+        )
         {
             if (address.Length < 2)
-                throw new ArgumentOutOfRangeException(nameof(address.Length), address.Length, "The length of the address format is incorrect");
+                throw new ArgumentOutOfRangeException(
+                    nameof(address.Length),
+                    address.Length,
+                    "The length of the address format is incorrect"
+                );
 
             var addr = address.ToUpper();
             int index = 0;
@@ -57,7 +74,14 @@ namespace NProtocol.Protocols.Mc
 
             Parse(addr, index, out memory, out startAddress, out isOctAddress);
         }
-        private static void Parse(string address, int index, out PlcMemory1E memory, out uint startAddress, out bool isOctAddress)
+
+        private static void Parse(
+            string address,
+            int index,
+            out PlcMemory1E memory,
+            out uint startAddress,
+            out bool isOctAddress
+        )
         {
             string memoryStr = address.Substring(0, index);
             string valueStr = address.Substring(index);
@@ -65,10 +89,12 @@ namespace NProtocol.Protocols.Mc
             isOctAddress = HasOctAddress(memory);
             startAddress = ConvertStartAddress(isOctAddress, valueStr);
         }
+
         public static bool HasOctAddress(PlcMemory1E memory)
         {
             return memory == PlcMemory1E.X || memory == PlcMemory1E.Y;
         }
+
         public static uint ConvertStartAddress(bool isOctAddress, string value)
         {
             if (isOctAddress)
@@ -84,6 +110,7 @@ namespace NProtocol.Protocols.Mc
                 return Convert.ToUInt32(value);
             }
         }
+
         public override string ToString()
         {
             int totalWidth = PadLeftTotalWidth(Memory);
@@ -91,20 +118,23 @@ namespace NProtocol.Protocols.Mc
                 ? BitConverter.GetBytes(StartAddress).Reverse().ToArray().ToOctString("")
                 : StartAddress.ToString();
 
-            string val = valueStr.Length > totalWidth
-                ? valueStr.Remove(0, valueStr.Length - totalWidth)
-                : valueStr.PadLeft(totalWidth, '0');
+            string val =
+                valueStr.Length > totalWidth
+                    ? valueStr.Remove(0, valueStr.Length - totalWidth)
+                    : valueStr.PadLeft(totalWidth, '0');
 
             return $"{Memory}{val}";
         }
-        private int PadLeftTotalWidth(PlcMemory1E memory) => memory switch
-        {
-            PlcMemory1E.X or PlcMemory1E.Y => 3,
-            PlcMemory1E.M or PlcMemory1E.S => 4,
-            PlcMemory1E.TS or PlcMemory1E.CS or PlcMemory1E.TN or PlcMemory1E.CN => 3,
-            PlcMemory1E.D => 4,
-            PlcMemory1E.R => 5,
-            _ => 6,
-        };
+
+        private int PadLeftTotalWidth(PlcMemory1E memory) =>
+            memory switch
+            {
+                PlcMemory1E.X or PlcMemory1E.Y => 3,
+                PlcMemory1E.M or PlcMemory1E.S => 4,
+                PlcMemory1E.TS or PlcMemory1E.CS or PlcMemory1E.TN or PlcMemory1E.CN => 3,
+                PlcMemory1E.D => 4,
+                PlcMemory1E.R => 5,
+                _ => 6,
+            };
     }
 }

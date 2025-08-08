@@ -1,5 +1,5 @@
-﻿using NProtocol.Enums;
-using System;
+﻿using System;
+using NProtocol.Enums;
 
 namespace NProtocol.Base
 {

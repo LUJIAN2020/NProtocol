@@ -1,9 +1,9 @@
-﻿using NProtocol.Base;
-using NProtocol.Extensions;
-using NProtocol.Protocols.S7.Enums;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using NProtocol.Base;
+using NProtocol.Extensions;
+using NProtocol.Protocols.S7.Enums;
 
 namespace NProtocol.Protocols.S7
 {
@@ -21,14 +21,23 @@ namespace NProtocol.Protocols.S7
             var cotp = CreateCotpFuctionPacket(CotpPduType.Data);
             var s7Comm = Array.Empty<byte>();
             if (isRead)
-                s7Comm = CreateMultipleS7CommPacket(S7CommPduType.Job, S7CommFuncCode.ReadVar, items);
+                s7Comm = CreateMultipleS7CommPacket(
+                    S7CommPduType.Job,
+                    S7CommFuncCode.ReadVar,
+                    items
+                );
             else
-                s7Comm = CreateMultipleS7CommPacket(S7CommPduType.Job, S7CommFuncCode.WriteVar, items);
+                s7Comm = CreateMultipleS7CommPacket(
+                    S7CommPduType.Job,
+                    S7CommFuncCode.WriteVar,
+                    items
+                );
             byte[] len = ((ushort)(tpkt.Length + cotp.Length + s7Comm.Length)).ToBytes();
             tpkt[2] = len[1];
             tpkt[3] = len[0];
             return tpkt.Combine(cotp, s7Comm);
         }
+
         /// <summary>
         /// 创建多个S7comm数据包
         /// </summary>
@@ -36,7 +45,11 @@ namespace NProtocol.Protocols.S7
         /// <param name="s7CommFuncCode"></param>
         /// <param name="items"></param>
         /// <returns></returns>
-        private byte[] CreateMultipleS7CommPacket(S7CommPduType s7CommPduType, S7CommFuncCode s7CommFuncCode, IEnumerable<MultipleItem> items)
+        private byte[] CreateMultipleS7CommPacket(
+            S7CommPduType s7CommPduType,
+            S7CommFuncCode s7CommFuncCode,
+            IEnumerable<MultipleItem> items
+        )
         {
             var header = CreateS7CommHeaderPacket(s7CommPduType);
             var parameter = CreateMultipleS7CommParameterPacket(s7CommFuncCode, items);
@@ -56,6 +69,7 @@ namespace NProtocol.Protocols.S7
                 return header.Combine(parameter);
             }
         }
+
         /// <summary>
         /// 创建多个S7comm参数数据包
         /// </summary>
@@ -63,13 +77,19 @@ namespace NProtocol.Protocols.S7
         /// <param name="items"></param>
         /// <returns></returns>
         /// <exception cref="NotSupportedException"></exception>
-        private byte[] CreateMultipleS7CommParameterPacket(S7CommFuncCode s7CommFuncCode, IEnumerable<MultipleItem> items)
+        private byte[] CreateMultipleS7CommParameterPacket(
+            S7CommFuncCode s7CommFuncCode,
+            IEnumerable<MultipleItem> items
+        )
         {
-            if (s7CommFuncCode != S7CommFuncCode.ReadVar && s7CommFuncCode != S7CommFuncCode.WriteVar)
+            if (
+                s7CommFuncCode != S7CommFuncCode.ReadVar
+                && s7CommFuncCode != S7CommFuncCode.WriteVar
+            )
                 throw new NotSupportedException($"功能码暂时不支持,{s7CommFuncCode}.");
             int itemCount = items.Count();
             var buffer = new byte[12 * itemCount + 2];
-            buffer[0] = (byte)s7CommFuncCode;//作业请求（Job）和确认数据响应（Ack_Data）
+            buffer[0] = (byte)s7CommFuncCode; //作业请求（Job）和确认数据响应（Ack_Data）
             buffer[1] = (byte)itemCount;
             int no = 0;
             foreach (var item in items)
@@ -91,12 +111,20 @@ namespace NProtocol.Protocols.S7
                         varType = S7VarType.Counter;
                     }
                 }
-                var itemPacket = CreateParameterItemPacket(varType, item.MemoryAreaType, db, item.StartAddress, item.BitAddress, item.Count);
+                var itemPacket = CreateParameterItemPacket(
+                    varType,
+                    item.MemoryAreaType,
+                    db,
+                    item.StartAddress,
+                    item.BitAddress,
+                    item.Count
+                );
                 Buffer.BlockCopy(itemPacket, 0, buffer, 2 + (12 * no), itemPacket.Length);
                 no++;
             }
             return buffer;
         }
+
         /// <summary>
         /// 创建多个S7comm负载数据包
         /// </summary>
@@ -124,6 +152,7 @@ namespace NProtocol.Protocols.S7
             }
             return buffer;
         }
+
         /// <summary>
         /// 多个连续地址读
         /// </summary>
@@ -173,6 +202,7 @@ namespace NProtocol.Protocols.S7
                 return result.ToResult(items);
             });
         }
+
         /// <summary>
         /// 多个连续地址写
         /// </summary>
@@ -198,6 +228,7 @@ namespace NProtocol.Protocols.S7
                 return result.ToResult(items);
             });
         }
+
         /// <summary>
         /// 验证写入数据参数项
         /// </summary>
@@ -205,12 +236,19 @@ namespace NProtocol.Protocols.S7
         /// <param name="isWrite"></param>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
         /// <exception cref="ArgumentNullException"></exception>
-        private void ValidateWriteMultipleItems(IEnumerable<MultipleItem> items, bool isWrite = false)
+        private void ValidateWriteMultipleItems(
+            IEnumerable<MultipleItem> items,
+            bool isWrite = false
+        )
         {
             EnqueueExecute(() =>
             {
                 if (items.Count() > 20)
-                    throw new ArgumentOutOfRangeException(nameof(items), items.Count(), "参数项最多不能超过20个");
+                    throw new ArgumentOutOfRangeException(
+                        nameof(items),
+                        items.Count(),
+                        "参数项最多不能超过20个"
+                    );
                 if (isWrite)
                 {
                     foreach (var item in items)
@@ -227,7 +265,8 @@ namespace NProtocol.Protocols.S7
                                     throw new ArgumentOutOfRangeException(
                                         nameof(item.WriteData.Length),
                                         item.WriteData.Length,
-                                        "数据长度必须=1");
+                                        "数据长度必须=1"
+                                    );
                                 break;
                             case S7MemoryAreaType.S7Counter:
                             case S7MemoryAreaType.S7Timer:
@@ -235,7 +274,8 @@ namespace NProtocol.Protocols.S7
                                     throw new ArgumentOutOfRangeException(
                                         nameof(item.WriteData.Length),
                                         item.WriteData.Length,
-                                        "数据长度必须=2");
+                                        "数据长度必须=2"
+                                    );
                                 break;
                             default:
                                 break;
@@ -244,7 +284,8 @@ namespace NProtocol.Protocols.S7
                             throw new ArgumentOutOfRangeException(
                                 nameof(item.WriteData.Length),
                                 item.WriteData.Length,
-                                "写入数据长度必须为偶数");
+                                "写入数据长度必须为偶数"
+                            );
                     }
                 }
             });

@@ -5,7 +5,6 @@
     /// </summary>
     public enum S7CommPduType : byte
     {
-
         /// <summary>
         /// 作业请求，如，读/写存储器，读/写块，启动/停止设备，设置通信 PduType_request
         /// </summary>

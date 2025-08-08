@@ -9,9 +9,10 @@
         /// fins over tcp
         /// </summary>
         FinsTcp = 0,
+
         /// <summary>
         /// fins over udp
         /// </summary>
-        FinsUdp = 1
+        FinsUdp = 1,
     }
 }

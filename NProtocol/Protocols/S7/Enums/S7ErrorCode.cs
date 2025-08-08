@@ -49,6 +49,5 @@
         /// Error on write data
         /// </summary>
         WriteData = 0x32,
-
     }
 }

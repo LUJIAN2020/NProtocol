@@ -6,6 +6,7 @@
         /// Int16,UInt16
         /// </summary>
         AB,
+
         /// <summary>
         /// Int32,UInt32,Float
         /// </summary>
@@ -13,6 +14,7 @@
         CDAB,
         BADC,
         DCBA,
+
         /// <summary>
         /// Int64,UInt64,Double
         /// </summary>

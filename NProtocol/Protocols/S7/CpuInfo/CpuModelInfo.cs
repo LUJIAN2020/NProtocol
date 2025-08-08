@@ -1,5 +1,5 @@
-﻿using NProtocol.Extensions;
-using System.Text;
+﻿using System.Text;
+using NProtocol.Extensions;
 
 namespace NProtocol.Protocols.S7.CpuInfo
 {
@@ -15,23 +15,28 @@ namespace NProtocol.Protocols.S7.CpuInfo
             Firmware = new Model(buffer.Slice(2 * 28, 28), encoding, isLittleEndian);
             FirmwareExtension = new Model(buffer.Slice(3 * 28, 28), encoding, isLittleEndian);
         }
+
         /// <summary>
         /// 模块信息
         /// </summary>
         public Model Model { get; private set; }
+
         /// <summary>
         /// 硬件信息
         /// </summary>
         public Model Hardware { get; private set; }
+
         /// <summary>
         /// 版本信息
         /// </summary>
         public Model Firmware { get; private set; }
+
         /// <summary>
         /// 扩展版本信息
         /// </summary>
         public Model FirmwareExtension { get; private set; }
     }
+
     /// <summary>
     /// 模块信息
     /// </summary>
@@ -45,22 +50,27 @@ namespace NProtocol.Protocols.S7.CpuInfo
             Version = buffer.Slice(24, 2).ToUInt16(isLittleEndian);
             Release = buffer.Slice(26, 2).ToUInt16(isLittleEndian);
         }
+
         /// <summary>
         /// Index: Identification of the module (0x0001)
         /// </summary>
         public ushort Identification { get; private set; }
+
         /// <summary>
-        /// MlfB (Order number of the module): 6ES7 517-3UP00-0AB0 
+        /// MlfB (Order number of the module): 6ES7 517-3UP00-0AB0
         /// </summary>
         public string OrderNumber { get; private set; }
+
         /// <summary>
         /// BGTyp (Module type ID): 0x0000
         /// </summary>
         public ushort TypeId { get; private set; }
+
         /// <summary>
         /// Version of the module or release of the operating system
         /// </summary>
         public ushort Version { get; private set; }
+
         /// <summary>
         /// Release of the PG description file
         /// </summary>

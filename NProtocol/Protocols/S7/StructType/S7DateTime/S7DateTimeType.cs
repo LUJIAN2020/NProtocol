@@ -9,13 +9,15 @@
         /// 2 byte yyyy-MM-dd
         /// </summary>
         Date,
+
         /// <summary>
         /// 8 byte yyyy-MM-dd HH:mm:ss
         /// </summary>
         DateAndTime,
+
         /// <summary>
         /// 12 byte yyyy-MM-DD HH:mm:ss.ffffff
         /// </summary>
-        DTL
+        DTL,
     }
 }

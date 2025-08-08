@@ -10,10 +10,12 @@ namespace NProtocol.Protocols.S7.StructType
             Type = type;
             ReservedLength = reservedLength;
         }
+
         public S7StringType Type { get; }
         public byte ReservedLength { get; }
-        public byte ReservedLengthInBytes => Type == S7StringType.S7String
-            ? (byte)(ReservedLength + 2)
-            : (byte)(ReservedLength * 2 + 4);
+        public byte ReservedLengthInBytes =>
+            Type == S7StringType.S7String
+                ? (byte)(ReservedLength + 2)
+                : (byte)(ReservedLength * 2 + 4);
     }
 }

@@ -34,6 +34,5 @@
         /// 计时器T 读/写 可操作数据类型：int32/uint32/float
         /// </summary>
         S7Timer = 0x1D,
-
     }
 }

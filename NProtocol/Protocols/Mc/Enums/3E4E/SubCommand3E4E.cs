@@ -9,6 +9,7 @@
         /// 字为单位操作
         /// </summary>
         Word = 0x0000,
+
         /// <summary>
         /// 位为单位操作
         /// </summary>

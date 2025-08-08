@@ -4,6 +4,6 @@
     {
         SerialPort,
         Tcp,
-        Udp
+        Udp,
     }
 }

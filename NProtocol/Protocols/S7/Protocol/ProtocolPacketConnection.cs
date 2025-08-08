@@ -1,7 +1,7 @@
-﻿using NProtocol.Base;
+﻿using System.ComponentModel;
+using NProtocol.Base;
 using NProtocol.Extensions;
 using NProtocol.Protocols.S7.Enums;
-using System.ComponentModel;
 
 namespace NProtocol.Protocols.S7
 {
@@ -18,6 +18,7 @@ namespace NProtocol.Protocols.S7
             ConnectionRequest();
             ConnectionSetup();
         }
+
         /// <summary>
         /// 连接请求
         /// </summary>
@@ -38,6 +39,7 @@ namespace NProtocol.Protocols.S7
                 return NoLockExecute(sendData);
             });
         }
+
         /// <summary>
         /// 连接设置
         /// </summary>
@@ -64,6 +66,7 @@ namespace NProtocol.Protocols.S7
                 return NoLockExecute(sendData);
             });
         }
+
         /// <summary>
         /// 获取连接请求包
         /// </summary>
@@ -77,6 +80,7 @@ namespace NProtocol.Protocols.S7
             tpkt[3] = len[0];
             return tpkt.Combine(cotp);
         }
+
         /// <summary>
         /// 获取S7协议连接设置报文
         /// </summary>

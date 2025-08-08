@@ -46,7 +46,11 @@ namespace NProtocol.Extensions
         public static byte[] ToCrc(this byte[] data)
         {
             if (data.Length == 0)
-                throw new ArgumentOutOfRangeException(nameof(data.Length), data.Length, "The array length must be > 0");
+                throw new ArgumentOutOfRangeException(
+                    nameof(data.Length),
+                    data.Length,
+                    "The array length must be > 0"
+                );
 
             ushort num = ushort.MaxValue;
             foreach (byte b in data)
@@ -67,7 +71,11 @@ namespace NProtocol.Extensions
         public static byte ToLrc(this byte[] data)
         {
             if (data.Length == 0)
-                throw new ArgumentOutOfRangeException(nameof(data.Length), data.Length, "The array length must be > 0");
+                throw new ArgumentOutOfRangeException(
+                    nameof(data.Length),
+                    data.Length,
+                    "The array length must be > 0"
+                );
 
             byte b = 0;
             foreach (byte b2 in data)
@@ -86,7 +94,11 @@ namespace NProtocol.Extensions
         public static string ToBcc(this byte[] data)
         {
             if (data.Length == 0)
-                throw new ArgumentOutOfRangeException(nameof(data.Length), data.Length, "The array length must be > 0");
+                throw new ArgumentOutOfRangeException(
+                    nameof(data.Length),
+                    data.Length,
+                    "The array length must be > 0"
+                );
 
             byte[] bcc = new byte[1];
             for (int i = 0; i < data.Length; i++)
@@ -105,7 +117,11 @@ namespace NProtocol.Extensions
         public static byte ToCs(this byte[] data)
         {
             if (data.Length == 0)
-                throw new ArgumentOutOfRangeException(nameof(data.Length), data.Length, "The array length must be > 0");
+                throw new ArgumentOutOfRangeException(
+                    nameof(data.Length),
+                    data.Length,
+                    "The array length must be > 0"
+                );
 
             byte cs = 0;
             for (int i = 0; i < data.Length; i++)
@@ -130,7 +146,6 @@ namespace NProtocol.Extensions
             return (byte)num;
         }
 
-
         /// <summary>
         /// Checksum and inversion
         /// </summary>
@@ -149,7 +164,11 @@ namespace NProtocol.Extensions
         public static ushort ToBcd16FromDecimal(this ushort value)
         {
             if (value > 0x9999)
-                throw new ArgumentOutOfRangeException(nameof(value), value, "Decimal range of 0-39321");
+                throw new ArgumentOutOfRangeException(
+                    nameof(value),
+                    value,
+                    "Decimal range of 0-39321"
+                );
 
             const short F = 0x000F;
             int bcd = 0;

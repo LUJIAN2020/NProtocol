@@ -1,9 +1,9 @@
-﻿using NProtocol.Connectors;
+﻿using System;
+using System.Threading;
+using NProtocol.Connectors;
 using NProtocol.Enums;
 using NProtocol.Exceptions;
 using NProtocol.Extensions;
-using System;
-using System.Threading;
 
 namespace NProtocol.Base
 {
@@ -13,30 +13,37 @@ namespace NProtocol.Base
         private int writeTimeout = 1000;
         private readonly object _lock = new();
         private readonly IConnector connecter;
+
         /// <summary>
         /// Records read/write raw message data, performance loss, do not enable if not necessary
         /// </summary>
         public event Action<string, RW, byte[]>? LogReadWriteRaw;
+
         public DriverBase(IParameter parameter, ConnectMode mode)
         {
             connecter = CreateConnector(parameter, mode);
             Parameter = parameter;
             ConnectMode = mode;
         }
+
         public IParameter Parameter { get; }
         public ConnectMode ConnectMode { get; }
-        private IConnector CreateConnector(IParameter parameter, ConnectMode mode) => mode switch
-        {
-            ConnectMode.SerialPort => new SerialPortConnector(parameter),
-            ConnectMode.Tcp => new TcpConnector(parameter),
-            ConnectMode.Udp => new UdpConnector(parameter),
-            _ => throw new ArgumentException($"Unsupported connection types `{mode}`"),
-        };
+
+        private IConnector CreateConnector(IParameter parameter, ConnectMode mode) =>
+            mode switch
+            {
+                ConnectMode.SerialPort => new SerialPortConnector(parameter),
+                ConnectMode.Tcp => new TcpConnector(parameter),
+                ConnectMode.Udp => new UdpConnector(parameter),
+                _ => throw new ArgumentException($"Unsupported connection types `{mode}`"),
+            };
+
         /// <summary>
         /// The size of the data cache received
         /// </summary>
         public int ReceivedBufferSize { get; set; } = 1024 * 1024;
         public bool Connected => connecter.Connected;
+
         /// <summary>
         /// Drive ID
         /// Serial port communication is usually a serial port name
@@ -67,6 +74,7 @@ namespace NProtocol.Base
                 }
             }
         }
+
         /// <summary>
         /// Extract payload data and return the read data by default. If you need to extract payload data, rewrite this method
         /// This method can also be used for data verification, such as CRC verification, by returning null to indicate that the data verification fails
@@ -75,6 +83,7 @@ namespace NProtocol.Base
         /// <param name="readData">Read data</param>
         /// <returns></returns>
         protected abstract byte[]? ExtractPayload(byte[] writeData, byte[] readData);
+
         /// <summary>
         /// Join the team and execute
         /// </summary>
@@ -86,6 +95,7 @@ namespace NProtocol.Base
                 action.Invoke();
             }
         }
+
         /// <summary>
         /// Join the team and execute
         /// </summary>
@@ -99,6 +109,7 @@ namespace NProtocol.Base
                 return func.Invoke();
             }
         }
+
         /// <summary>
         /// The command is not locked
         /// </summary>
@@ -107,10 +118,7 @@ namespace NProtocol.Base
         /// <exception cref="Exception"></exception>
         protected Result NoLockExecute(byte[] writeData)
         {
-            var result = new Result()
-            {
-                SendData = writeData,
-            };
+            var result = new Result() { SendData = writeData };
             Write(writeData);
             int offset = 0;
             var data = new byte[ReceivedBufferSize];
@@ -138,6 +146,7 @@ namespace NProtocol.Base
                 ThrowLoopTimeoutException(result.StartTime);
             }
         }
+
         /// <summary>
         /// An exception is thrown for timeout
         /// </summary>
@@ -151,6 +160,7 @@ namespace NProtocol.Base
                 throw new LoopTimeoutException("Loop read data timed out.", DriverId);
             }
         }
+
         /// <summary>
         /// Execute an unconditional command not locked
         /// </summary>
@@ -158,38 +168,40 @@ namespace NProtocol.Base
         /// <returns></returns>
         protected Result NoLockExecuteNoResponse(byte[] writeData)
         {
-            var result = new Result
-            {
-                SendData = writeData,
-                StartTime = DateTime.Now
-            };
+            var result = new Result { SendData = writeData, StartTime = DateTime.Now };
             connecter.Write(writeData);
             result.EndTime = DateTime.Now;
             return result;
         }
+
         public void Connect()
         {
             connecter.Connect();
         }
+
         public void Close()
         {
             connecter.Close();
         }
+
         public void Dispose()
         {
             connecter.Dispose();
         }
+
         public int Write(byte[] writeData)
         {
             LogReadWriteRaw?.Invoke(DriverId, RW.W, writeData);
             return connecter.Write(writeData);
         }
+
         public byte[] Read()
         {
             var buffer = connecter.Read();
             LogReadWriteRaw?.Invoke(DriverId, RW.R, buffer);
             return buffer;
         }
+
         public void DiscardBuffer(int timeout = 100)
         {
             connecter.DiscardBuffer(timeout);

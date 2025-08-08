@@ -1,6 +1,6 @@
-﻿using NProtocol.Extensions;
-using System;
+﻿using System;
 using System.Text;
+using NProtocol.Extensions;
 
 namespace NProtocol.Base
 {
@@ -10,11 +10,15 @@ namespace NProtocol.Base
         {
             Value = value;
         }
+
         public T Value { get; }
+
         public override string ToString()
         {
             var sb = new StringBuilder();
-            sb.AppendLine($"------------ {StartTime:yyyy-MM-dd HH:mm:ss.fff} [Elapsed={Elapsed.TotalMilliseconds}ms] ------------")
+            sb.AppendLine(
+                    $"------------ {StartTime:yyyy-MM-dd HH:mm:ss.fff} [Elapsed={Elapsed.TotalMilliseconds}ms] ------------"
+                )
                 .AppendLine($"TX-HEX [{SendData.Length}] : {SendDataHexString}")
                 .AppendLine($"RX-HEX [{ReceivedData.Length}] : {ReceivedDataHexString}")
                 .AppendLine($"TX-ASCII : {SendDataAsciiString}")

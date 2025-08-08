@@ -1,5 +1,5 @@
-﻿using NProtocol.Extensions;
-using System.Text;
+﻿using System.Text;
+using NProtocol.Extensions;
 
 namespace NProtocol.Protocols.S7.CpuInfo
 {
@@ -19,12 +19,14 @@ namespace NProtocol.Protocols.S7.CpuInfo
             OemId = GetString(encoding, buffer, ref startIndex);
             LocationDesignation = GetString(encoding, buffer, ref startIndex);
         }
+
         private string GetString(Encoding encoding, byte[] buffer, ref int start)
         {
             string msg = encoding.GetString(buffer.Slice(start += 2, 32)).Replace("\0", "").Trim();
             start += 32;
             return msg;
         }
+
         public string AutomationSystemName { get; private set; }
         public string ModuleName { get; private set; }
         public string ModulePlantIdentification { get; private set; }

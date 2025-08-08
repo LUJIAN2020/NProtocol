@@ -16,22 +16,27 @@ namespace NProtocol.Protocols.S7.CpuInfo
             MaximumCommunicationBusRate = buffer.Slice(startIndex += 4, 4).ToUInt32(isLittleEndian);
             Reserved = buffer.Slice(startIndex += 4);
         }
+
         /// <summary>
         /// 最大Pdu长度 单位：byte
         /// </summary>
         public ushort MaximumPduSize { get; private set; }
+
         /// <summary>
         /// 最大连接数
         /// </summary>
         public ushort MaximumActiveConnections { get; private set; }
+
         /// <summary>
         /// 最大MPI传输速率 单位：bps
         /// </summary>
         public uint MaximumMpiRate { get; private set; }
+
         /// <summary>
         /// 最大通讯总线速率 单位：bps
         /// </summary>
         public uint MaximumCommunicationBusRate { get; private set; }
+
         /// <summary>
         /// 保留
         /// </summary>

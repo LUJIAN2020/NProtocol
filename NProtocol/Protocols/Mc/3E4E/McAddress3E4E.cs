@@ -1,7 +1,7 @@
-﻿using NProtocol.Exceptions;
-using NProtocol.Extensions;
-using System;
+﻿using System;
 using System.Linq;
+using NProtocol.Exceptions;
+using NProtocol.Extensions;
 
 namespace NProtocol.Protocols.Mc
 {
@@ -10,11 +10,17 @@ namespace NProtocol.Protocols.Mc
         public McAddress3E4E(string address)
         {
             Address = address;
-            ParseMcAddress(address, out PlcMemory3E4E memory, out uint startAddress, out bool isHexAddress);
+            ParseMcAddress(
+                address,
+                out PlcMemory3E4E memory,
+                out uint startAddress,
+                out bool isHexAddress
+            );
             Memory = memory;
             StartAddress = startAddress;
             IsHexAddress = isHexAddress;
         }
+
         public McAddress3E4E(PlcMemory3E4E memory, uint startAddress)
         {
             Memory = memory;
@@ -22,14 +28,25 @@ namespace NProtocol.Protocols.Mc
             IsHexAddress = HasHexAddress(memory);
             Address = this.ToString();
         }
+
         public string Address { get; }
         public PlcMemory3E4E Memory { get; }
         public bool IsHexAddress { get; }
         public uint StartAddress { get; }
-        public static void ParseMcAddress(string address, out PlcMemory3E4E memory, out uint startAddress, out bool isHexAddress)
+
+        public static void ParseMcAddress(
+            string address,
+            out PlcMemory3E4E memory,
+            out uint startAddress,
+            out bool isHexAddress
+        )
         {
             if (address.Length < 2)
-                throw new ArgumentOutOfRangeException(nameof(address.Length), address.Length, "The length of the address format is incorrect");
+                throw new ArgumentOutOfRangeException(
+                    nameof(address.Length),
+                    address.Length,
+                    "The length of the address format is incorrect"
+                );
 
             var addr = address.ToUpper();
             int index;
@@ -44,69 +61,75 @@ namespace NProtocol.Protocols.Mc
                 case 'V':
                 case 'W':
                 case 'R':
-                    {
-                        index = 1;
-                        break;
-                    }
+                {
+                    index = 1;
+                    break;
+                }
                 case 'S':
+                {
+                    index = addr[1] switch
                     {
-                        index = addr[1] switch
-                        {
-                            //SB SM SC SN SD SW
-                            'B' or 'M' or 'C' or 'N' or 'D' or 'W' => 2,
-                            //STS
-                            'T' => 3,
-                            //S
-                            _ => 1,
-                        };
-                        break;
-                    }
+                        //SB SM SC SN SD SW
+                        'B' or 'M' or 'C' or 'N' or 'D' or 'W' => 2,
+                        //STS
+                        'T' => 3,
+                        //S
+                        _ => 1,
+                    };
+                    break;
+                }
                 case 'D':
+                {
+                    index = addr[1] switch
                     {
-                        index = addr[1] switch
-                        {
-
-                            'X' or 'Y' => 2,//DX DY
-                            _ => 1,//D
-                        };
-                        break;
-                    }
+                        'X' or 'Y' => 2, //DX DY
+                        _ => 1, //D
+                    };
+                    break;
+                }
                 case 'Z':
+                {
+                    index = addr[1] switch
                     {
-                        index = addr[1] switch
-                        {
-                            'R' => 2,//ZR
-                            _ => 1,//R
-                        };
-                        break;
-                    }
+                        'R' => 2, //ZR
+                        _ => 1, //R
+                    };
+                    break;
+                }
                 case 'T':
+                {
+                    index = addr[1] switch
                     {
-                        index = addr[1] switch
-                        {
-                            //TS TC TN
-                            'S' or 'C' or 'N' => 2,
-                            _ => throw new AddressParseException("Address format error", address),
-                        };
-                        break;
-                    }
+                        //TS TC TN
+                        'S' or 'C' or 'N' => 2,
+                        _ => throw new AddressParseException("Address format error", address),
+                    };
+                    break;
+                }
                 case 'C':
+                {
+                    index = addr[1] switch
                     {
-                        index = addr[1] switch
-                        {
-                            //CS CC CN
-                            'S' or 'C' or 'N' => 2,
-                            _ => throw new AddressParseException("Address format error", address),
-                        };
-                        break;
-                    }
+                        //CS CC CN
+                        'S' or 'C' or 'N' => 2,
+                        _ => throw new AddressParseException("Address format error", address),
+                    };
+                    break;
+                }
                 default:
                     throw new AddressParseException("Address format error", address);
             }
 
             Parse(address, index, out memory, out startAddress, out isHexAddress);
         }
-        private static void Parse(string address, int index, out PlcMemory3E4E memory, out uint startAddress, out bool isHexAddress)
+
+        private static void Parse(
+            string address,
+            int index,
+            out PlcMemory3E4E memory,
+            out uint startAddress,
+            out bool isHexAddress
+        )
         {
             string memoryStr = address.Substring(0, index);
             string valueStr = address.Substring(index);
@@ -114,6 +137,7 @@ namespace NProtocol.Protocols.Mc
             isHexAddress = HasHexAddress(memory);
             startAddress = ConvertStartAddress(isHexAddress, valueStr);
         }
+
         public static bool HasHexAddress(PlcMemory3E4E memory)
         {
             return memory == PlcMemory3E4E.X
@@ -126,6 +150,7 @@ namespace NProtocol.Protocols.Mc
                 || memory == PlcMemory3E4E.SW
                 || memory == PlcMemory3E4E.ZR;
         }
+
         public static uint ConvertStartAddress(bool isHexAddress, string value)
         {
             if (isHexAddress)
@@ -141,6 +166,7 @@ namespace NProtocol.Protocols.Mc
                 return Convert.ToUInt32(value);
             }
         }
+
         public override string ToString()
         {
             int totalWidth = PadLeftTotalWidth(Memory);
@@ -148,12 +174,14 @@ namespace NProtocol.Protocols.Mc
                 ? BitConverter.GetBytes(StartAddress).Reverse().ToArray().ToHexString("")
                 : StartAddress.ToString();
 
-            string val = valueStr.Length > totalWidth
-                ? valueStr.Remove(0, valueStr.Length - totalWidth)
-                : valueStr.PadLeft(totalWidth, '0');
+            string val =
+                valueStr.Length > totalWidth
+                    ? valueStr.Remove(0, valueStr.Length - totalWidth)
+                    : valueStr.PadLeft(totalWidth, '0');
 
             return $"{Memory}{val}";
         }
+
         private int PadLeftTotalWidth(PlcMemory3E4E memory)
         {
             switch (memory)

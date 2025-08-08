@@ -6,9 +6,10 @@
         /// ASCII string.
         /// </summary>
         S7String,
+
         /// <summary>
         /// Unicode string.
         /// </summary>
-        S7WString
+        S7WString,
     }
 }

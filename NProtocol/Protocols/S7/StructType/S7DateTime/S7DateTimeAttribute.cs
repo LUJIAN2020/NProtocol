@@ -9,13 +9,15 @@ namespace NProtocol.Protocols.S7.StructType
         {
             Type = type;
         }
+
         public S7DateTimeType Type { get; }
-        public byte Size => Type switch
-        {
-            S7DateTimeType.Date => 2,
-            S7DateTimeType.DateAndTime => 8,
-            S7DateTimeType.DTL => 12,
-            _ => throw new ArgumentException("Not supported type.", nameof(Type))
-        };
+        public byte Size =>
+            Type switch
+            {
+                S7DateTimeType.Date => 2,
+                S7DateTimeType.DateAndTime => 8,
+                S7DateTimeType.DTL => 12,
+                _ => throw new ArgumentException("Not supported type.", nameof(Type)),
+            };
     }
 }

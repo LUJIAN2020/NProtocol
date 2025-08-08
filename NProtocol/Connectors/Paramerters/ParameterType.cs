@@ -3,6 +3,6 @@
     public enum ParameterType
     {
         SerialPort,
-        EnterNet
+        EnterNet,
     }
 }

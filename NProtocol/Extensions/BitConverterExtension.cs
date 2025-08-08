@@ -14,6 +14,7 @@ namespace NProtocol.Extensions
         /// true=小端序 false=大端序
         /// </summary>
         public readonly static bool IsLittleEndian = BitConverter.IsLittleEndian;
+
         /// <summary>
         /// byte to bool[]
         /// </summary>
@@ -28,6 +29,7 @@ namespace NProtocol.Extensions
             }
             return bs;
         }
+
         /// <summary>
         /// byte[] to bool[]
         /// </summary>
@@ -43,6 +45,7 @@ namespace NProtocol.Extensions
             }
             return result;
         }
+
         /// <summary>
         /// Int16 to bool[]
         /// </summary>
@@ -52,6 +55,7 @@ namespace NProtocol.Extensions
         {
             return value.ToBytes(isLittleEndian).ToBooleans();
         }
+
         /// <summary>
         /// UInt16 to bool[]
         /// </summary>
@@ -61,6 +65,7 @@ namespace NProtocol.Extensions
         {
             return ((short)value).ToBooleans(isLittleEndian);
         }
+
         /// <summary>
         /// Int32 to bool[]
         /// </summary>
@@ -70,6 +75,7 @@ namespace NProtocol.Extensions
         {
             return value.ToBytes(isLittleEndian).ToBooleans();
         }
+
         /// <summary>
         /// UInt32 to bool[]
         /// </summary>
@@ -79,6 +85,7 @@ namespace NProtocol.Extensions
         {
             return value.ToBytes(isLittleEndian).ToBooleans();
         }
+
         /// <summary>
         /// Int64 to bool[]
         /// </summary>
@@ -89,6 +96,7 @@ namespace NProtocol.Extensions
         {
             return value.ToBytes(isLittleEndian).ToBooleans();
         }
+
         /// <summary>
         /// UInt64 to bool[]
         /// </summary>
@@ -99,6 +107,7 @@ namespace NProtocol.Extensions
         {
             return value.ToBytes(isLittleEndian).ToBooleans();
         }
+
         /// <summary>
         /// Int16[] to bool[]
         /// </summary>
@@ -109,6 +118,7 @@ namespace NProtocol.Extensions
         {
             return values.ToBytes(isLittleEndian).ToBooleans();
         }
+
         /// <summary>
         /// UInt16[] to bool[]
         /// </summary>
@@ -119,6 +129,7 @@ namespace NProtocol.Extensions
         {
             return values.ToBytes(isLittleEndian).ToBooleans();
         }
+
         /// <summary>
         /// Int32[] to bool[]
         /// </summary>
@@ -129,6 +140,7 @@ namespace NProtocol.Extensions
         {
             return values.ToBytes(isLittleEndian).ToBooleans();
         }
+
         /// <summary>
         /// UInt32[] to bool[]
         /// </summary>
@@ -139,6 +151,7 @@ namespace NProtocol.Extensions
         {
             return values.ToBytes(isLittleEndian).ToBooleans();
         }
+
         /// <summary>
         /// Int64[] to bool[]
         /// </summary>
@@ -149,6 +162,7 @@ namespace NProtocol.Extensions
         {
             return values.ToBytes(isLittleEndian).ToBooleans();
         }
+
         /// <summary>
         /// UInt64[] to bool[]
         /// </summary>
@@ -159,6 +173,7 @@ namespace NProtocol.Extensions
         {
             return values.ToBytes(isLittleEndian).ToBooleans();
         }
+
         /// <summary>
         /// bool[] to byte
         /// </summary>
@@ -168,7 +183,11 @@ namespace NProtocol.Extensions
         public static byte ToByte(this bool[] bs)
         {
             if (bs.Length > 8)
-                throw new ArgumentOutOfRangeException(nameof(bs), bs.Length, "The array length must be <= 8");
+                throw new ArgumentOutOfRangeException(
+                    nameof(bs),
+                    bs.Length,
+                    "The array length must be <= 8"
+                );
 
             byte b = 0;
             for (int i = 0; i < bs.Length; i++)
@@ -180,6 +199,7 @@ namespace NProtocol.Extensions
             }
             return b;
         }
+
         /// <summary>
         /// bool[] to byte[]
         /// </summary>
@@ -192,12 +212,14 @@ namespace NProtocol.Extensions
             for (int i = 0; i < buffer.Length; i++)
             {
                 bool[] bs8 = new bool[8];
-                if (i + 1 == buffer.Length) bs8 = new bool[bs.Length - i * 8];
+                if (i + 1 == buffer.Length)
+                    bs8 = new bool[bs.Length - i * 8];
                 Buffer.BlockCopy(bs, i * 8, bs8, 0, bs8.Length);
                 buffer[i] = bs8.ToByte();
             }
             return buffer;
         }
+
         /// <summary>
         /// Int16 to bte[]
         /// </summary>
@@ -210,6 +232,7 @@ namespace NProtocol.Extensions
                 ? BitConverter.GetBytes(value)
                 : BitConverter.GetBytes(value).Reverse().ToArray();
         }
+
         /// <summary>
         /// UInt16 to byte[]
         /// </summary>
@@ -222,6 +245,7 @@ namespace NProtocol.Extensions
                 ? BitConverter.GetBytes(value)
                 : BitConverter.GetBytes(value).Reverse().ToArray();
         }
+
         /// <summary>
         /// Int32 to byte[]
         /// </summary>
@@ -234,6 +258,7 @@ namespace NProtocol.Extensions
                 ? BitConverter.GetBytes(value)
                 : BitConverter.GetBytes(value).Reverse().ToArray();
         }
+
         /// <summary>
         /// UInt32 to byte[]
         /// </summary>
@@ -246,6 +271,7 @@ namespace NProtocol.Extensions
                 ? BitConverter.GetBytes(value)
                 : BitConverter.GetBytes(value).Reverse().ToArray();
         }
+
         /// <summary>
         /// Int64 to byte[]
         /// </summary>
@@ -258,6 +284,7 @@ namespace NProtocol.Extensions
                 ? BitConverter.GetBytes(value)
                 : BitConverter.GetBytes(value).Reverse().ToArray();
         }
+
         /// <summary>
         /// UInt64 to byte[]
         /// </summary>
@@ -270,6 +297,7 @@ namespace NProtocol.Extensions
                 ? BitConverter.GetBytes(value)
                 : BitConverter.GetBytes(value).Reverse().ToArray();
         }
+
         /// <summary>
         /// float to byte[]
         /// </summary>
@@ -282,6 +310,7 @@ namespace NProtocol.Extensions
                 ? BitConverter.GetBytes(value)
                 : BitConverter.GetBytes(value).Reverse().ToArray();
         }
+
         /// <summary>
         /// double to byte[]
         /// </summary>
@@ -291,9 +320,10 @@ namespace NProtocol.Extensions
         public static byte[] ToBytes(this double value, bool isLittleEndian = true)
         {
             return isLittleEndian
-                 ? BitConverter.GetBytes(value)
-                 : BitConverter.GetBytes(value).Reverse().ToArray();
+                ? BitConverter.GetBytes(value)
+                : BitConverter.GetBytes(value).Reverse().ToArray();
         }
+
         /// <summary>
         /// Int16[] to byte[]
         /// </summary>
@@ -311,6 +341,7 @@ namespace NProtocol.Extensions
             }
             return buffer;
         }
+
         /// <summary>
         /// UInt16[] to byte[]
         /// </summary>
@@ -328,6 +359,7 @@ namespace NProtocol.Extensions
             }
             return buffer;
         }
+
         /// <summary>
         /// Int32[] to byte[]
         /// </summary>
@@ -347,6 +379,7 @@ namespace NProtocol.Extensions
             }
             return buffer;
         }
+
         /// <summary>
         /// UInt32[] to byte[]
         /// </summary>
@@ -366,6 +399,7 @@ namespace NProtocol.Extensions
             }
             return buffer;
         }
+
         /// <summary>
         /// Int32[] to byte[]
         /// </summary>
@@ -389,6 +423,7 @@ namespace NProtocol.Extensions
             }
             return buffer;
         }
+
         /// <summary>
         /// UInt32[] to byte[]
         /// </summary>
@@ -412,6 +447,7 @@ namespace NProtocol.Extensions
             }
             return buffer;
         }
+
         /// <summary>
         /// float[] to byte[]
         /// </summary>
@@ -431,6 +467,7 @@ namespace NProtocol.Extensions
             }
             return buffer;
         }
+
         /// <summary>
         /// double[] to byte[]
         /// </summary>
@@ -454,6 +491,7 @@ namespace NProtocol.Extensions
             }
             return buffer;
         }
+
         /// <summary>
         /// byte[] to Int16
         /// </summary>
@@ -464,11 +502,17 @@ namespace NProtocol.Extensions
         public static short ToInt16(this byte[] buffer, bool isLittleEndian = true)
         {
             if (buffer.Length != 2)
-                throw new ArgumentOutOfRangeException(nameof(buffer), buffer.Length, "The array length must be 2");
+                throw new ArgumentOutOfRangeException(
+                    nameof(buffer),
+                    buffer.Length,
+                    "The array length must be 2"
+                );
 
-            if (isLittleEndian) Array.Reverse(buffer);
+            if (isLittleEndian)
+                Array.Reverse(buffer);
             return BitConverter.ToInt16(buffer, 0);
         }
+
         /// <summary>
         /// byte[] to UInt16
         /// </summary>
@@ -478,11 +522,17 @@ namespace NProtocol.Extensions
         public static ushort ToUInt16(this byte[] buffer, bool isLittleEndian = true)
         {
             if (buffer.Length != 2)
-                throw new ArgumentOutOfRangeException(nameof(buffer), buffer.Length, "The array length must be 2");
+                throw new ArgumentOutOfRangeException(
+                    nameof(buffer),
+                    buffer.Length,
+                    "The array length must be 2"
+                );
 
-            if (isLittleEndian) Array.Reverse(buffer);
+            if (isLittleEndian)
+                Array.Reverse(buffer);
             return BitConverter.ToUInt16(buffer, 0);
         }
+
         /// <summary>
         /// byte[] to Int32
         /// </summary>
@@ -493,11 +543,17 @@ namespace NProtocol.Extensions
         public static int ToInt32(this byte[] buffer, bool isLittleEndian = true)
         {
             if (buffer.Length != 4)
-                throw new ArgumentOutOfRangeException(nameof(buffer), buffer.Length, "The array length must be 4");
+                throw new ArgumentOutOfRangeException(
+                    nameof(buffer),
+                    buffer.Length,
+                    "The array length must be 4"
+                );
 
-            if (isLittleEndian) Array.Reverse(buffer);
+            if (isLittleEndian)
+                Array.Reverse(buffer);
             return BitConverter.ToInt32(buffer, 0);
         }
+
         /// <summary>
         /// byte[] to UInt32
         /// </summary>
@@ -508,6 +564,7 @@ namespace NProtocol.Extensions
         {
             return (uint)buffer.ToInt32(isLittleEndian);
         }
+
         /// <summary>
         /// byte[] to Int64
         /// </summary>
@@ -518,11 +575,17 @@ namespace NProtocol.Extensions
         public static long ToInt64(this byte[] buffer, bool isLittleEndian = true)
         {
             if (buffer.Length != 8)
-                throw new ArgumentOutOfRangeException(nameof(buffer), buffer.Length, "The array length must be 8");
+                throw new ArgumentOutOfRangeException(
+                    nameof(buffer),
+                    buffer.Length,
+                    "The array length must be 8"
+                );
 
-            if (isLittleEndian) Array.Reverse(buffer);
+            if (isLittleEndian)
+                Array.Reverse(buffer);
             return BitConverter.ToInt64(buffer, 0);
         }
+
         /// <summary>
         /// byte[] to UInt64
         /// </summary>
@@ -533,11 +596,17 @@ namespace NProtocol.Extensions
         public static ulong ToUInt64(this byte[] buffer, bool isLittleEndian = true)
         {
             if (buffer.Length != 8)
-                throw new ArgumentOutOfRangeException(nameof(buffer), buffer.Length, "The array length must be 8");
+                throw new ArgumentOutOfRangeException(
+                    nameof(buffer),
+                    buffer.Length,
+                    "The array length must be 8"
+                );
 
-            if (isLittleEndian) Array.Reverse(buffer);
+            if (isLittleEndian)
+                Array.Reverse(buffer);
             return BitConverter.ToUInt64(buffer, 0);
         }
+
         /// <summary>
         /// byte[] to float
         /// </summary>
@@ -548,11 +617,17 @@ namespace NProtocol.Extensions
         public static float ToFloat(this byte[] buffer, bool isLittleEndian = true)
         {
             if (buffer.Length != 4)
-                throw new ArgumentOutOfRangeException(nameof(buffer), buffer.Length, "The array length must be 4");
+                throw new ArgumentOutOfRangeException(
+                    nameof(buffer),
+                    buffer.Length,
+                    "The array length must be 4"
+                );
 
-            if (isLittleEndian) Array.Reverse(buffer);
+            if (isLittleEndian)
+                Array.Reverse(buffer);
             return BitConverter.ToSingle(buffer, 0);
         }
+
         /// <summary>
         /// byte[] to double
         /// </summary>
@@ -563,11 +638,17 @@ namespace NProtocol.Extensions
         public static double ToDouble(this byte[] buffer, bool isLittleEndian = true)
         {
             if (buffer.Length != 8)
-                throw new ArgumentOutOfRangeException(nameof(buffer), buffer.Length, "The array length must be 8");
+                throw new ArgumentOutOfRangeException(
+                    nameof(buffer),
+                    buffer.Length,
+                    "The array length must be 8"
+                );
 
-            if (isLittleEndian) Array.Reverse(buffer);
+            if (isLittleEndian)
+                Array.Reverse(buffer);
             return BitConverter.ToDouble(buffer, 0);
         }
+
         /// <summary>
         /// byte[] to Int16[]
         /// </summary>
@@ -578,10 +659,18 @@ namespace NProtocol.Extensions
         public static short[] ToInt16Array(this byte[] buffer, bool isLittleEndian = true)
         {
             if (buffer.Length < 2)
-                throw new ArgumentOutOfRangeException(nameof(buffer), buffer.Length, "The array length must be > 2");
+                throw new ArgumentOutOfRangeException(
+                    nameof(buffer),
+                    buffer.Length,
+                    "The array length must be > 2"
+                );
 
             if (buffer.Length % 2 != 0)
-                throw new ArgumentOutOfRangeException(nameof(buffer), buffer.Length, "The array length must be a multiple of 2");
+                throw new ArgumentOutOfRangeException(
+                    nameof(buffer),
+                    buffer.Length,
+                    "The array length must be a multiple of 2"
+                );
 
             short[] shorts = new short[buffer.Length / 2];
             for (int i = 0; i < shorts.Length; i++)
@@ -591,6 +680,7 @@ namespace NProtocol.Extensions
             }
             return shorts;
         }
+
         /// <summary>
         /// byte[] to UInt16[]
         /// </summary>
@@ -601,10 +691,18 @@ namespace NProtocol.Extensions
         public static ushort[] ToUInt16Array(this byte[] buffer, bool isLittleEndian = true)
         {
             if (buffer.Length < 2)
-                throw new ArgumentOutOfRangeException(nameof(buffer), buffer.Length, "The array length must be > 2");
+                throw new ArgumentOutOfRangeException(
+                    nameof(buffer),
+                    buffer.Length,
+                    "The array length must be > 2"
+                );
 
             if (buffer.Length % 2 != 0)
-                throw new ArgumentOutOfRangeException(nameof(buffer), buffer.Length, "The array length must be a multiple of 2");
+                throw new ArgumentOutOfRangeException(
+                    nameof(buffer),
+                    buffer.Length,
+                    "The array length must be a multiple of 2"
+                );
 
             ushort[] ushorts = new ushort[buffer.Length / 2];
             for (int i = 0; i < ushorts.Length; i++)
@@ -614,6 +712,7 @@ namespace NProtocol.Extensions
             }
             return ushorts;
         }
+
         /// <summary>
         /// byte[] to Int32[]
         /// </summary>
@@ -624,10 +723,18 @@ namespace NProtocol.Extensions
         public static int[] ToInt32Array(this byte[] buffer, bool isLittleEndian = true)
         {
             if (buffer.Length < 4)
-                throw new ArgumentOutOfRangeException(nameof(buffer), buffer.Length, "The array length must be > 4");
+                throw new ArgumentOutOfRangeException(
+                    nameof(buffer),
+                    buffer.Length,
+                    "The array length must be > 4"
+                );
 
             if (buffer.Length % 4 != 0)
-                throw new ArgumentOutOfRangeException(nameof(buffer), buffer.Length, "The array length must be a multiple of 4");
+                throw new ArgumentOutOfRangeException(
+                    nameof(buffer),
+                    buffer.Length,
+                    "The array length must be a multiple of 4"
+                );
 
             int[] ints = new int[buffer.Length / 4];
             byte[] buf = new byte[4];
@@ -641,6 +748,7 @@ namespace NProtocol.Extensions
             }
             return ints;
         }
+
         /// <summary>
         /// byte[] to UInt32[]
         /// </summary>
@@ -651,10 +759,18 @@ namespace NProtocol.Extensions
         public static uint[] ToUInt32Array(this byte[] buffer, bool isLittleEndian = true)
         {
             if (buffer.Length < 4)
-                throw new ArgumentOutOfRangeException(nameof(buffer), buffer.Length, "The array length must be > 4");
+                throw new ArgumentOutOfRangeException(
+                    nameof(buffer),
+                    buffer.Length,
+                    "The array length must be > 4"
+                );
 
             if (buffer.Length % 4 != 0)
-                throw new ArgumentOutOfRangeException(nameof(buffer), buffer.Length, "The array length must be a multiple of 4");
+                throw new ArgumentOutOfRangeException(
+                    nameof(buffer),
+                    buffer.Length,
+                    "The array length must be a multiple of 4"
+                );
 
             uint[] uints = new uint[buffer.Length / 4];
             byte[] buf = new byte[4];
@@ -668,6 +784,7 @@ namespace NProtocol.Extensions
             }
             return uints;
         }
+
         /// <summary>
         /// byte[] to float[]
         /// </summary>
@@ -678,10 +795,18 @@ namespace NProtocol.Extensions
         public static float[] ToFloatArray(this byte[] buffer, bool isLittleEndian = true)
         {
             if (buffer.Length < 4)
-                throw new ArgumentOutOfRangeException(nameof(buffer), buffer.Length, "The array length must be > 4");
+                throw new ArgumentOutOfRangeException(
+                    nameof(buffer),
+                    buffer.Length,
+                    "The array length must be > 4"
+                );
 
             if (buffer.Length % 4 != 0)
-                throw new ArgumentOutOfRangeException(nameof(buffer), buffer.Length, "The array length must be a multiple of 4");
+                throw new ArgumentOutOfRangeException(
+                    nameof(buffer),
+                    buffer.Length,
+                    "The array length must be a multiple of 4"
+                );
 
             float[] floats = new float[buffer.Length / 4];
             byte[] buf = new byte[4];
@@ -695,6 +820,7 @@ namespace NProtocol.Extensions
             }
             return floats;
         }
+
         /// <summary>
         /// byte[] to double[]
         /// </summary>
@@ -705,10 +831,18 @@ namespace NProtocol.Extensions
         public static double[] ToDoubleArray(this byte[] buffer, bool isLittleEndian = true)
         {
             if (buffer.Length < 8)
-                throw new ArgumentOutOfRangeException(nameof(buffer), buffer.Length, "The array length must be > 8");
+                throw new ArgumentOutOfRangeException(
+                    nameof(buffer),
+                    buffer.Length,
+                    "The array length must be > 8"
+                );
 
             if (buffer.Length % 8 != 0)
-                throw new ArgumentOutOfRangeException(nameof(buffer), buffer.Length, "The array length must be a multiple of 8");
+                throw new ArgumentOutOfRangeException(
+                    nameof(buffer),
+                    buffer.Length,
+                    "The array length must be a multiple of 8"
+                );
 
             double[] doubles = new double[buffer.Length / 8];
             byte[] buf = new byte[8];
@@ -726,6 +860,7 @@ namespace NProtocol.Extensions
             }
             return doubles;
         }
+
         /// <summary>
         /// byte[] to Int64[]
         /// </summary>
@@ -736,10 +871,18 @@ namespace NProtocol.Extensions
         public static long[] ToInt64Array(this byte[] buffer, bool isLittleEndian = true)
         {
             if (buffer.Length < 8)
-                throw new ArgumentOutOfRangeException(nameof(buffer), buffer.Length, "The array length must be > 8");
+                throw new ArgumentOutOfRangeException(
+                    nameof(buffer),
+                    buffer.Length,
+                    "The array length must be > 8"
+                );
 
             if (buffer.Length % 8 != 0)
-                throw new ArgumentOutOfRangeException(nameof(buffer), buffer.Length, "The array length must be a multiple of 8");
+                throw new ArgumentOutOfRangeException(
+                    nameof(buffer),
+                    buffer.Length,
+                    "The array length must be a multiple of 8"
+                );
 
             long[] values = new long[buffer.Length / 8];
             byte[] buf = new byte[8];
@@ -757,6 +900,7 @@ namespace NProtocol.Extensions
             }
             return values;
         }
+
         /// <summary>
         /// byte[] to UInt64[]
         /// </summary>
@@ -767,10 +911,18 @@ namespace NProtocol.Extensions
         public static ulong[] ToUInt64Array(this byte[] buffer, bool isLittleEndian = true)
         {
             if (buffer.Length < 8)
-                throw new ArgumentOutOfRangeException(nameof(buffer), buffer.Length, "The array length must be > 8");
+                throw new ArgumentOutOfRangeException(
+                    nameof(buffer),
+                    buffer.Length,
+                    "The array length must be > 8"
+                );
 
             if (buffer.Length % 8 != 0)
-                throw new ArgumentOutOfRangeException(nameof(buffer), buffer.Length, "The array length must be a multiple of 8");
+                throw new ArgumentOutOfRangeException(
+                    nameof(buffer),
+                    buffer.Length,
+                    "The array length must be a multiple of 8"
+                );
 
             ulong[] values = new ulong[buffer.Length / 8];
             byte[] buf = new byte[8];
@@ -788,6 +940,7 @@ namespace NProtocol.Extensions
             }
             return values;
         }
+
         /// <summary>
         /// byte[] to array 只支持基础类型
         /// </summary>
@@ -797,15 +950,23 @@ namespace NProtocol.Extensions
         /// <returns></returns>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
         /// <exception cref="ArgumentException"></exception>
-        public static T[] ToValueArrayFromBytes<T>(this byte[] buffer, bool isLittleEndian = true) where T : struct
+        public static T[] ToValueArrayFromBytes<T>(this byte[] buffer, bool isLittleEndian = true)
+            where T : struct
         {
             int typeSize = Marshal.SizeOf(typeof(T));
             if (buffer.Length < typeSize)
-                throw new ArgumentOutOfRangeException(nameof(buffer.Length), buffer.Length, $"The array length must be > {typeSize}");
+                throw new ArgumentOutOfRangeException(
+                    nameof(buffer.Length),
+                    buffer.Length,
+                    $"The array length must be > {typeSize}"
+                );
 
             if (buffer.Length % typeSize > 0)
-                throw new ArgumentOutOfRangeException(nameof(buffer.Length), buffer.Length,
-                    $"This type `{nameof(T)}`, the buffer length must be a multiple of {typeSize}");
+                throw new ArgumentOutOfRangeException(
+                    nameof(buffer.Length),
+                    buffer.Length,
+                    $"This type `{nameof(T)}`, the buffer length must be a multiple of {typeSize}"
+                );
 
             T t = default;
             switch (t)
@@ -845,6 +1006,7 @@ namespace NProtocol.Extensions
             }
             throw new ArgumentException($"`{nameof(T)}` type not supported");
         }
+
         /// <summary>
         /// byte[] to value 只支持基础类型
         /// </summary>
@@ -852,10 +1014,12 @@ namespace NProtocol.Extensions
         /// <param name="buffer"></param>
         /// <param name="isLittleEndian"></param>
         /// <returns></returns>
-        public static T ToValueFromBytes<T>(this byte[] buffer, bool isLittleEndian = true) where T : struct
+        public static T ToValueFromBytes<T>(this byte[] buffer, bool isLittleEndian = true)
+            where T : struct
         {
             return buffer.ToValueArrayFromBytes<T>(isLittleEndian).FirstOrDefault();
         }
+
         /// <summary>
         /// 值类型转换为字节数组 只支持基础类型
         /// </summary>
@@ -864,8 +1028,9 @@ namespace NProtocol.Extensions
         /// <param name="isLittleEndian"></param>
         /// <returns></returns>
         /// <exception cref="ArgumentException"></exception>
-        public static byte[] ToBytesFromValue<T>(this T value, bool isLittleEndian = true) where T : struct
-            => value switch
+        public static byte[] ToBytesFromValue<T>(this T value, bool isLittleEndian = true)
+            where T : struct =>
+            value switch
             {
                 short val => val.ToBytes(isLittleEndian),
                 ushort val => val.ToBytes(isLittleEndian),
@@ -875,8 +1040,12 @@ namespace NProtocol.Extensions
                 long val => val.ToBytes(isLittleEndian),
                 ulong val => val.ToBytes(isLittleEndian),
                 double val => val.ToBytes(isLittleEndian),
-                _ => throw new ArgumentException($"`{nameof(T)}` type not supported", nameof(value)),
+                _ => throw new ArgumentException(
+                    $"`{nameof(T)}` type not supported",
+                    nameof(value)
+                ),
             };
+
         /// <summary>
         /// 值类型数组转换为字节数组 只支持基础类型
         /// </summary>
@@ -884,8 +1053,10 @@ namespace NProtocol.Extensions
         /// <param name="values"></param>
         /// <param name="isLittleEndian"></param>
         /// <returns></returns>
-        public static byte[] ToBytesFromValues<T>(this T[] values, bool isLittleEndian = true) where T : struct
-            => values.SelectMany(c => c.ToBytesFromValue(isLittleEndian)).ToArray();
+        public static byte[] ToBytesFromValues<T>(this T[] values, bool isLittleEndian = true)
+            where T : struct =>
+            values.SelectMany(c => c.ToBytesFromValue(isLittleEndian)).ToArray();
+
         /// <summary>
         /// Word转换为16个位
         /// </summary>
@@ -896,7 +1067,11 @@ namespace NProtocol.Extensions
         public static bool[] ToBooleansFromWord(this ushort[] values, bool isLittleEndian = true)
         {
             if (values.Length == 0)
-                throw new ArgumentOutOfRangeException(nameof(values.Length), values.Length, "The array length must be > 0");
+                throw new ArgumentOutOfRangeException(
+                    nameof(values.Length),
+                    values.Length,
+                    "The array length must be > 0"
+                );
 
             var bits = new bool[values.Length * 2 * 8];
             for (int i = 0; i < values.Length; i++)
@@ -909,6 +1084,7 @@ namespace NProtocol.Extensions
             }
             return bits;
         }
+
         /// <summary>
         /// 2Byte的Word转16个位
         /// </summary>
@@ -919,7 +1095,11 @@ namespace NProtocol.Extensions
         public static bool[] ToBooleansFromWord(this byte[] values, bool isLittleEndian = true)
         {
             if (values.Length < 2 || values.Length % 2 > 0)
-                throw new ArgumentOutOfRangeException(nameof(values.Length), values.Length, "The array length must be even");
+                throw new ArgumentOutOfRangeException(
+                    nameof(values.Length),
+                    values.Length,
+                    "The array length must be even"
+                );
 
             var bits = new bool[values.Length * 8];
             var bitArray = new BitArray(values);

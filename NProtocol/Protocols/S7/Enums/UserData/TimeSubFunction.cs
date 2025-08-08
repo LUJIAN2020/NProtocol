@@ -9,6 +9,7 @@
         /// 读时钟
         /// </summary>
         ReadClock = 0x01,
+
         /// <summary>
         /// 设置时钟
         /// </summary>
@@ -18,6 +19,6 @@
         /// 下面这两个不常用
         /// </summary>
         ReadClockFollowing = 0x03,
-        SetClockFollowing = 0x04
+        SetClockFollowing = 0x04,
     }
 }

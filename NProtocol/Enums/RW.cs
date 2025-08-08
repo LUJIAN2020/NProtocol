@@ -2,6 +2,7 @@
 {
     public enum RW
     {
-        R, W
+        R,
+        W,
     }
 }

@@ -6,10 +6,12 @@
         /// boolean
         /// </summary>
         Bit = 0,
+
         /// <summary>
         /// word/ushort
         /// </summary>
         Word = 1,
+
         /// <summary>
         /// string
         /// </summary>

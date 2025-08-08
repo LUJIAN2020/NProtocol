@@ -4,7 +4,13 @@ namespace NProtocol.Protocols.S7
 {
     public class MultipleItem
     {
-        public MultipleItem(S7MemoryAreaType type = S7MemoryAreaType.DataBlock, ushort startAddress = 0, ushort count = 1, ushort? db = default, byte[]? writeData = default)
+        public MultipleItem(
+            S7MemoryAreaType type = S7MemoryAreaType.DataBlock,
+            ushort startAddress = 0,
+            ushort count = 1,
+            ushort? db = default,
+            byte[]? writeData = default
+        )
         {
             MemoryAreaType = type;
             DbNumber = db;
@@ -12,6 +18,7 @@ namespace NProtocol.Protocols.S7
             Count = count;
             WriteData = writeData;
         }
+
         public S7MemoryAreaType MemoryAreaType { get; }
         public ushort? DbNumber { get; }
         public ushort StartAddress { get; }
@@ -20,10 +27,12 @@ namespace NProtocol.Protocols.S7
         public byte[]? WriteData { get; }
         public byte[]? ReadValue { get; set; }
         public S7CommReturnCode ReturnCode { get; set; }
+
         public override string ToString()
         {
             return MultipleParameterToAddressString(this);
         }
+
         private string MultipleParameterToAddressString(MultipleItem item)
         {
             string addr;

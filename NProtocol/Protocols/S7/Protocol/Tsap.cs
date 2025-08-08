@@ -7,6 +7,7 @@
             FirstByte = firstByte;
             SecondByte = secondByte;
         }
+
         public byte FirstByte { get; }
         public byte SecondByte { get; }
     }

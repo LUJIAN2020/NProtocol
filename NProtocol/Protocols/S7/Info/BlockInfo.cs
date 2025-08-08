@@ -1,6 +1,6 @@
-﻿using NProtocol.Extensions;
+﻿using System;
+using NProtocol.Extensions;
 using NProtocol.Protocols.S7.Enums;
-using System;
 
 namespace NProtocol.Protocols.S7.Info
 {
@@ -8,7 +8,12 @@ namespace NProtocol.Protocols.S7.Info
     {
         public BlockInfo(byte[] buffer, bool isLittleEndian = true)
         {
-            if (buffer.Length != 42) throw new ArgumentOutOfRangeException(nameof(buffer.Length), buffer.Length, "buffer length must 42.");
+            if (buffer.Length != 42)
+                throw new ArgumentOutOfRangeException(
+                    nameof(buffer.Length),
+                    buffer.Length,
+                    "buffer length must 42."
+                );
             BlockType = buffer.Slice(0, 2).ToUInt16(isLittleEndian);
             LengthOfInfo = buffer.Slice(2, 2).ToUInt16(isLittleEndian);
             UnknownBlockinfo2 = buffer.Slice(4, 2).ToUInt16(isLittleEndian);
@@ -31,6 +36,7 @@ namespace NProtocol.Protocols.S7.Info
             LocalDataLength = buffer.Slice(38, 2).ToUInt16(isLittleEndian);
             MC7CodeLength = buffer.Slice(40, 2).ToUInt16(isLittleEndian);
         }
+
         public ushort BlockType { get; private set; }
         public ushort LengthOfInfo { get; private set; }
         public ushort UnknownBlockinfo2 { get; private set; }
@@ -48,6 +54,5 @@ namespace NProtocol.Protocols.S7.Info
         public ushort AddLength { get; private set; }
         public ushort LocalDataLength { get; private set; }
         public ushort MC7CodeLength { get; private set; }
-
     }
 }

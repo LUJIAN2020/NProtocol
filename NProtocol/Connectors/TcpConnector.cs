@@ -1,7 +1,7 @@
-﻿using NProtocol.Extensions;
-using System;
+﻿using System;
 using System.Net;
 using System.Net.Sockets;
+using NProtocol.Extensions;
 
 namespace NProtocol.Connectors
 {
@@ -9,10 +9,15 @@ namespace NProtocol.Connectors
     {
         private int readTimeout = 1000;
         private int writeTimeout = 1000;
-        private Socket client = new(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+        private Socket client = new(
+            AddressFamily.InterNetwork,
+            SocketType.Stream,
+            ProtocolType.Tcp
+        );
         public EtherNetParameter Parameter { get; set; }
         public EndPoint? Local => client != null ? client.LocalEndPoint : default;
         public EndPoint? Remote => client != null ? client.RemoteEndPoint : default;
+
         public TcpConnector(IParameter parameter)
         {
             if (parameter is EtherNetParameter para)
@@ -21,23 +26,30 @@ namespace NProtocol.Connectors
             }
             else
             {
-                throw new ArgumentException("Type error. The parameter type is not the tcp network parameter type", nameof(parameter));
+                throw new ArgumentException(
+                    "Type error. The parameter type is not the tcp network parameter type",
+                    nameof(parameter)
+                );
             }
         }
+
         public void Connect()
         {
             client.SendTimeout = WriteTimeout;
             client.ReceiveTimeout = ReadTimeout;
             client.Connect(Parameter.IP, Parameter.Port);
         }
+
         public void Close()
         {
             client.Close();
         }
+
         public void Dispose()
         {
             client.SafeClose();
         }
+
         public byte[] Read()
         {
             ValidateConnected();
@@ -45,6 +57,7 @@ namespace NProtocol.Connectors
             int len = client.Receive(buffer);
             return buffer.Slice(0, len);
         }
+
         public int Write(byte[] buffer)
         {
             ValidateConnected();
@@ -63,6 +76,7 @@ namespace NProtocol.Connectors
                 return client.Send(buffer);
             }
         }
+
         public bool Connected => client != null && client.Connected;
         public string DriverId => $"LocalEndPoint:{Local},RemoteEndPoint:{Remote}";
         public int ReadTimeout
@@ -89,6 +103,7 @@ namespace NProtocol.Connectors
                 }
             }
         }
+
         private void ValidateConnected()
         {
             if (!client.Connected)
@@ -98,6 +113,7 @@ namespace NProtocol.Connectors
                 Connect();
             }
         }
+
         public void DiscardBuffer(int timeout = 100)
         {
             client.DiscardBuffer(timeout);

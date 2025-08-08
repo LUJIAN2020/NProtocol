@@ -13,15 +13,15 @@
         /// <summary>
         /// 按位进行数据编排
         /// </summary>
-        BIT = 3,//1
-        BYTE_WORD_DWORD = 4,//实际长度*byte
-        INTEGER = 5,//2
+        BIT = 3, //1
+        BYTE_WORD_DWORD = 4, //实际长度*byte
+        INTEGER = 5, //2
 
         /// <summary>
         /// 按字节进行数据编排
         /// </summary>
-        DINTEGER = 6,//4
-        REAL = 7,//4
-        OCTET_STRING = 9,//1*实际
+        DINTEGER = 6, //4
+        REAL = 7, //4
+        OCTET_STRING = 9, //1*实际
     }
 }

@@ -7,8 +7,9 @@ namespace NProtocol.Extensions
 {
     public static class ArrayExtension
     {
-        public static T[] Slice<T>(this T[] array, int start)
-         => array.Slice(start, array.Length - start);
+        public static T[] Slice<T>(this T[] array, int start) =>
+            array.Slice(start, array.Length - start);
+
         public static T[] Slice<T>(this T[] array, int start, int length)
         {
             if (start < 0 || start > array.Length)
@@ -24,19 +25,26 @@ namespace NProtocol.Extensions
             Array.Copy(array, start, buffer, 0, length);
             return buffer;
         }
-        public static T[] Combine<T>(this T[] firstArray, T[] nextArray) where T : struct
+
+        public static T[] Combine<T>(this T[] firstArray, T[] nextArray)
+            where T : struct
         {
-            if (nextArray.Length == 0) return firstArray;
-            if (firstArray.Length == 0) return nextArray;
+            if (nextArray.Length == 0)
+                return firstArray;
+            if (firstArray.Length == 0)
+                return nextArray;
 
             var combined = new T[firstArray.Length + nextArray.Length];
             Array.Copy(firstArray, 0, combined, 0, firstArray.Length);
             Array.Copy(nextArray, 0, combined, firstArray.Length, nextArray.Length);
             return combined;
         }
-        public static T[] Combine<T>(this T[] firstArray, params T[][] nextArray) where T : struct
+
+        public static T[] Combine<T>(this T[] firstArray, params T[][] nextArray)
+            where T : struct
         {
-            if (nextArray.Length == 0) return firstArray;
+            if (nextArray.Length == 0)
+                return firstArray;
 
             int totalLength = firstArray.Length + nextArray.Sum(arr => arr.Length);
             T[] result = new T[totalLength];
@@ -49,6 +57,7 @@ namespace NProtocol.Extensions
             }
             return result;
         }
+
         private static void FlattenArray(Array array, List<object> result)
         {
             foreach (var item in array)
@@ -63,6 +72,7 @@ namespace NProtocol.Extensions
                 }
             }
         }
+
         public static List<object> Flatten(this Array array)
         {
             var result = new List<object>();
@@ -74,6 +84,7 @@ namespace NProtocol.Extensions
             FlattenArray(array, result);
             return result;
         }
+
         public static string ToFlattenString(this Array array)
         {
             var flattened = array.Flatten();
@@ -81,7 +92,11 @@ namespace NProtocol.Extensions
             for (int i = 0; i < flattened.Count; i++)
             {
                 var type = flattened[i].GetType();
-                if (type.Name == nameof(String) || type.Name == nameof(TimeSpan) || type.Name == nameof(DateTime))
+                if (
+                    type.Name == nameof(String)
+                    || type.Name == nameof(TimeSpan)
+                    || type.Name == nameof(DateTime)
+                )
                 {
                     sb.Append($"'{flattened[i]}'");
                 }
@@ -98,6 +113,7 @@ namespace NProtocol.Extensions
             sb.Append(" ]");
             return sb.ToString();
         }
+
         public static IEnumerable<T[]> ChunkBy<T>(this T[] array, int size)
         {
             if (array == null)
