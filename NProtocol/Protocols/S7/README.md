@@ -199,3 +199,37 @@ public struct MyStruct
 |Byte | VB1 | DB1.DBB1
 |Int <br> Word  | VW2 | DB1.DBW2
 |DInt <br> DWord <br> Real | VD4 | DB1.DBD4
+
+## 🥁Other operations
+
+* CPU DateTime
+```
+s7.SetCpuDateTime(DateTime.Now);
+
+var result = s7.GetCpuDateTime();
+DateTime time = result.Value;
+```
+
+* Read CPU Status
+```C#
+var result = s7.ReadCpuStatus();
+CpuStatus status = result.Value;
+```
+
+* Get CPU model info
+```C#
+var result = s7.GetCpuModelInfo();
+var status = result.Value;
+```
+
+*Get CPU component info
+```C#
+var result = s7.GetCpuComponentInfo();
+var status = result.Value;
+```
+
+* Get CPU communication capability info
+```C#
+var result = s7.GetCpuCommunicationCapabilityInfo();
+var status = result.Value;
+```

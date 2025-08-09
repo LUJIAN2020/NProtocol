@@ -19,6 +19,18 @@ namespace NProtocol.Demo
             StringWR(s7);
             StructWR(s7);
             s7.Close();
+
+
+            var result = s7.ReadCpuStatus();
+            CpuStatus status = result.Value;
+
+            s7.SetCpuDateTime(DateTime.Now);
+
+            var result1 = s7.GetCpuDateTime();
+            DateTime time = result1.Value;
+
+    
+
         }
         static void BooleanWR(S7Client s7)
         {

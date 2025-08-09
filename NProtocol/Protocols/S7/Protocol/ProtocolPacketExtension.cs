@@ -136,7 +136,7 @@ namespace NProtocol.Protocols.S7
         /// </summary>
         /// <returns></returns>
         /// <exception cref="ArgumentNullException"></exception>
-        public Result<CpuStatus> GetCpuStatusInfo()
+        public Result<CpuStatus> ReadCpuStatus()
         {
             return EnqueueExecute(() =>
             {

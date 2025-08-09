@@ -200,3 +200,38 @@ public struct MyStruct
 |Byte | VB1 | DB1.DBB1
 |Int <br> Word  | VW2 | DB1.DBW2
 |DInt <br> DWord <br> Real | VD4 | DB1.DBD4
+
+## 🥁其他操作
+
+* CPU时间操作
+```
+s7.SetCpuDateTime(DateTime.Now);
+
+var result = s7.GetCpuDateTime();
+DateTime time = result.Value;
+```
+
+* 获取CPU状态
+```C#
+var result = s7.ReadCpuStatus();
+CpuStatus status = result.Value;
+```
+
+* 获取CPU模块信息
+```C#
+var result = s7.GetCpuModelInfo();
+var status = result.Value;
+```
+
+* 获取CPU组件信息
+```C#
+var result = s7.GetCpuComponentInfo();
+var status = result.Value;
+```
+
+* 获取CPU通讯能力信息
+```C#
+var result = s7.GetCpuCommunicationCapabilityInfo();
+var status = result.Value;
+```
+
