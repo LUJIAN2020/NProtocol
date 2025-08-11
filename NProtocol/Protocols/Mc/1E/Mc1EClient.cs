@@ -9,9 +9,9 @@ using NProtocol.Extensions;
 namespace NProtocol.Protocols.Mc
 {
     /// <summary>
-    /// 三菱MC协议
+    /// Mitsubishi MC protocol is not tested and is temporarily unavailable
     /// </summary>
-    public class Mc1EClient : McProtocolBase
+    internal class Mc1EClient : McProtocolBase
     {
         //MC协议报文格式1E帧
         //请求报文：帧头+副帧头+可编程控制器编号+ACPU监视定时器+请求数据
@@ -158,114 +158,114 @@ namespace NProtocol.Protocols.Mc
             switch (t)
             {
                 case bool:
-                {
-                    uint start =
-                        address.StartAddress % 16 > 0
-                            ? address.StartAddress - (address.StartAddress % 16)
-                            : address.StartAddress;
+                    {
+                        uint start =
+                            address.StartAddress % 16 > 0
+                                ? address.StartAddress - (address.StartAddress % 16)
+                                : address.StartAddress;
 
-                    byte _count =
-                        (address.StartAddress + count - start) % 16 > 0
-                            ? (byte)((address.StartAddress + count - start) / 16 + 1)
-                            : (byte)((address.StartAddress + count - start) / 16);
+                        byte _count =
+                            (address.StartAddress + count - start) % 16 > 0
+                                ? (byte)((address.StartAddress + count - start) / 16 + 1)
+                                : (byte)((address.StartAddress + count - start) / 16);
 
-                    var addr = new McAddress1E(address.Memory, start);
-                    var result = ReadBytes(addr, _count);
-                    result.Payload = result.ReceivedData.Slice(2);
-                    var bs = result
-                        .Payload.ToBooleansFromWord(IsLittleEndian)
-                        .Slice((int)(address.StartAddress - start), count);
-                    if (bs is T[] val)
-                        return result.ToResult(val);
-                    break;
-                }
+                        var addr = new McAddress1E(address.Memory, start);
+                        var result = ReadBytes(addr, _count);
+                        result.Payload = result.ReceivedData.Slice(2);
+                        var bs = result
+                            .Payload.ToBooleansFromWord(IsLittleEndian)
+                            .Slice((int)(address.StartAddress - start), count);
+                        if (bs is T[] val)
+                            return result.ToResult(val);
+                        break;
+                    }
                 case byte:
-                {
-                    var result = ReadBytes(address, count);
-                    result.Payload = result.ReceivedData.Slice(2);
-                    var values = result.Payload;
-                    if (values is T[] val)
-                        return result.ToResult(val);
-                    break;
-                }
+                    {
+                        var result = ReadBytes(address, count);
+                        result.Payload = result.ReceivedData.Slice(2);
+                        var values = result.Payload;
+                        if (values is T[] val)
+                            return result.ToResult(val);
+                        break;
+                    }
                 case short:
-                {
-                    var result = ReadBytes(address, count);
-                    result.Payload = result.ReceivedData.Slice(2);
-                    var values = result.Payload.ToInt16Array(IsLittleEndian);
-                    if (values is T[] val)
-                        return result.ToResult(val);
-                    break;
-                }
+                    {
+                        var result = ReadBytes(address, count);
+                        result.Payload = result.ReceivedData.Slice(2);
+                        var values = result.Payload.ToInt16Array(IsLittleEndian);
+                        if (values is T[] val)
+                            return result.ToResult(val);
+                        break;
+                    }
                 case ushort:
-                {
-                    var result = ReadBytes(address, count);
-                    result.Payload = result.ReceivedData.Slice(2);
-                    var values = result.Payload.ToUInt16Array(IsLittleEndian);
-                    if (values is T[] val)
-                        return result.ToResult(val);
-                    break;
-                }
+                    {
+                        var result = ReadBytes(address, count);
+                        result.Payload = result.ReceivedData.Slice(2);
+                        var values = result.Payload.ToUInt16Array(IsLittleEndian);
+                        if (values is T[] val)
+                            return result.ToResult(val);
+                        break;
+                    }
                 case int:
-                {
-                    const int byteSize = 2;
-                    var result = ReadBytes(address, (byte)(count * byteSize));
-                    result.Payload = result.ReceivedData.Slice(2);
-                    var values = result.Payload.ToInt32Array(IsLittleEndian);
-                    if (values is T[] val)
-                        return result.ToResult(val);
-                    break;
-                }
+                    {
+                        const int byteSize = 2;
+                        var result = ReadBytes(address, (byte)(count * byteSize));
+                        result.Payload = result.ReceivedData.Slice(2);
+                        var values = result.Payload.ToInt32Array(IsLittleEndian);
+                        if (values is T[] val)
+                            return result.ToResult(val);
+                        break;
+                    }
                 case uint:
-                {
-                    const int byteSize = 2;
-                    var result = ReadBytes(address, (byte)(count * byteSize));
-                    result.Payload = result.ReceivedData.Slice(2);
-                    var values = result.Payload.ToUInt32Array(IsLittleEndian);
-                    if (values is T[] val)
-                        return result.ToResult(val);
-                    break;
-                }
+                    {
+                        const int byteSize = 2;
+                        var result = ReadBytes(address, (byte)(count * byteSize));
+                        result.Payload = result.ReceivedData.Slice(2);
+                        var values = result.Payload.ToUInt32Array(IsLittleEndian);
+                        if (values is T[] val)
+                            return result.ToResult(val);
+                        break;
+                    }
                 case float:
-                {
-                    const int byteSize = 2;
-                    var result = ReadBytes(address, (byte)(count * byteSize));
-                    result.Payload = result.ReceivedData.Slice(2);
-                    var values = result.Payload.ToFloatArray(IsLittleEndian);
-                    if (values is T[] val)
-                        return result.ToResult(val);
-                    break;
-                }
+                    {
+                        const int byteSize = 2;
+                        var result = ReadBytes(address, (byte)(count * byteSize));
+                        result.Payload = result.ReceivedData.Slice(2);
+                        var values = result.Payload.ToFloatArray(IsLittleEndian);
+                        if (values is T[] val)
+                            return result.ToResult(val);
+                        break;
+                    }
                 case long:
-                {
-                    const int byteSize = 4;
-                    var result = ReadBytes(address, (byte)(count * byteSize));
-                    result.Payload = result.ReceivedData.Slice(2);
-                    var values = result.Payload.ToInt64Array(IsLittleEndian);
-                    if (values is T[] val)
-                        return result.ToResult(val);
-                    break;
-                }
+                    {
+                        const int byteSize = 4;
+                        var result = ReadBytes(address, (byte)(count * byteSize));
+                        result.Payload = result.ReceivedData.Slice(2);
+                        var values = result.Payload.ToInt64Array(IsLittleEndian);
+                        if (values is T[] val)
+                            return result.ToResult(val);
+                        break;
+                    }
                 case ulong:
-                {
-                    const int byteSize = 4;
-                    var result = ReadBytes(address, (byte)(count * byteSize));
-                    result.Payload = result.ReceivedData.Slice(2);
-                    var values = result.Payload.ToUInt64Array(IsLittleEndian);
-                    if (values is T[] val)
-                        return result.ToResult(val);
-                    break;
-                }
+                    {
+                        const int byteSize = 4;
+                        var result = ReadBytes(address, (byte)(count * byteSize));
+                        result.Payload = result.ReceivedData.Slice(2);
+                        var values = result.Payload.ToUInt64Array(IsLittleEndian);
+                        if (values is T[] val)
+                            return result.ToResult(val);
+                        break;
+                    }
                 case double:
-                {
-                    const int byteSize = 4;
-                    var result = ReadBytes(address, (byte)(count * byteSize));
-                    result.Payload = result.ReceivedData.Slice(2);
-                    var values = result.Payload.ToDoubleArray(IsLittleEndian);
-                    if (values is T[] val)
-                        return result.ToResult(val);
-                    break;
-                }
+                    {
+                        const int byteSize = 4;
+                        var result = ReadBytes(address, (byte)(count * byteSize));
+                        result.Payload = result.ReceivedData.Slice(2);
+                        var values = result.Payload.ToDoubleArray(IsLittleEndian);
+                        if (values is T[] val)
+                            return result.ToResult(val);
+                        break;
+                    }
                 default:
                     break;
             }
@@ -341,84 +341,84 @@ namespace NProtocol.Protocols.Mc
             switch (writeData)
             {
                 case bool[] bs:
-                {
-                    //写入单位为字，比较危险，不支持连续位写入
-                    if (address.Memory == PlcMemory1E.D || address.Memory == PlcMemory1E.R)
-                        throw new Exception(
-                            $"The `{address.Memory}` address does not support write bits"
-                        );
-
-                    if (writeData.Length % 2 > 0)
-                        throw new ArgumentOutOfRangeException(
-                            nameof(writeData.Length),
-                            writeData.Length,
-                            "Write length is a multiple of 2"
-                        );
-
-                    int count = writeData.Length;
-                    var bytes = new byte[count / 2];
-                    for (int i = 0; i < bs.Length; i += 2)
                     {
-                        byte left = bs[i] ? (byte)0x10 : byte.MinValue;
-                        byte right = bs[i + 1] ? (byte)0x01 : byte.MinValue;
-                        bytes[i / 2] = (byte)(left + right);
+                        //写入单位为字，比较危险，不支持连续位写入
+                        if (address.Memory == PlcMemory1E.D || address.Memory == PlcMemory1E.R)
+                            throw new Exception(
+                                $"The `{address.Memory}` address does not support write bits"
+                            );
+
+                        if (writeData.Length % 2 > 0)
+                            throw new ArgumentOutOfRangeException(
+                                nameof(writeData.Length),
+                                writeData.Length,
+                                "Write length is a multiple of 2"
+                            );
+
+                        int count = writeData.Length;
+                        var bytes = new byte[count / 2];
+                        for (int i = 0; i < bs.Length; i += 2)
+                        {
+                            byte left = bs[i] ? (byte)0x10 : byte.MinValue;
+                            byte right = bs[i + 1] ? (byte)0x01 : byte.MinValue;
+                            bytes[i / 2] = (byte)(left + right);
+                        }
+                        return WriteBytes(
+                            Command1E.BatchWriteBit,
+                            address.Memory,
+                            address.StartAddress,
+                            (byte)count,
+                            bytes
+                        );
                     }
-                    return WriteBytes(
-                        Command1E.BatchWriteBit,
-                        address.Memory,
-                        address.StartAddress,
-                        (byte)count,
-                        bytes
-                    );
-                }
                 case short[] values:
-                {
-                    int count = writeData.Length;
-                    var data = values.ToBytes(!IsLittleEndian);
-                    return WriteBytes(address, data);
-                }
+                    {
+                        int count = writeData.Length;
+                        var data = values.ToBytes(!IsLittleEndian);
+                        return WriteBytes(address, data);
+                    }
                 case ushort[] values:
-                {
-                    int count = writeData.Length;
-                    var data = values.ToBytes(!IsLittleEndian);
-                    return WriteBytes(address, data);
-                }
+                    {
+                        int count = writeData.Length;
+                        var data = values.ToBytes(!IsLittleEndian);
+                        return WriteBytes(address, data);
+                    }
                 case int[] values:
-                {
-                    int count = writeData.Length / 2;
-                    var data = values.ToBytes(!IsLittleEndian);
-                    return WriteBytes(address, data);
-                }
+                    {
+                        int count = writeData.Length / 2;
+                        var data = values.ToBytes(!IsLittleEndian);
+                        return WriteBytes(address, data);
+                    }
                 case uint[] values:
-                {
-                    int count = writeData.Length / 2;
-                    var data = values.ToBytes(!IsLittleEndian);
-                    return WriteBytes(address, data);
-                }
+                    {
+                        int count = writeData.Length / 2;
+                        var data = values.ToBytes(!IsLittleEndian);
+                        return WriteBytes(address, data);
+                    }
                 case float[] values:
-                {
-                    int count = writeData.Length / 2;
-                    var data = values.ToBytes(!IsLittleEndian);
-                    return WriteBytes(address, data);
-                }
+                    {
+                        int count = writeData.Length / 2;
+                        var data = values.ToBytes(!IsLittleEndian);
+                        return WriteBytes(address, data);
+                    }
                 case long[] values:
-                {
-                    int count = writeData.Length / 4;
-                    var data = values.ToBytes(!IsLittleEndian);
-                    return WriteBytes(address, data);
-                }
+                    {
+                        int count = writeData.Length / 4;
+                        var data = values.ToBytes(!IsLittleEndian);
+                        return WriteBytes(address, data);
+                    }
                 case ulong[] values:
-                {
-                    int count = writeData.Length / 4;
-                    var data = values.ToBytes(!IsLittleEndian);
-                    return WriteBytes(address, data);
-                }
+                    {
+                        int count = writeData.Length / 4;
+                        var data = values.ToBytes(!IsLittleEndian);
+                        return WriteBytes(address, data);
+                    }
                 case double[] values:
-                {
-                    int count = writeData.Length / 4;
-                    var data = values.ToBytes(!IsLittleEndian);
-                    return WriteBytes(address, data);
-                }
+                    {
+                        int count = writeData.Length / 4;
+                        var data = values.ToBytes(!IsLittleEndian);
+                        return WriteBytes(address, data);
+                    }
                 default:
                     throw new ArgumentException("Type not supported", t.GetType().ToString());
             }
