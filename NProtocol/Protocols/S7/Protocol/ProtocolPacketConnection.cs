@@ -6,12 +6,12 @@ using NProtocol.Protocols.S7.Enums;
 namespace NProtocol.Protocols.S7
 {
     /// <summary>
-    /// 建立连接用到的协议包
+    /// Protocol packet used to establish a connection
     /// </summary>
     public partial class S7Client
     {
         /// <summary>
-        /// 建立连接
+        /// Establishes a connection
         /// </summary>
         public void EstablishConnection()
         {
@@ -20,19 +20,19 @@ namespace NProtocol.Protocols.S7
         }
 
         /// <summary>
-        /// 连接请求
+        /// Connection request
         /// </summary>
         /// <returns></returns>
         [EditorBrowsable(EditorBrowsableState.Never)]
         public Result ConnectionRequest()
         {
-            //发送
-            //TPKT 03 00 00 16
-            //COTP 11 e0 00 00 00 01 00 c0 01 0a c1 02 01 00 c2 02 03 01
+            // Send:
+            // TPKT 03 00 00 16
+            // COTP 11 e0 00 00 00 01 00 c0 01 0a c1 02 01 00 c2 02 03 01
 
-            //接收
-            //TPKT 03 00 00 16
-            //COTP 11 d0 00 01 00 42 00 c0 01 0a c1 02 01 00 c2 02 03 01
+            // Receive:
+            // TPKT 03 00 00 16
+            // COTP 11 d0 00 01 00 42 00 c0 01 0a c1 02 01 00 c2 02 03 01
             return EnqueueExecute(() =>
             {
                 var sendData = GetConnectionRequestPacket();
@@ -41,25 +41,25 @@ namespace NProtocol.Protocols.S7
         }
 
         /// <summary>
-        /// 连接设置
+        /// Connection setup
         /// </summary>
         /// <returns></returns>
         [EditorBrowsable(EditorBrowsableState.Never)]
         public Result ConnectionSetup()
         {
-            //发送
-            //TPKT   03 00 00 19
-            //COTP   02 f0 80
-            //S7 Comm
-            //  Header 32 01 00 00 00 01 00 08 00 00
-            //  Parameter  f0 00 00 01 00 01 03 c0
+            // Send:
+            // TPKT   03 00 00 19
+            // COTP   02 f0 80
+            // S7 Comm
+            //   Header 32 01 00 00 00 01 00 08 00 00
+            //   Parameter  f0 00 00 01 00 01 03 c0
 
-            //接收
-            //TPKT   03 00 00 1b
-            //COTP   02 f0 80
-            //S7 Comm
-            //  Header      32 03 00 00 00 01 00 08 00 00 00 00
-            //  Parameter   f0 00 00 01 00 01 03 c0
+            // Receive:
+            // TPKT   03 00 00 1b
+            // COTP   02 f0 80
+            // S7 Comm
+            //   Header      32 03 00 00 00 01 00 08 00 00 00 00
+            //   Parameter   f0 00 00 01 00 01 03 c0
             return EnqueueExecute(() =>
             {
                 var sendData = GetS7ConnectionSetupPacket();
@@ -68,7 +68,7 @@ namespace NProtocol.Protocols.S7
         }
 
         /// <summary>
-        /// 获取连接请求包
+        /// Gets the connection request packet
         /// </summary>
         /// <returns></returns>
         private byte[] GetConnectionRequestPacket()
@@ -82,7 +82,7 @@ namespace NProtocol.Protocols.S7
         }
 
         /// <summary>
-        /// 获取S7协议连接设置报文
+        /// Gets the S7 protocol connection setup packet
         /// </summary>
         /// <returns></returns>
         private byte[] GetS7ConnectionSetupPacket()

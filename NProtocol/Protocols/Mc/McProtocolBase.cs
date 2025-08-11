@@ -16,36 +16,34 @@ namespace NProtocol.Protocols.Mc
             4E帧格式是一种高速通讯格式，由四个字节的帧头、一个字节的设备地址、一个字节的功能码、一个字节的数据长度、若干字节的数据和两个字节的CRC校验码组成。
      */
 
-    /// <summary>
-    /// Mc协议基础类
-    /// </summary>
+
     public abstract class McProtocolBase : DriverBase
     {
         public McProtocolBase(EtherNetParameter parameter, ConnectMode mode)
             : base(parameter, mode) { }
 
         /// <summary>
-        /// 正确结束符
+        /// Correct end code
         /// </summary>
         public const byte OkEndCode = 0;
 
         /// <summary>
-        /// 错误结束符
+        /// Error end code
         /// </summary>
         public const byte ErrorEndCode = 0x5B;
 
         /// <summary>
-        /// 可编程控制器编号
+        /// Programmable Controller Number
         /// </summary>
         public byte PlcNumber { get; set; } = 0xFF;
 
         /// <summary>
-        /// CPU监视计时器
+        /// CPU monitoring timer
         /// </summary>
         public ushort CpuTimer { get; set; }
 
         /// <summary>
-        /// MC协议默认为大端序字节序
+        /// MC protocol defaults to big-endian byte order
         /// </summary>
         public bool IsLittleEndian { get; } = false;
     }

@@ -1,9 +1,9 @@
 ﻿namespace NProtocol.Protocols.S7.Enums
 {
     /// <summary>
-    /// Syntax Id，全称Syntax Ids of variable specification，
-    /// 即IDS 的地址规范的格式类型，用于确定寻址模式和其余项目结构的格式
-    /// 一般读写数据都十返回S7ANY
+    /// Syntax Id, full name: Syntax Ids of variable specification,
+    /// which refers to the format type of the IDS address specification, used to determine the addressing mode and the format of the remaining item structure.
+    /// Typically, read and write data will return S7ANY.
     /// </summary>
     public enum S7CommSyntaxId : byte
     {

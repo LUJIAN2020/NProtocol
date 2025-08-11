@@ -4,7 +4,7 @@ using NProtocol.Extensions;
 namespace NProtocol.Protocols.Modbus
 {
     /// <summary>
-    /// 字节序扩展方法
+    /// Byte order extension method
     /// </summary>
     public static class EndianFormatExtension
     {

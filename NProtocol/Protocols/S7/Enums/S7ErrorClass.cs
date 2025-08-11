@@ -1,42 +1,42 @@
 ﻿namespace NProtocol.Protocols.S7.Enums
 {
     /// <summary>
-    /// 错误类型
+    /// Error types
     /// </summary>
     public enum S7ErrorClass : byte
     {
         /// <summary>
-        /// 没有错误
+        /// No error
         /// </summary>
         NoError = 0x00,
 
         /// <summary>
-        /// 应用关系
+        /// Application relationship
         /// </summary>
         ApplicationRelationship = 0x81,
 
         /// <summary>
-        /// 对象定义
+        /// Object definition
         /// </summary>
         ObjectDefinition = 0x82,
 
         /// <summary>
-        /// 没有可用资源
+        /// No available resources
         /// </summary>
         NoResourcesAvailable = 0x83,
 
         /// <summary>
-        /// 服务处理中错误
+        /// Error during service processing
         /// </summary>
         ErrorOnServiceProcessing = 0x84,
 
         /// <summary>
-        /// 请求错误
+        /// Request error
         /// </summary>
         ErrorOnSupplies = 0x85,
 
         /// <summary>
-        /// 访问错误
+        /// Access error
         /// </summary>
         AccessError = 0x87,
     }

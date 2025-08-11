@@ -1,7 +1,7 @@
 ﻿namespace NProtocol.Protocols.S7.Enums
 {
     /// <summary>
-    /// 块类型
+    /// Block type
     /// </summary>
     public enum BlockType : ushort
     {
@@ -15,7 +15,7 @@
     }
 
     /// <summary>
-    /// 子块类型
+    /// Sub-block type
     /// </summary>
     public enum SubBlockType : byte
     {
@@ -27,4 +27,5 @@
         FB = 0x0E,
         SFB = 0x0F,
     }
+
 }

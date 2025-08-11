@@ -10,7 +10,7 @@ namespace NProtocol.Protocols.S7
     public partial class S7Client
     {
         /// <summary>
-        /// 获取多个读数据包
+        /// Get multiple read data packets
         /// </summary>
         /// <param name="items"></param>
         /// <param name="isRead"></param>
@@ -39,7 +39,7 @@ namespace NProtocol.Protocols.S7
         }
 
         /// <summary>
-        /// 创建多个S7comm数据包
+        /// Create multiple S7comm data packets
         /// </summary>
         /// <param name="s7CommPduType">pdu type</param>
         /// <param name="s7CommFuncCode"></param>
@@ -71,7 +71,7 @@ namespace NProtocol.Protocols.S7
         }
 
         /// <summary>
-        /// 创建多个S7comm参数数据包
+        /// Create multiple S7comm parameter data packets
         /// </summary>
         /// <param name="s7CommFuncCode"></param>
         /// <param name="items"></param>
@@ -86,7 +86,7 @@ namespace NProtocol.Protocols.S7
                 s7CommFuncCode != S7CommFuncCode.ReadVar
                 && s7CommFuncCode != S7CommFuncCode.WriteVar
             )
-                throw new NotSupportedException($"功能码暂时不支持,{s7CommFuncCode}.");
+                throw new NotSupportedException($"Function code is temporarily not supported, {s7CommFuncCode}.");
             int itemCount = items.Count();
             var buffer = new byte[12 * itemCount + 2];
             buffer[0] = (byte)s7CommFuncCode; //作业请求（Job）和确认数据响应（Ack_Data）
@@ -126,7 +126,7 @@ namespace NProtocol.Protocols.S7
         }
 
         /// <summary>
-        /// 创建多个S7comm负载数据包
+        /// Create multiple S7comm payload data packets
         /// </summary>
         /// <param name="items"></param>
         /// <returns></returns>
@@ -154,9 +154,9 @@ namespace NProtocol.Protocols.S7
         }
 
         /// <summary>
-        /// 多个连续地址读
+        /// Multiple consecutive address read
         /// </summary>
-        /// <param name="items">地址集合key=地址，value=读取长度</param>
+        /// <param name="items">Address collection, key = address, value = read length</param>
         /// <returns></returns>
         /// <exception cref="ArgumentException"></exception>
         /// <exception cref="ArgumentNullException"></exception>
@@ -204,12 +204,12 @@ namespace NProtocol.Protocols.S7
         }
 
         /// <summary>
-        /// 多个连续地址写
+        /// Multiple consecutive address write
         /// </summary>
-        /// <param name="items">参数</param>
-        /// <returns>返回多定义参数</returns>
+        /// <param name="items">Parameters</param>
+        /// <returns>Returns multiple defined parameters</returns>
         /// <exception cref="LpException"></exception>
-        /// <exception cref="ArgumentNullException">参数不能为空</exception>
+        /// <exception cref="ArgumentNullException">Parameters cannot be null</exception>
         public Result<IEnumerable<MultipleItem>> WriteMultipleVars(IEnumerable<MultipleItem> items)
         {
             return EnqueueExecute(() =>
@@ -230,7 +230,7 @@ namespace NProtocol.Protocols.S7
         }
 
         /// <summary>
-        /// 验证写入数据参数项
+        /// Validate write data parameter items
         /// </summary>
         /// <param name="items"></param>
         /// <param name="isWrite"></param>
@@ -247,7 +247,7 @@ namespace NProtocol.Protocols.S7
                     throw new ArgumentOutOfRangeException(
                         nameof(items),
                         items.Count(),
-                        "参数项最多不能超过20个"
+                        "The number of parameters cannot exceed 20"
                     );
                 if (isWrite)
                 {
@@ -265,7 +265,7 @@ namespace NProtocol.Protocols.S7
                                     throw new ArgumentOutOfRangeException(
                                         nameof(item.WriteData.Length),
                                         item.WriteData.Length,
-                                        "数据长度必须=1"
+                                        "Data length must be equal to 1"
                                     );
                                 break;
                             case S7MemoryAreaType.S7Counter:
@@ -274,7 +274,7 @@ namespace NProtocol.Protocols.S7
                                     throw new ArgumentOutOfRangeException(
                                         nameof(item.WriteData.Length),
                                         item.WriteData.Length,
-                                        "数据长度必须=2"
+                                        "Data length must be equal to 2"
                                     );
                                 break;
                             default:
@@ -284,7 +284,7 @@ namespace NProtocol.Protocols.S7
                             throw new ArgumentOutOfRangeException(
                                 nameof(item.WriteData.Length),
                                 item.WriteData.Length,
-                                "写入数据长度必须为偶数"
+                                "The data length to be written must be even"
                             );
                     }
                 }

@@ -1,7 +1,7 @@
 ﻿namespace NProtocol.Protocols.S7.Enums
 {
     /// <summary>
-    /// S7协议的变量类型，目前只实现常用的以下类型
+    /// Variable types in the S7 protocol, currently only the following commonly used types are implemented.
     /// </summary>
     public enum S7VarType : byte
     {

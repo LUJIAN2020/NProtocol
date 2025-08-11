@@ -25,7 +25,7 @@ namespace NProtocol.Protocols.S7.Info
             BlockNumber = buffer.Slice(12, 2).ToUInt16(isLittleEndian);
             LengthLoadMemory = buffer.Slice(14, 4).ToInt32(isLittleEndian);
             BlockSecurity = buffer.Slice(18, 4);
-            //不知道怎么计算的
+            //I don't know how to calculate it
             //byte[] left = new byte[2];
             //long t1 = left.Combine(buffer.ArrayCut(22, 27)).ToInt64(false);
             //long t2 = left.Combine(buffer.ArrayCut(28, 33)).ToInt64(false);

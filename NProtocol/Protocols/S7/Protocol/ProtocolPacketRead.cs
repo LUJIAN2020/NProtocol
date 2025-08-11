@@ -10,19 +10,19 @@ using NProtocol.Protocols.S7.StructType;
 namespace NProtocol.Protocols.S7
 {
     /// <summary>
-    /// S7协议读的方法
+    /// Method for reading S7 protocol
     /// </summary>
     public partial class S7Client
     {
         /// <summary>
-        /// 获取读变量报文包
+        /// Get the read variable message packet
         /// </summary>
-        /// <param name="areaType">内存区域类型</param>
-        /// <param name="varType">变量类型</param>
-        /// <param name="db">DB块</param>
-        /// <param name="wordAddress">字地址</param>
-        /// <param name="bitAddress">位地址</param>
-        /// <param name="count">总个数</param>
+        /// <param name="areaType">Memory area type</param>
+        /// <param name="varType">Variable type</param>
+        /// <param name="db">DB block</param>
+        /// <param name="wordAddress">Word address</param>
+        /// <param name="bitAddress">Bit address</param>
+        /// <param name="count">Total count</param>
         /// <returns></returns>
         private byte[] GetReadVarPacket(
             S7MemoryAreaType areaType,
@@ -53,7 +53,7 @@ namespace NProtocol.Protocols.S7
         }
 
         /// <summary>
-        /// 读字节数组
+        /// Read byte array
         /// </summary>
         /// <param name="areaType"></param>
         /// <param name="db"></param>
@@ -89,9 +89,9 @@ namespace NProtocol.Protocols.S7
         }
 
         /// <summary>
-        /// 读连续的多个字节
+        /// Read multiple consecutive bytes
         /// </summary>
-        /// <param name="item">S7地址参数</param>
+        /// <param name="item">S7 address parameter</param>
         /// <param name="count"></param>
         /// <returns></returns>
         /// <exception cref="ArgumentNullException"></exception>
@@ -101,11 +101,11 @@ namespace NProtocol.Protocols.S7
         }
 
         /// <summary>
-        /// 读数据 字节数组返回 执行结果泛型返回
+        /// Read data, returns byte array with a generic result
         /// </summary>
-        /// <param name="address">字符串格式开始地址</param>
-        /// <param name="count">读取数据长度</param>
-        /// <returns>执行结果泛型返回</returns>
+        /// <param name="address">Starting address in string format</param>
+        /// <param name="count">Length of data to read</param>
+        /// <returns>Execution result in generic form</returns>
         public Result<byte[]> ReadBytes(string address, ushort count)
         {
             var item = new S7Addresss(address);
@@ -113,11 +113,11 @@ namespace NProtocol.Protocols.S7
         }
 
         /// <summary>
-        /// 读单个字节
+        /// Read a single byte
         /// </summary>
-        /// <param name="address"></param>
-        /// <returns></returns>
-        /// <exception cref="ArgumentNullException"></exception>
+        /// <param name="address">Address to read from</param>
+        /// <returns>Byte value</returns>
+        /// <exception cref="ArgumentNullException">Thrown when address is null</exception>
         public Result<byte> ReadByte(string address)
         {
             var result = ReadBytes(address, 1);
@@ -126,12 +126,11 @@ namespace NProtocol.Protocols.S7
         }
 
         /// <summary>
-        /// 批量读取位 按字节进行读取
+        /// Batch read bits, read by byte
         /// </summary>
-        /// <param name="address">字符串地址</param>
-        /// <param name="count">读取总数</param>
-        /// <returns>返回结果</returns>
-        /// <exception cref="LpException"></exception>
+        /// <param name="address">String address</param>
+        /// <param name="count">Total number of bits to read</param>
+        /// <returns>Result of the read operation</returns>
         public Result<bool[]> ReadBooleans(string address, ushort count)
         {
             var item = new S7Addresss(address);
@@ -145,10 +144,10 @@ namespace NProtocol.Protocols.S7
         }
 
         /// <summary>
-        /// 读一个位
+        /// Read a single bit
         /// </summary>
-        /// <param name="address">字符串地址</param>
-        /// <returns>执行返回</returns>
+        /// <param name="address">String address</param>
+        /// <returns>Execution result</returns>
         public Result<bool> ReadBoolean(string address)
         {
             var result = ReadBooleans(address, 1);
@@ -189,12 +188,11 @@ namespace NProtocol.Protocols.S7
         }
 
         /// <summary>
-        /// 读连续的多个字
+        /// Read multiple consecutive words
         /// </summary>
         /// <param name="address"></param>
         /// <param name="count"></param>
         /// <returns></returns>
-        /// <exception cref="ArgumentNullException"></exception>
         public Result<ushort[]> ReadWords(string address, byte count)
         {
             const byte byteLength = 2;
@@ -204,11 +202,10 @@ namespace NProtocol.Protocols.S7
         }
 
         /// <summary>
-        /// 读单个字
+        /// Read a single word
         /// </summary>
         /// <param name="address"></param>
         /// <returns></returns>
-        /// <exception cref="ArgumentNullException"></exception>
         public Result<ushort> ReadWord(string address)
         {
             var result = ReadWords(address, 1);
@@ -217,12 +214,11 @@ namespace NProtocol.Protocols.S7
         }
 
         /// <summary>
-        /// 读多个双字
+        /// Read multiple double words
         /// </summary>
         /// <param name="address"></param>
         /// <param name="count"></param>
         /// <returns></returns>
-        /// <exception cref="ArgumentNullException"></exception>
         public Result<uint[]> ReadDWords(string address, byte count)
         {
             const byte byteLength = 4;
@@ -232,11 +228,10 @@ namespace NProtocol.Protocols.S7
         }
 
         /// <summary>
-        /// 读单个双字
+        /// Read a single double word
         /// </summary>
         /// <param name="address"></param>
         /// <returns></returns>
-        /// <exception cref="ArgumentNullException"></exception>
         public Result<uint> ReadDWord(string address)
         {
             var result = ReadDWords(address, 1);
@@ -245,12 +240,11 @@ namespace NProtocol.Protocols.S7
         }
 
         /// <summary>
-        /// 读多个连续的S7Int数据
+        /// Read multiple continuous S7Int data
         /// </summary>
         /// <param name="address"></param>
         /// <param name="count"></param>
         /// <returns></returns>
-        /// <exception cref="ArgumentNullException"></exception>
         public Result<short[]> ReadInts(string address, byte count)
         {
             const byte byteLength = 2;
@@ -939,14 +933,11 @@ namespace NProtocol.Protocols.S7
         }
 
         /// <summary>
-        /// 读连续的Date
+        /// Read continuous Date data
         /// </summary>
-        /// <param name="areaType"></param>
-        /// <param name="db"></param>
-        /// <param name="wordAddress"></param>
+        /// <param name="address"></param>
         /// <param name="count"></param>
         /// <returns></returns>
-        /// <exception cref="ArgumentNullException"></exception>
         public Result<DateTime[]> ReadDates(
             S7MemoryAreaType areaType,
             ushort db,
@@ -966,13 +957,12 @@ namespace NProtocol.Protocols.S7
         }
 
         /// <summary>
-        /// 读单个Date
+        /// Read date
         /// </summary>
         /// <param name="areaType"></param>
         /// <param name="db"></param>
         /// <param name="wordAddress"></param>
         /// <returns></returns>
-        /// <exception cref="ArgumentNullException"></exception>
         public Result<DateTime> ReadDate(S7MemoryAreaType areaType, ushort db, int wordAddress)
         {
             var result = ReadDates(areaType, db, wordAddress, 1);
@@ -981,7 +971,7 @@ namespace NProtocol.Protocols.S7
         }
 
         /// <summary>
-        /// 读数据
+        /// Read
         /// </summary>
         /// <param name="address"></param>
         /// <returns></returns>

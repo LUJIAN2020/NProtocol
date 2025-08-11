@@ -1,37 +1,37 @@
 ﻿namespace NProtocol.Protocols.Mc
 {
     /// <summary>
-    /// MC指令码3E、4E主指令码
+    /// MC instruction code 3E and 4E main instruction code
     /// </summary>
     public enum Command3E4E : ushort
     {
         /// <summary>
-        /// 批量读取 Word/Bit
+        /// Batch read (Word/Bit)
         /// </summary>
         BatchRead = 0x0401,
 
         /// <summary>
-        /// 批量写入 Word/Bit
+        /// Batch write (Word/Bit)
         /// </summary>
         BatchWrite = 0x1401,
 
         /// <summary>
-        /// 随机读取 Word
+        /// Random read (Word)
         /// </summary>
         RandomRead = 0x0403,
 
         /// <summary>
-        /// 随机写入 Word/Bit
+        /// Random write (Word/Bit)
         /// </summary>
         RandomWrite = 0x1402,
 
         /// <summary>
-        /// 多块读取 Word
+        /// Multiblock read (Word)
         /// </summary>
         MultiblockRead = 0x0406,
 
         /// <summary>
-        /// 多块写入 Word
+        /// Multiblock write (Word)
         /// </summary>
         MultiblockWrite = 0x1406,
     }

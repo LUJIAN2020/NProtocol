@@ -3,7 +3,7 @@
 namespace NProtocol.Protocols.S7.CpuInfo
 {
     /// <summary>
-    /// 通讯能力
+    /// Communication capabilities
     /// </summary>
     public class CpuCommunicationCapabilityInfo
     {
@@ -18,27 +18,27 @@ namespace NProtocol.Protocols.S7.CpuInfo
         }
 
         /// <summary>
-        /// 最大Pdu长度 单位：byte
+        /// Maximum PDU length, in bytes
         /// </summary>
         public ushort MaximumPduSize { get; private set; }
 
         /// <summary>
-        /// 最大连接数
+        /// Maximum number of connections
         /// </summary>
         public ushort MaximumActiveConnections { get; private set; }
 
         /// <summary>
-        /// 最大MPI传输速率 单位：bps
+        /// Maximum MPI transmission rate, in bps
         /// </summary>
         public uint MaximumMpiRate { get; private set; }
 
         /// <summary>
-        /// 最大通讯总线速率 单位：bps
+        /// Maximum communication bus rate, in bps
         /// </summary>
         public uint MaximumCommunicationBusRate { get; private set; }
 
         /// <summary>
-        /// 保留
+        /// Reserved
         /// </summary>
         public byte[] Reserved { get; set; }
     }

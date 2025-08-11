@@ -9,7 +9,7 @@ namespace NProtocol.Protocols.S7.Extensions
         public const ushort S7WStringMaximumLength = 0x3FFE;
 
         /// <summary>
-        /// 字节数组转换为S7字符串
+        /// Convert byte array to S7 string
         /// </summary>
         /// <param name="bytes"></param>
         /// <returns></returns>
@@ -32,7 +32,7 @@ namespace NProtocol.Protocols.S7.Extensions
         }
 
         /// <summary>
-        /// 字节数组转换为S7W字符串
+        /// Convert byte array to S7W string
         /// </summary>
         /// <param name="bytes"></param>
         /// <returns></returns>
@@ -57,10 +57,10 @@ namespace NProtocol.Protocols.S7.Extensions
         }
 
         /// <summary>
-        /// ASCII字符串转字节数组
+        /// Convert ASCII string to byte array
         /// </summary>
-        /// <param name="value">字符串内容</param>
-        /// <param name="reservedLength">有效长度</param>
+        /// <param name="value">String content</param>
+        /// <param name="reservedLength">Valid length</param>
         /// <returns></returns>
         /// <exception cref="ArgumentNullException"></exception>
         /// <exception cref="ArgumentException"></exception>
@@ -87,10 +87,10 @@ namespace NProtocol.Protocols.S7.Extensions
         }
 
         /// <summary>
-        /// Unicode字符串转字节数组
+        /// Convert Unicode string to byte array
         /// </summary>
-        /// <param name="value">字符串内容</param>
-        /// <param name="reservedLength">有效长度</param>
+        /// <param name="value">String content</param>
+        /// <param name="reservedLength">Valid length</param>
         /// <returns></returns>
         /// <exception cref="ArgumentNullException"></exception>
         /// <exception cref="ArgumentException"></exception>

@@ -4,7 +4,7 @@ using NProtocol.Extensions;
 namespace NProtocol.Protocols.S7.CpuInfo
 {
     /// <summary>
-    /// CPU模块信息
+    /// CPU module information
     /// </summary>
     public class CpuModelInfo
     {
@@ -17,28 +17,28 @@ namespace NProtocol.Protocols.S7.CpuInfo
         }
 
         /// <summary>
-        /// 模块信息
+        /// Module information
         /// </summary>
         public Model Model { get; private set; }
 
         /// <summary>
-        /// 硬件信息
+        /// Hardware information
         /// </summary>
         public Model Hardware { get; private set; }
 
         /// <summary>
-        /// 版本信息
+        /// Firmware version information
         /// </summary>
         public Model Firmware { get; private set; }
 
         /// <summary>
-        /// 扩展版本信息
+        /// Extended firmware version information
         /// </summary>
         public Model FirmwareExtension { get; private set; }
     }
 
     /// <summary>
-    /// 模块信息
+    /// Module information
     /// </summary>
     public class Model
     {

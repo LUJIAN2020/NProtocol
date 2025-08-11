@@ -1,7 +1,7 @@
 ﻿namespace NProtocol.Protocols.Mc;
 
 /// <summary>
-/// 帧
+/// Frame
 /// </summary>
 public enum McFrame : byte
 {

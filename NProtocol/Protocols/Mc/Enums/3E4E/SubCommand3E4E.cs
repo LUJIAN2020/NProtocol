@@ -1,17 +1,17 @@
 ﻿namespace NProtocol.Protocols.Mc
 {
     /// <summary>
-    /// MC指令码3E、4E子指令码
+    /// MC instruction code 3E, 4E sub-command codes
     /// </summary>
     public enum SubCommand3E4E : ushort
     {
         /// <summary>
-        /// 字为单位操作
+        /// Word-based operation
         /// </summary>
         Word = 0x0000,
 
         /// <summary>
-        /// 位为单位操作
+        /// Bit-based operation
         /// </summary>
         Bit = 0x0001,
     }

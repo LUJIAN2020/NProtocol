@@ -9,16 +9,16 @@ using NProtocol.Protocols.S7.Enums.UserData;
 namespace NProtocol.Protocols.S7
 {
     /// <summary>
-    /// S7协议扩展功能性方法
+    /// Extension functions for S7 protocol
     /// </summary>
     public partial class S7Client
     {
         /// <summary>
-        /// 创建扩展报文包
+        /// Creates an extended message packet
         /// </summary>
-        /// <param name="userDataFunction">用户数据功能码</param>
-        /// <param name="subFunction">子功能码</param>
-        /// <param name="payload">负载数据</param>
+        /// <param name="userDataFunction">User data function code</param>
+        /// <param name="subFunction">Sub function code</param>
+        /// <param name="payload">Payload data</param>
         /// <returns></returns>
         private byte[] CreateExtensionPacket(
             UserDataFunction userDataFunction,
@@ -49,7 +49,7 @@ namespace NProtocol.Protocols.S7
         }
 
         /// <summary>
-        /// 读取CPU时间
+        /// Read CPU time
         /// </summary>
         /// <param name="dateTime"></param>
         /// <returns></returns>
@@ -86,7 +86,7 @@ namespace NProtocol.Protocols.S7
         }
 
         /// <summary>
-        /// 设置CPU时钟（可能有问题，不要使用）
+        /// Set CPU time (may have issues, do not use)
         /// </summary>
         /// <param name="dateTime"></param>
         /// <returns></returns>
@@ -132,7 +132,7 @@ namespace NProtocol.Protocols.S7
         }
 
         /// <summary>
-        /// 获取CPU状态
+        /// Get CPU status
         /// </summary>
         /// <returns></returns>
         /// <exception cref="ArgumentNullException"></exception>
@@ -190,7 +190,7 @@ namespace NProtocol.Protocols.S7
         }
 
         /// <summary>
-        /// 设置CPU停止
+        /// Set CPU to stop
         /// </summary>
         /// <returns></returns>
         /// <exception cref="ArgumentNullException"></exception>
@@ -210,7 +210,7 @@ namespace NProtocol.Protocols.S7
         }
 
         /// <summary>
-        /// 热重启
+        /// Hot restart
         /// </summary>
         /// <returns></returns>
         /// <exception cref="ArgumentNullException"></exception>
@@ -255,7 +255,7 @@ namespace NProtocol.Protocols.S7
         }
 
         /// <summary>
-        /// 冷重启
+        /// Cold restart
         /// </summary>
         /// <returns></returns>
         /// <exception cref="ArgumentNullException"></exception>
@@ -302,7 +302,7 @@ namespace NProtocol.Protocols.S7
         }
 
         /// <summary>
-        /// 获取CPU系统信息
+        /// Get CPU system information
         /// </summary>
         /// <returns></returns>
         /// <exception cref="ArgumentNullException"></exception>
@@ -340,7 +340,7 @@ namespace NProtocol.Protocols.S7
         }
 
         /// <summary>
-        /// 获取CPU组件信息
+        /// Get CPU component information
         /// </summary>
         /// <returns></returns>
         /// <exception cref="ArgumentNullException"></exception>
@@ -378,7 +378,7 @@ namespace NProtocol.Protocols.S7
         }
 
         /// <summary>
-        /// 获取CPU通讯能力信息
+        /// Get CPU communication capability information
         /// </summary>
         /// <returns></returns>
         /// <exception cref="ArgumentNullException"></exception>

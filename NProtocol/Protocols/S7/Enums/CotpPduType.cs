@@ -1,62 +1,62 @@
 ﻿namespace NProtocol.Protocols.S7.Enums
 {
     /// <summary>
-    /// COTP连接包的PDU Type
+    /// PDU Type of the COTP connection packet
     /// </summary>
     public enum CotpPduType : byte
     {
         /// <summary>
-        /// 加急数据
+        /// Expedited data
         /// </summary>
         ExpeditedData = 0x01,
 
         /// <summary>
-        /// 加急数据确认
+        /// Expedited data acknowledgment
         /// </summary>
         ExpeditedDataAcknowledgement = 0x02,
 
         /// <summary>
-        /// 用户数据
+        /// User data
         /// </summary>
         UserData = 0x04,
 
         /// <summary>
-        /// 拒绝
+        /// Reject
         /// </summary>
         Reject = 0x05,
 
         /// <summary>
-        /// 数据确认
+        /// Data acknowledgment
         /// </summary>
         DataAcknowledgement = 0x06,
 
         /// <summary>
-        /// TPDU错误
+        /// TPDU error
         /// </summary>
         TPDUError = 0x07,
 
         /// <summary>
-        /// 断开请求
+        /// Disconnect request
         /// </summary>
         DisconnectRequest = 0x08,
 
         /// <summary>
-        /// 断开确认
+        /// Disconnect confirmation
         /// </summary>
         DisconnectConfirm = 0xC0,
 
         /// <summary>
-        /// 连接确认
+        /// Connect confirmation
         /// </summary>
         ConnectConfirm = 0xD0,
 
         /// <summary>
-        /// 连接请求
+        /// Connect request
         /// </summary>
         ConnectRequest = 0xE0,
 
         /// <summary>
-        /// 数据传输
+        /// Data transfer
         /// </summary>
         Data = 0xF0,
     }

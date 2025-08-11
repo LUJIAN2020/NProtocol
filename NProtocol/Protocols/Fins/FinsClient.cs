@@ -427,7 +427,7 @@ namespace NProtocol.Protocols.Fins
                     PlcMemory.C => 0x09,
                     PlcMemory.EB => 0x20, //EB地址需要加上bank号码
                     _ => throw new NotSupportedException(
-                        $"寄存器类型:{plcMemory},数据类型:{dataType}不支持"
+                        $"Register type:{plcMemory}, data type:{dataType} not supported"
                     ),
                 };
             }
@@ -443,7 +443,7 @@ namespace NProtocol.Protocols.Fins
                 PlcMemory.E => 0x98, //E地址只支持word
                 PlcMemory.EB => 0xA0, //EB地址需要加上bank号码
                 _ => throw new NotSupportedException(
-                    $"寄存器类型:{plcMemory},数据类型:{dataType}不支持"
+                    $"Register type:{plcMemory}, data type:{dataType} not supported"
                 ),
             };
         }
@@ -560,20 +560,20 @@ namespace NProtocol.Protocols.Fins
         }
 
         /// <summary>
-        /// 前置头部错误码字典
+        /// Front head error code dictionary
         /// </summary>
         private static readonly Dictionary<uint, string> headerErrorCodeValues = new()
         {
-            { 0x00000000, "正常" },
-            { 0x00000001, "头不是‘FINS’ (ASCII code)" },
-            { 0x00000002, "数据太长" },
-            { 0x00000003, "不支持的命令" },
-            { 0x00000020, "所有的连接被占用" },
-            { 0x00000021, "制定的节点已经连接" },
-            { 0x00000022, "未被指定的IP地址试图访问一个被保护的节点" },
-            { 0x00000023, "客户端FINS节点地址超范围" },
-            { 0x00000024, "相同的FINS节点地址已经被使用" },
-            { 0x00000025, "所有可用的节点地址都已使用" },
+            { 0x00000000, "Normal" },
+            { 0x00000001, "Header is not `FINS` (ASCII code)" },
+            { 0x00000002, "The data is too long" },
+            { 0x00000003, "Unsupported command" },
+            { 0x00000020, "All connections are occupied" },
+            { 0x00000021, "The specified nodes are connected" },
+            { 0x00000022, "An unspecified IP address attempts to access a protected node" },
+            { 0x00000023, "The client FINS node address is out of range" },
+            { 0x00000024, "The same FINS node address has been used" },
+            { 0x00000025, "All available node addresses are used" },
         };
         public Encoding FinsStringEncoding { get; set; } = Encoding.ASCII;
 

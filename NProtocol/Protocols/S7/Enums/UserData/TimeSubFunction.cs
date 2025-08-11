@@ -1,24 +1,25 @@
 ﻿namespace NProtocol.Protocols.S7.Enums.UserData
 {
     /// <summary>
-    /// 用户数据时间子功能码
+    /// User data time sub-function codes
     /// </summary>
     public enum TimeSubFunction : byte
     {
         /// <summary>
-        /// 读时钟
+        /// Read clock
         /// </summary>
         ReadClock = 0x01,
 
         /// <summary>
-        /// 设置时钟
+        /// Set clock
         /// </summary>
         SetClock = 0x02,
 
         /// <summary>
-        /// 下面这两个不常用
+        /// The following two are rarely used
         /// </summary>
         ReadClockFollowing = 0x03,
         SetClockFollowing = 0x04,
     }
+
 }

@@ -1,73 +1,74 @@
 ﻿namespace NProtocol.Protocols.S7.Enums
 {
     /// <summary>
-    /// S7Comm主功能码
+    /// S7Comm main function codes
     /// </summary>
     public enum S7CommFuncCode : byte
     {
         /// <summary>
-        /// CPU服务
+        /// CPU services
         /// </summary>
         CpuServices = 0x00,
 
         /// <summary>
-        /// 有错误的时候返回02功能码
+        /// Return function code 02 in case of error
         /// </summary>
         Response = 0x02,
 
         /// <summary>
-        /// 读取值
+        /// Read value
         /// </summary>
         ReadVar = 0x04,
 
         /// <summary>
-        /// 写入值
+        /// Write value
         /// </summary>
         WriteVar = 0x05,
 
         /// <summary>
-        /// 请求下载
+        /// Request download
         /// </summary>
         RequestDownload = 0x1A,
 
         /// <summary>
-        /// 下载数据块
+        /// Download data block
         /// </summary>
         DownloadBlock = 0x1B,
 
         /// <summary>
-        /// 下载结束
+        /// Download ended
         /// </summary>
         DownloadEnded = 0x1C,
 
         /// <summary>
-        /// 开始上传
+        /// Start upload
         /// </summary>
         StartUpload = 0x1D,
 
         /// <summary>
-        /// 上传
+        /// Upload
         /// </summary>
         Upload = 0x1E,
 
         /// <summary>
-        /// 上传结束
+        /// End upload
         /// </summary>
         EndUpload = 0x1F,
 
         /// <summary>
-        /// 程序调用服务
+        /// Program control service
         /// </summary>
         PlcControl = 0x28,
 
         /// <summary>
-        /// 关闭PLC
+        /// Stop PLC
         /// </summary>
         PlcStop = 0x29,
 
         /// <summary>
-        /// 建立通信 协商PDU长度
+        /// Establish communication and negotiate PDU length
         /// </summary>
         SetupCommunication = 0xF0,
     }
+
 }

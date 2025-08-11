@@ -1,19 +1,19 @@
-﻿using System;
-using NProtocol.Extensions;
+﻿using NProtocol.Extensions;
 using NProtocol.Protocols.S7.Enums;
 using NProtocol.Protocols.S7.Enums.UserData;
+using System;
 
 namespace NProtocol.Protocols.S7
 {
     /// <summary>
-    /// S7协议包组成
+    /// S7 Protocol Packet Composition
     /// </summary>
     public partial class S7Client
     {
-        //完整数据包：TPKT+COTP+S7Comm(Header+Parameter+Data)
+        //complete data packet：TPKT+COTP+S7Comm(Header+Parameter+Data)
 
         /// <summary>
-        /// 创建TPKT包,4字节
+        /// Creates a TPKT packet, 4 bytes
         /// </summary>
         /// <returns></returns>
         private byte[] CreateTpktPacket()
@@ -29,7 +29,7 @@ namespace NProtocol.Protocols.S7
         }
 
         /// <summary>
-        /// 创建COTP连接包,18字节
+        /// Creates a COTP connection packet, 18 bytes
         /// </summary>
         /// <returns></returns>
         private byte[] CreateCotpConnectionPacket(CotpPduType pduType)
@@ -58,7 +58,7 @@ namespace NProtocol.Protocols.S7
         }
 
         /// <summary>
-        /// 创建COTP功能包，3字节
+        /// Creates a COTP function packet, 3 bytes
         /// </summary>
         /// <returns></returns>
         private byte[] CreateCotpFuctionPacket(CotpPduType pduType)
@@ -72,7 +72,7 @@ namespace NProtocol.Protocols.S7
         }
 
         /// <summary>
-        /// 创建S7协议包
+        /// Creates an S7 protocol packet
         /// </summary>
         /// <returns></returns>
         private byte[] CreateS7CommPacket(
@@ -115,9 +115,9 @@ namespace NProtocol.Protocols.S7
         }
 
         /// <summary>
-        /// 创建S7Comm头部包，固定长度10字节
+        /// Creates an S7Comm header packet, fixed length of 10 bytes
         /// </summary>
-        /// <param name="s7CommPduType">S7协议PDU类型</param>
+        /// <param name="s7CommPduType">S7 protocol PDU type</param>
         /// <returns></returns>
         private byte[] CreateS7CommHeaderPacket(S7CommPduType s7CommPduType)
         {
@@ -137,7 +137,7 @@ namespace NProtocol.Protocols.S7
         }
 
         /// <summary>
-        /// 创建S7Comm参数包，长度不固定，长度主要依据功能码变化
+        /// Creates an S7Comm parameter packet, length is variable and mainly depends on the function code
         /// </summary>
         /// <param name="s7CommFuncCode"></param>
         /// <param name="areaType"></param>
@@ -164,18 +164,18 @@ namespace NProtocol.Protocols.S7
             switch (s7CommFuncCode)
             {
                 case S7CommFuncCode.CpuServices:
-                {
-                    buffer = new byte[8];
-                    buffer[0] = (byte)s7CommFuncCode; //作业请求（Job）和确认数据响应（Ack_Data）
-                    buffer[1] = (byte)count;
-                    buffer[2] = VariableSpecification;
-                    buffer[3] = 0x04; //parameter长度
-                    buffer[4] = 0x11; //request=0x11 response=0x12
-                    buffer[5] = (byte)(0x40 + (byte)userDataFunction); //前4位 4=request 8=response 后4位 UserDataFunction
-                    buffer[6] = subFunction; //子功能码，根据UserDataFunction改变而改变
-                    buffer[7] = 0x00; //sequence number 顺序号 不懂什么意思
-                    break;
-                }
+                    {
+                        buffer = new byte[8];
+                        buffer[0] = (byte)s7CommFuncCode; //作业请求（Job）和确认数据响应（Ack_Data）
+                        buffer[1] = (byte)count;
+                        buffer[2] = VariableSpecification;
+                        buffer[3] = 0x04; //parameter长度
+                        buffer[4] = 0x11; //request=0x11 response=0x12
+                        buffer[5] = (byte)(0x40 + (byte)userDataFunction); //前4位 4=request 8=response 后4位 UserDataFunction
+                        buffer[6] = subFunction; //子功能码，根据UserDataFunction改变而改变
+                        buffer[7] = 0x00; //sequence number 顺序号 不懂什么意思
+                        break;
+                    }
                 case S7CommFuncCode.SetupCommunication: //设置通讯，固定长度8字节
                     buffer = new byte[8];
                     buffer[0] = (byte)s7CommFuncCode; //作业请求（Job）和确认数据响应（Ack_Data）
@@ -192,21 +192,21 @@ namespace NProtocol.Protocols.S7
                     break;
                 case S7CommFuncCode.ReadVar:
                 case S7CommFuncCode.WriteVar:
-                {
-                    buffer = new byte[12 + 2];
-                    buffer[0] = (byte)s7CommFuncCode; //作业请求（Job）和确认数据响应（Ack_Data）
-                    buffer[1] = 1;
-                    var item = CreateParameterItemPacket(
-                        varType,
-                        areaType,
-                        db,
-                        byteAddress,
-                        bitAddress,
-                        count
-                    );
-                    Buffer.BlockCopy(item, 0, buffer, 2, item.Length);
-                    break;
-                }
+                    {
+                        buffer = new byte[12 + 2];
+                        buffer[0] = (byte)s7CommFuncCode; //作业请求（Job）和确认数据响应（Ack_Data）
+                        buffer[1] = 1;
+                        var item = CreateParameterItemPacket(
+                            varType,
+                            areaType,
+                            db,
+                            byteAddress,
+                            bitAddress,
+                            count
+                        );
+                        Buffer.BlockCopy(item, 0, buffer, 2, item.Length);
+                        break;
+                    }
                 case S7CommFuncCode.RequestDownload:
                     break;
                 case S7CommFuncCode.DownloadBlock:
@@ -248,7 +248,7 @@ namespace NProtocol.Protocols.S7
         }
 
         /// <summary>
-        /// 创建每一项的parameter
+        /// Creates the parameter for each item
         /// </summary>
         /// <param name="varType"></param>
         /// <param name="areaType"></param>
@@ -339,7 +339,7 @@ namespace NProtocol.Protocols.S7
         }
 
         /// <summary>
-        /// 创建S7Comm负载数据包 一般为写入的数据
+        /// Creates the S7Comm payload data packet, typically for written data
         /// </summary>
         /// <returns></returns>
         private byte[] CreateS7CommDataPacket(S7VarType varType, byte[]? writeData)
@@ -360,9 +360,9 @@ namespace NProtocol.Protocols.S7
         }
 
         /// <summary>
-        /// 获取传输尺寸类型
+        /// Gets the transport size type
         /// </summary>
-        /// <param name="varType">变量类型</param>
+        /// <param name="varType">Variable type</param>
         /// <returns></returns>
         /// <exception cref="FormatException"></exception>
         private S7CommTransportSizeType GetTransportSizeType(S7VarType varType)
@@ -399,9 +399,9 @@ namespace NProtocol.Protocols.S7
         }
 
         /// <summary>
-        /// 更具传输类型获取传输尺寸
+        /// Gets the transport size based on the transport type
         /// </summary>
-        /// <param name="type">传输类型</param>
+        /// <param name="type">Transport type</param>
         /// <returns></returns>
         private int GetTransportSizeLength(S7CommTransportSizeType type)
         {

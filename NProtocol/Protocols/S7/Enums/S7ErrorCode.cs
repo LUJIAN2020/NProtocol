@@ -1,7 +1,7 @@
 ﻿namespace NProtocol.Protocols.S7.Enums
 {
     /// <summary>
-    /// 错误代码
+    /// Error code
     /// </summary>
     public enum S7ErrorCode : byte
     {
