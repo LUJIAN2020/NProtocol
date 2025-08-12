@@ -10,52 +10,52 @@ namespace NProtocol.Protocols.S7
     public partial class S7Client : DriverBase
     {
         /// <summary>
-        /// PDU尺寸
+        /// Protocol Data Unit Size
         /// </summary>
         public const ushort PduSize = 960;
 
         /// <summary>
-        /// 确定项目结构的主要类型，通常为0x12，代表变量规范
+        /// Determine the main type of the project structure, typically 0x12, representing variable specification.
         /// </summary>
         public const byte VariableSpecification = 0x12;
 
         /// <summary>
-        /// 冗余数据，通常为0x0000
+        /// Redundant data, typically 0x0000
         /// </summary>
         public const ushort RedundancyIdentification = 0;
 
         /// <summary>
-        /// 默认TPDU长度，(2^10 = 1024)
+        /// Default TPDU length, (2^10 = 1024)
         /// </summary>
         public const byte DefaultTpduSize = 0x0A;
 
         /// <summary>
-        /// 协议Id，固定值
+        /// Protocol ID, fixed value
         /// </summary>
         public const byte ProtocolId = 0x32;
 
         /// <summary>
-        /// 版本号
+        /// Version number
         /// </summary>
         public const byte Version = 0x03;
 
         /// <summary>
-        /// 保留
+        /// Reserved
         /// </summary>
         public const byte Reserved = 0x00;
 
         /// <summary>
-        /// 目标引用 唯一标识
+        /// Target reference unique identifier
         /// </summary>
         public ushort DestinationReference { get; private set; }
 
         /// <summary>
-        /// 源引用 唯一标识
+        /// Source reference unique identifier
         /// </summary>
         public ushort SourceReference { get; private set; }
 
         /// <summary>
-        /// 协议数据单元参考，通过请求事件增加；
+        /// Protocol Data Unit reference, added through request events;
         /// </summary>
         public ushort ProtocolDataUnitReference { get; private set; }
         public byte Rack { get; set; }
@@ -233,12 +233,12 @@ namespace NProtocol.Protocols.S7
                 case 3:
                 case 4:
                 case 5:
-                    return len / 8; //返回的数据是按位组织的
+                    return len / 8; //The returned data is bit-oriented.
                 case 6:
                 case 7:
                 case 8:
                 default:
-                    return len; //返回的数据是按字节组织
+                    return len; //The returned data is byte-oriented.
             }
         }
 

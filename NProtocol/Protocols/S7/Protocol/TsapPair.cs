@@ -4,7 +4,7 @@ using NProtocol.Protocols.S7.Enums;
 namespace NProtocol.Protocols.S7
 {
     /// <summary>
-    /// TSAP部分
+    /// TSAP section
     /// </summary>
     public readonly struct TsapPair
     {
@@ -15,12 +15,12 @@ namespace NProtocol.Protocols.S7
         }
 
         /// <summary>
-        /// 本机
+        /// Local machine
         /// </summary>
         public Tsap Local { get; }
 
         /// <summary>
-        /// 远程
+        /// Remote machine
         /// </summary>
         public Tsap Remote { get; }
 

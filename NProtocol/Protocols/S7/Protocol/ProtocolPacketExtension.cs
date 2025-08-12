@@ -51,7 +51,6 @@ namespace NProtocol.Protocols.S7
         /// <summary>
         /// Read CPU time
         /// </summary>
-        /// <param name="dateTime"></param>
         /// <returns></returns>
         public Result<DateTime> GetCpuDateTime()
         {
@@ -135,7 +134,6 @@ namespace NProtocol.Protocols.S7
         /// Get CPU status
         /// </summary>
         /// <returns></returns>
-        /// <exception cref="ArgumentNullException"></exception>
         public Result<CpuStatus> ReadCpuStatus()
         {
             return EnqueueExecute(() =>
@@ -193,7 +191,6 @@ namespace NProtocol.Protocols.S7
         /// Set CPU to stop
         /// </summary>
         /// <returns></returns>
-        /// <exception cref="ArgumentNullException"></exception>
         public Result SetCpuStop()
         {
             return EnqueueExecute(() =>
@@ -213,7 +210,6 @@ namespace NProtocol.Protocols.S7
         /// Hot restart
         /// </summary>
         /// <returns></returns>
-        /// <exception cref="ArgumentNullException"></exception>
         public Result SetCpuHotRestart()
         {
             return EnqueueExecute(() =>
@@ -258,7 +254,6 @@ namespace NProtocol.Protocols.S7
         /// Cold restart
         /// </summary>
         /// <returns></returns>
-        /// <exception cref="ArgumentNullException"></exception>
         public Result SetCpuColdRestart()
         {
             return EnqueueExecute(() =>
@@ -305,7 +300,6 @@ namespace NProtocol.Protocols.S7
         /// Get CPU system information
         /// </summary>
         /// <returns></returns>
-        /// <exception cref="ArgumentNullException"></exception>
         public Result<CpuModelInfo> GetCpuModelInfo()
         {
             return EnqueueExecute(() =>
@@ -343,7 +337,6 @@ namespace NProtocol.Protocols.S7
         /// Get CPU component information
         /// </summary>
         /// <returns></returns>
-        /// <exception cref="ArgumentNullException"></exception>
         public Result<CpuCompnenetInfo> GetCpuComponentInfo()
         {
             return EnqueueExecute(() =>
@@ -381,7 +374,6 @@ namespace NProtocol.Protocols.S7
         /// Get CPU communication capability information
         /// </summary>
         /// <returns></returns>
-        /// <exception cref="ArgumentNullException"></exception>
         public Result<CpuCommunicationCapabilityInfo> GetCpuCommunicationCapabilityInfo()
         {
             return EnqueueExecute(() =>

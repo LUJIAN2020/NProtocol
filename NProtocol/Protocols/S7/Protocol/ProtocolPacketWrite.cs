@@ -10,12 +10,12 @@ using NProtocol.Protocols.S7.StructType;
 namespace NProtocol.Protocols.S7
 {
     /// <summary>
-    /// S7协议写的方法
+    /// S7 protocol write method
     /// </summary>
     public partial class S7Client
     {
         /// <summary>
-        /// 获取写入变量报文包
+        /// Get the write variable message packet
         /// </summary>
         /// <param name="areaType"></param>
         /// <param name="varType"></param>
@@ -24,7 +24,6 @@ namespace NProtocol.Protocols.S7
         /// <param name="count"></param>
         /// <param name="writeData"></param>
         /// <returns></returns>
-        /// <exception cref="LpException"></exception>
         private byte[] GetWriteVarPacket(
             S7MemoryAreaType areaType,
             S7VarType varType,
@@ -54,7 +53,7 @@ namespace NProtocol.Protocols.S7
         }
 
         /// <summary>
-        /// 写入字节数组
+        /// Write byte array
         /// </summary>
         /// <param name="areaType"></param>
         /// <param name="varType"></param>
@@ -85,7 +84,7 @@ namespace NProtocol.Protocols.S7
         }
 
         /// <summary>
-        /// 写入连续位
+        /// Write consecutive bits
         /// </summary>
         /// <param name="address"></param>
         /// <param name="states"></param>
@@ -109,11 +108,11 @@ namespace NProtocol.Protocols.S7
         }
 
         /// <summary>
-        /// 写入连续的字节数组
+        /// Write consecutive byte array
         /// </summary>
-        /// <param name="address">字符串格式开始地址</param>
-        /// <param name="values">写入值字节数组</param>
-        /// <returns>执行结果</returns>
+        /// <param name="address">Starting address in string format</param>
+        /// <param name="values">Byte array of values to be written</param>
+        /// <returns>Execution result</returns>
         public Result WriteBytes(string address, params byte[] values)
         {
             if (values.Length == 0)
@@ -134,10 +133,10 @@ namespace NProtocol.Protocols.S7
         }
 
         /// <summary>
-        /// 验证写入数据长度
+        /// Validate the length of the data to be written
         /// </summary>
-        /// <param name="varType">变量类型</param>
-        /// <param name="length">数据长度</param>
+        /// <param name="varType">Variable type</param>
+        /// <param name="length">Data length</param>
         /// <exception cref="ArgumentException"></exception>
         private void ValidateWriteValueLength(S7VarType varType, int length)
         {
@@ -191,11 +190,11 @@ namespace NProtocol.Protocols.S7
         }
 
         /// <summary>
-        /// 写入字符串到DB块 仅支持ASCII写入
+        /// Write a string to the DB block, only supports ASCII writing
         /// </summary>
-        /// <param name="dbNumber">DB块编号</param>
-        /// <param name="address">地址</param>
-        /// <param name="content">写入内容，非中文</param>
+        /// <param name="dbNumber">DB block number</param>
+        /// <param name="address">Address</param>
+        /// <param name="content">Content to be written, non-Chinese characters</param>
         /// <returns></returns>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
         public Result WriteS7StringToDataBlock(ushort dbNumber, ushort address, string content)
@@ -225,7 +224,7 @@ namespace NProtocol.Protocols.S7
         }
 
         /// <summary>
-        /// 写入长字符串，中文字符
+        /// Write a long string, including Chinese characters
         /// </summary>
         /// <param name="dbNumber"></param>
         /// <param name="address"></param>
@@ -263,7 +262,7 @@ namespace NProtocol.Protocols.S7
         }
 
         /// <summary>
-        /// 批量写入字
+        /// Write multiple words
         /// </summary>
         /// <param name="address"></param>
         /// <param name="values"></param>
@@ -275,7 +274,7 @@ namespace NProtocol.Protocols.S7
         }
 
         /// <summary>
-        /// 批量写入双字
+        /// Write multiple double words
         /// </summary>
         /// <param name="address"></param>
         /// <param name="values"></param>
@@ -287,7 +286,7 @@ namespace NProtocol.Protocols.S7
         }
 
         /// <summary>
-        /// 写入多个Int16
+        /// Write multiple Int16 values
         /// </summary>
         /// <param name="address"></param>
         /// <param name="values"></param>
@@ -299,7 +298,7 @@ namespace NProtocol.Protocols.S7
         }
 
         /// <summary>
-        /// 写入连续多个Int32
+        /// Write multiple consecutive Int32 values
         /// </summary>
         /// <param name="address"></param>
         /// <param name="values"></param>
@@ -311,7 +310,7 @@ namespace NProtocol.Protocols.S7
         }
 
         /// <summary>
-        /// 写入连续多个实数
+        /// Write multiple consecutive floating-point values
         /// </summary>
         /// <param name="address"></param>
         /// <param name="values"></param>
@@ -323,7 +322,7 @@ namespace NProtocol.Protocols.S7
         }
 
         /// <summary>
-        /// 写入多个双精度实数
+        /// Write multiple double-precision floating-point values
         /// </summary>
         /// <param name="areaType"></param>
         /// <param name="db"></param>
@@ -342,7 +341,7 @@ namespace NProtocol.Protocols.S7
         }
 
         /// <summary>
-        /// 写入结构体
+        /// Write structure
         /// </summary>
         /// <param name="structValue"></param>
         /// <param name="db"></param>
@@ -362,7 +361,7 @@ namespace NProtocol.Protocols.S7
         }
 
         /// <summary>
-        /// 写入连续的毫秒
+        /// Write consecutive milliseconds
         /// </summary>
         /// <param name="areaType"></param>
         /// <param name="db"></param>
@@ -382,7 +381,7 @@ namespace NProtocol.Protocols.S7
         }
 
         /// <summary>
-        /// 写入连续的LTime 最小单位：纳秒
+        /// Write consecutive LTime values with the smallest unit: nanoseconds
         /// </summary>
         /// <param name="areaType"></param>
         /// <param name="db"></param>
@@ -401,7 +400,7 @@ namespace NProtocol.Protocols.S7
         }
 
         /// <summary>
-        /// 写入连续的DT 日期+时间
+        /// Write consecutive DT (Date + Time) values
         /// </summary>
         /// <param name="areaType"></param>
         /// <param name="db"></param>
@@ -420,12 +419,12 @@ namespace NProtocol.Protocols.S7
         }
 
         /// <summary>
-        /// 写入连续的日期
+        /// Write consecutive date values
         /// </summary>
         /// <param name="areaType"></param>
         /// <param name="db"></param>
         /// <param name="wordAddress"></param>
-        /// <param name="dateTimes"></param>
+        /// <param name="dates"></param>
         /// <returns></returns>
         public Result WriteDates(
             S7MemoryAreaType areaType,
@@ -439,7 +438,7 @@ namespace NProtocol.Protocols.S7
         }
 
         /// <summary>
-        /// 写入连续的LTOD
+        /// Write consecutive LTOD (LTime to Date) values
         /// </summary>
         /// <param name="areaType"></param>
         /// <param name="db"></param>
@@ -458,7 +457,7 @@ namespace NProtocol.Protocols.S7
         }
 
         /// <summary>
-        /// 写入连续的LTOD
+        /// Write consecutive LTOD (LTime to Date) values
         /// </summary>
         /// <param name="areaType"></param>
         /// <param name="db"></param>
@@ -477,7 +476,7 @@ namespace NProtocol.Protocols.S7
         }
 
         /// <summary>
-        /// 写入连续的DTL
+        /// Write consecutive DTL (Date + Time to LTime) values
         /// </summary>
         /// <param name="areaType"></param>
         /// <param name="db"></param>
@@ -496,7 +495,7 @@ namespace NProtocol.Protocols.S7
         }
 
         /// <summary>
-        /// 写入值
+        /// Write value
         /// </summary>
         /// <param name="address"></param>
         /// <param name="value"></param>
@@ -546,7 +545,7 @@ namespace NProtocol.Protocols.S7
         }
 
         /// <summary>
-        /// 校验S7变量类型
+        /// Validate S7 variable type
         /// </summary>
         /// <param name="t1"></param>
         /// <param name="t2"></param>

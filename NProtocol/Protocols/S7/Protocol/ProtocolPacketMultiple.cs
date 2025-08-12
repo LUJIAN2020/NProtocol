@@ -89,7 +89,7 @@ namespace NProtocol.Protocols.S7
                 throw new NotSupportedException($"Function code is temporarily not supported, {s7CommFuncCode}.");
             int itemCount = items.Count();
             var buffer = new byte[12 * itemCount + 2];
-            buffer[0] = (byte)s7CommFuncCode; //作业请求（Job）和确认数据响应（Ack_Data）
+            buffer[0] = (byte)s7CommFuncCode; //Job Request (Job) and Acknowledgment Data Response (Ack_Data)
             buffer[1] = (byte)itemCount;
             int no = 0;
             foreach (var item in items)
@@ -158,8 +158,6 @@ namespace NProtocol.Protocols.S7
         /// </summary>
         /// <param name="items">Address collection, key = address, value = read length</param>
         /// <returns></returns>
-        /// <exception cref="ArgumentException"></exception>
-        /// <exception cref="ArgumentNullException"></exception>
         public Result<IEnumerable<MultipleItem>> ReadMultipleVars(IEnumerable<MultipleItem> items)
         {
             return EnqueueExecute(() =>
@@ -208,8 +206,6 @@ namespace NProtocol.Protocols.S7
         /// </summary>
         /// <param name="items">Parameters</param>
         /// <returns>Returns multiple defined parameters</returns>
-        /// <exception cref="LpException"></exception>
-        /// <exception cref="ArgumentNullException">Parameters cannot be null</exception>
         public Result<IEnumerable<MultipleItem>> WriteMultipleVars(IEnumerable<MultipleItem> items)
         {
             return EnqueueExecute(() =>

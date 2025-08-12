@@ -254,11 +254,10 @@ namespace NProtocol.Protocols.S7
         }
 
         /// <summary>
-        /// 读单个S7Int数据
+        /// Read a single S7Int data
         /// </summary>
         /// <param name="address"></param>
         /// <returns></returns>
-        /// <exception cref="ArgumentNullException"></exception>
         public Result<short> ReadInt(string address)
         {
             var result = ReadInts(address, 1);
@@ -267,12 +266,11 @@ namespace NProtocol.Protocols.S7
         }
 
         /// <summary>
-        /// 读多个连续的S7DInt数据
+        /// Read multiple consecutive S7DInt data
         /// </summary>
         /// <param name="address"></param>
         /// <param name="count"></param>
         /// <returns></returns>
-        /// <exception cref="ArgumentNullException"></exception>
         public Result<int[]> ReadDInts(string address, byte count)
         {
             const byte byteLength = 4;
@@ -282,11 +280,10 @@ namespace NProtocol.Protocols.S7
         }
 
         /// <summary>
-        /// 读单个S7DInt数据
+        /// Read a single S7DInt data
         /// </summary>
         /// <param name="address"></param>
         /// <returns></returns>
-        /// <exception cref="ArgumentNullException"></exception>
         public Result<int> ReadDInt(string address)
         {
             var result = ReadDInts(address, 1);
@@ -295,12 +292,11 @@ namespace NProtocol.Protocols.S7
         }
 
         /// <summary>
-        /// 读连续的多个实数
+        /// Read multiple consecutive floating-point values
         /// </summary>
         /// <param name="address"></param>
         /// <param name="count"></param>
         /// <returns></returns>
-        /// <exception cref="ArgumentNullException"></exception>
         public Result<float[]> ReadReals(string address, byte count)
         {
             const byte byteLength = 4;
@@ -310,11 +306,10 @@ namespace NProtocol.Protocols.S7
         }
 
         /// <summary>
-        /// 读单个实数
+        /// Read a single floating-point value
         /// </summary>
         /// <param name="address"></param>
         /// <returns></returns>
-        /// <exception cref="ArgumentNullException"></exception>
         public Result<float> ReadReal(string address)
         {
             var result = ReadReals(address, 1);
@@ -323,12 +318,13 @@ namespace NProtocol.Protocols.S7
         }
 
         /// <summary>
-        /// 读连续的多个长实数 不支持直接寻址读取
+        /// Read multiple consecutive long floating-point values. Direct addressing is not supported.
         /// </summary>
-        /// <param name="address"></param>
+        /// <param name="areaType"></param>
+        /// <param name="db"></param>
+        /// <param name="wordAddress"></param>
         /// <param name="count"></param>
         /// <returns></returns>
-        /// <exception cref="ArgumentNullException"></exception>
         public Result<double[]> ReadLReals(
             S7MemoryAreaType areaType,
             ushort db,
@@ -343,13 +339,12 @@ namespace NProtocol.Protocols.S7
         }
 
         /// <summary>
-        /// 读单个长实数 不支持直接寻址读取
+        /// Read a single long floating-point value. Direct addressing is not supported.
         /// </summary>
         /// <param name="areaType"></param>
         /// <param name="db"></param>
         /// <param name="wordAddress"></param>
         /// <returns></returns>
-        /// <exception cref="ArgumentNullException"></exception>
         public Result<double> ReadLReal(S7MemoryAreaType areaType, ushort db, int wordAddress)
         {
             var result = ReadLReals(areaType, db, wordAddress, 1);
@@ -358,12 +353,13 @@ namespace NProtocol.Protocols.S7
         }
 
         /// <summary>
-        /// 读字符串 返回S7String
+        /// Read a string and return S7String
         /// </summary>
-        /// <param name="dbNumber">DB块</param>
-        /// <param name="address">地址</param>
-        /// <returns>类型：S7String</returns>
-        /// <exception cref="LpException"></exception>
+        /// <param name="dbNumber"></param>
+        /// <param name="address"></param>
+        /// <param name="stringLength"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentOutOfRangeException"></exception>
         public Result<string> ReadS7StringFromDataBlock(
             ushort dbNumber,
             ushort address,
@@ -382,12 +378,13 @@ namespace NProtocol.Protocols.S7
         }
 
         /// <summary>
-        /// 读字符串 返回S7WString
+        /// Read a string and return S7WString
         /// </summary>
-        /// <param name="dbNumber">DB块</param>
-        /// <param name="address">地址</param>
-        /// <returns>类型：S7WString</returns>
-        /// <exception cref="LpException"></exception>
+        /// <param name="dbNumber"></param>
+        /// <param name="address"></param>
+        /// <param name="stringLength"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentOutOfRangeException"></exception>
         public Result<string> ReadS7WStringFromDataBlock(
             ushort dbNumber,
             ushort address,
@@ -406,7 +403,7 @@ namespace NProtocol.Protocols.S7
         }
 
         /// <summary>
-        /// 读S7Char
+        ///  Read S7Char
         /// </summary>
         /// <param name="dbNumber"></param>
         /// <param name="address"></param>
@@ -421,11 +418,10 @@ namespace NProtocol.Protocols.S7
         }
 
         /// <summary>
-        /// 读S7WChar
+        /// Read S7WChar
         /// </summary>
         /// <param name="dbNumber"></param>
         /// <param name="address"></param>
-        /// <returns></returns>
         /// <returns></returns>
         public Result<string> ReadS7WCharFromDataBlock(ushort dbNumber, ushort address)
         {
@@ -436,13 +432,12 @@ namespace NProtocol.Protocols.S7
         }
 
         /// <summary>
-        /// 读字符串
+        /// Read string to bytes
         /// </summary>
         /// <param name="dbNumber"></param>
         /// <param name="address"></param>
         /// <param name="count"></param>
         /// <returns></returns>
-        /// <exception cref="LpException"></exception>
         private Result<byte[]> ReadStringFromDataBlock(
             ushort dbNumber,
             ushort address,
@@ -467,14 +462,15 @@ namespace NProtocol.Protocols.S7
         }
 
         /// <summary>
-        /// 读多个结构体
+        /// Read multiple structures
         /// </summary>
-        /// <typeparam name="T">结构体类型</typeparam>
-        /// <param name="dbNumber">DB块</param>
-        /// <param name="startAddress">开始地址</param>
-        /// <param name="count">结构体总数</param>
-        /// <returns>结构体数组</returns>
+        /// <typeparam name="T">Structure type</typeparam>
+        /// <param name="dbNumber">DB block</param>
+        /// <param name="startAddress">Starting address</param>
+        /// <param name="count">Total number of structures</param>
+        /// <returns>Array of structures</returns>
         /// <exception cref="ArgumentNullException"></exception>
+
         public T[] ReadStructs<T>(ushort dbNumber, ushort startAddress, int count)
             where T : struct
         {
@@ -499,11 +495,11 @@ namespace NProtocol.Protocols.S7
         }
 
         /// <summary>
-        /// 读单个结构体
+        /// Read a single structure
         /// </summary>
-        /// <typeparam name="T">结构体类型</typeparam>
-        /// <param name="dbNumber">DB块</param>
-        /// <param name="startAddress">开始地址</param>
+        /// <typeparam name="T">Structure type</typeparam>
+        /// <param name="dbNumber">DB block</param>
+        /// <param name="startAddress">Starting address</param>
         /// <returns></returns>
         public T ReadStruct<T>(ushort dbNumber, ushort startAddress)
             where T : struct
@@ -512,7 +508,7 @@ namespace NProtocol.Protocols.S7
         }
 
         /// <summary>
-        /// 读DB块
+        /// Read DB block
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="dbNumber"></param>
@@ -676,7 +672,7 @@ namespace NProtocol.Protocols.S7
         }
 
         /// <summary>
-        /// 读DB块
+        /// Read DB block
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="dbNumber"></param>
@@ -692,17 +688,16 @@ namespace NProtocol.Protocols.S7
         }
 
         /// <summary>
-        /// 读多个时间 单位：ms
+        /// Read multiple times, unit: ms
         /// </summary>
         /// <param name="areaType"></param>
         /// <param name="db"></param>
         /// <param name="wordAddress"></param>
         /// <param name="count"></param>
         /// <returns>
-        /// 范围：T#-24d_20h_31m_23s_648ms 到 T#24d_20h_31m_23s_647ms
-        /// 存储形式： -2,147,483,648 ms 到 +2,147,483,647 ms
+        /// Range: T#-24d_20h_31m_23s_648ms to T#24d_20h_31m_23s_647ms
+        /// Storage format: -2,147,483,648 ms to +2,147,483,647 ms
         /// </returns>
-        /// <exception cref="ArgumentNullException"></exception>
         public Result<TimeSpan[]> ReadTimes(
             S7MemoryAreaType areaType,
             ushort db,
@@ -717,16 +712,15 @@ namespace NProtocol.Protocols.S7
         }
 
         /// <summary>
-        /// 读单个时间 单位：ms
+        /// Read a single time, unit: ms
         /// </summary>
         /// <param name="areaType"></param>
         /// <param name="db"></param>
         /// <param name="wordAddress"></param>
         /// <returns>
-        /// 范围：T#-24d_20h_31m_23s_648ms 到 T#24d_20h_31m_23s_647ms
-        /// 存储形式： -2,147,483,648 ms 到 +2,147,483,647 ms
+        /// Range: T#-24d_20h_31m_23s_648ms to T#24d_20h_31m_23s_647ms
+        /// Storage format: -2,147,483,648 ms to +2,147,483,647 ms
         /// </returns>
-        /// <exception cref="ArgumentNullException"></exception>
         public Result<TimeSpan> ReadTime(S7MemoryAreaType areaType, ushort db, int wordAddress)
         {
             var result = ReadTimes(areaType, db, wordAddress, 1);
@@ -735,14 +729,13 @@ namespace NProtocol.Protocols.S7
         }
 
         /// <summary>
-        /// 读连续的LTime 单位：纳秒
+        /// Read consecutive LTime values, unit: nanoseconds
         /// </summary>
         /// <param name="areaType"></param>
         /// <param name="db"></param>
         /// <param name="wordAddress"></param>
         /// <param name="count"></param>
         /// <returns></returns>
-        /// <exception cref="ArgumentNullException"></exception>
         public Result<TimeSpan[]> ReadLTimes(
             S7MemoryAreaType areaType,
             ushort db,
@@ -757,13 +750,12 @@ namespace NProtocol.Protocols.S7
         }
 
         /// <summary>
-        /// 读LTime 单位：纳秒
+        /// Read LTime value, unit: nanoseconds
         /// </summary>
         /// <param name="areaType"></param>
         /// <param name="db"></param>
         /// <param name="wordAddress"></param>
         /// <returns></returns>
-        /// <exception cref="ArgumentNullException"></exception>
         public Result<TimeSpan> ReadLTime(S7MemoryAreaType areaType, ushort db, int wordAddress)
         {
             var result = ReadLTimes(areaType, db, wordAddress, 1);
@@ -772,14 +764,13 @@ namespace NProtocol.Protocols.S7
         }
 
         /// <summary>
-        /// 读连续的DateAndTime
+        /// Read consecutive DateAndTime values
         /// </summary>
         /// <param name="areaType"></param>
         /// <param name="db"></param>
         /// <param name="wordAddress"></param>
         /// <param name="count"></param>
         /// <returns></returns>
-        /// <exception cref="ArgumentNullException"></exception>
         public Result<DateTime[]> ReadDateAndTimes(
             S7MemoryAreaType areaType,
             ushort db,
@@ -799,13 +790,12 @@ namespace NProtocol.Protocols.S7
         }
 
         /// <summary>
-        /// 读单个DateAndTime
+        /// Read a single DateAndTime value
         /// </summary>
         /// <param name="areaType"></param>
         /// <param name="db"></param>
         /// <param name="wordAddress"></param>
         /// <returns></returns>
-        /// <exception cref="ArgumentNullException"></exception>
         public Result<DateTime> ReadDateAndTime(
             S7MemoryAreaType areaType,
             ushort db,
@@ -818,14 +808,13 @@ namespace NProtocol.Protocols.S7
         }
 
         /// <summary>
-        /// 读连续的TimeOfDay TOD
+        /// Read consecutive TimeOfDay (TOD) values
         /// </summary>
         /// <param name="areaType"></param>
         /// <param name="db"></param>
         /// <param name="wordAddress"></param>
         /// <param name="count"></param>
-        /// <returns>范围：TOD#0:0:0.0 到 TOD#23:59:59.999</returns>
-        /// <exception cref="ArgumentNullException"></exception>
+        /// <returns>Range: TOD#0:0:0.0 to TOD#23:59:59.999</returns>
         public Result<TimeSpan[]> ReadTimeOfDays(
             S7MemoryAreaType areaType,
             ushort db,
@@ -845,14 +834,13 @@ namespace NProtocol.Protocols.S7
         }
 
         /// <summary>
-        /// 读连续的LTimeOfDay LTOD
+        /// Read consecutive LTimeOfDay (LTOD) values
         /// </summary>
         /// <param name="areaType"></param>
         /// <param name="db"></param>
         /// <param name="wordAddress"></param>
         /// <param name="count"></param>
         /// <returns></returns>
-        /// <exception cref="ArgumentNullException"></exception>
         public Result<TimeSpan[]> ReadLTimeOfDays(
             S7MemoryAreaType areaType,
             ushort db,
@@ -872,13 +860,12 @@ namespace NProtocol.Protocols.S7
         }
 
         /// <summary>
-        /// 读单个LTimeOfDay
+        /// Read a single LTimeOfDay (LTOD) value
         /// </summary>
         /// <param name="areaType"></param>
         /// <param name="db"></param>
         /// <param name="wordAddress"></param>
         /// <returns></returns>
-        /// <exception cref="ArgumentNullException"></exception>
         public Result<TimeSpan> ReadLTimeOfDay(
             S7MemoryAreaType areaType,
             ushort db,
@@ -891,14 +878,13 @@ namespace NProtocol.Protocols.S7
         }
 
         /// <summary>
-        /// 读连续的DateTimeLong
+        /// Read consecutive DateTimeLong (DTL) values
         /// </summary>
         /// <param name="areaType"></param>
         /// <param name="db"></param>
         /// <param name="wordAddress"></param>
         /// <param name="count"></param>
-        /// <returns>范围：DTL#1970-01-01-00:00:00.0 到 DTL#2262-04-11-23:47:16.854775807</returns>
-        /// <exception cref="ArgumentNullException"></exception>
+        /// <returns>Range: DTL#1970-01-01-00:00:00.0 to DTL#2262-04-11-23:47:16.854775807</returns>
         public Result<DateTime[]> ReadDtls(
             S7MemoryAreaType areaType,
             ushort db,
@@ -918,13 +904,12 @@ namespace NProtocol.Protocols.S7
         }
 
         /// <summary>
-        /// 读单个DateTimeLong
+        /// Read a single DateTimeLong (DTL) value
         /// </summary>
         /// <param name="areaType"></param>
         /// <param name="db"></param>
         /// <param name="wordAddress"></param>
         /// <returns></returns>
-        /// <exception cref="ArgumentNullException"></exception>
         public Result<DateTime> ReadDtl(S7MemoryAreaType areaType, ushort db, int wordAddress)
         {
             var result = ReadDtls(areaType, db, wordAddress, 1);
@@ -935,7 +920,9 @@ namespace NProtocol.Protocols.S7
         /// <summary>
         /// Read continuous Date data
         /// </summary>
-        /// <param name="address"></param>
+        /// <param name="areaType"></param>
+        /// <param name="db"></param>
+        /// <param name="wordAddress"></param>
         /// <param name="count"></param>
         /// <returns></returns>
         public Result<DateTime[]> ReadDates(

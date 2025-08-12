@@ -55,24 +55,24 @@ namespace NProtocol.Protocols.S7
         }
 
         /// <summary>
-        /// S7Comm地址解析<br/>
-        /// 地址示例：<br/>
-        /// S7-200没有DB块 V=DB1
-        /// DB1.DBX29.0  地址为29.0，类型为布尔<br/>
-        /// DB1.DBB22  地址为22，类型为字节型<br/>
-        /// DB1.DBW28  地址为28，类型为字<br/>
-        /// DB1.DBD0  地址为0，类型为双字或实数<br/>
-        /// DB1.DBX18  地址为18类型为字符串<br/>
-        /// MB0 地址位0，类型为字节<br/>
-        /// MW2 地址为2，类型为字<br/>
-        /// MD6 地址为6，类型为双字<br/>
+        /// S7Comm address parsing<br/>
+        /// Example addresses:<br/>
+        /// S7-200 does not have DB blocks, V=DB1
+        /// DB1.DBX29.0  Address is 29.0, type is Boolean<br/>
+        /// DB1.DBB22  Address is 22, type is Byte<br/>
+        /// DB1.DBW28  Address is 28, type is Word<br/>
+        /// DB1.DBD0  Address is 0, type is Double Word or Real<br/>
+        /// DB1.DBX18  Address is 18, type is String<br/>
+        /// MB0 Address bit 0, type is Byte<br/>
+        /// MW2 Address is 2, type is Word<br/>
+        /// MD6 Address is 6, type is Double Word<br/>
         /// </summary>
-        /// <param name="inputAddress">字符串地址</param>
-        /// <param name="areaType">寄存器区域类型</param>
-        /// <param name="db">DB块</param>
-        /// <param name="varType">变量类型</param>
-        /// <param name="wordAddress">字地址</param>
-        /// <param name="bitAddress">位地址</param>
+        /// <param name="inputAddress">String address</param>
+        /// <param name="areaType">Register area type</param>
+        /// <param name="db">DB block</param>
+        /// <param name="varType">Variable type</param>
+        /// <param name="wordAddress">Word address</param>
+        /// <param name="bitAddress">Bit address</param>
         /// <exception cref="AddressParseException"></exception>
         public static void ParseS7CommAddress(
             string inputAddress,
