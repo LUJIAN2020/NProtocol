@@ -1008,7 +1008,7 @@ namespace NProtocol.Extensions
         }
 
         /// <summary>
-        /// byte[] to value 只支持基础类型
+        /// byte[] to value, Only basic types are supported
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="buffer"></param>
@@ -1021,7 +1021,7 @@ namespace NProtocol.Extensions
         }
 
         /// <summary>
-        /// 值类型转换为字节数组 只支持基础类型
+        /// The value type is converted to a byte array. Only basic types are supported
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="value"></param>
@@ -1047,7 +1047,7 @@ namespace NProtocol.Extensions
             };
 
         /// <summary>
-        /// 值类型数组转换为字节数组 只支持基础类型
+        /// Value type array converted to byte array only supports basic types
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="values"></param>
@@ -1058,7 +1058,7 @@ namespace NProtocol.Extensions
             values.SelectMany(c => c.ToBytesFromValue(isLittleEndian)).ToArray();
 
         /// <summary>
-        /// Word转换为16个位
+        /// Word Convert to 16 bits
         /// </summary>
         /// <param name="values"></param>
         /// <param name="isLittleEndian"></param>
@@ -1086,7 +1086,7 @@ namespace NProtocol.Extensions
         }
 
         /// <summary>
-        /// 2Byte的Word转16个位
+        /// 2 bytes of Word to 16 bits
         /// </summary>
         /// <param name="values"></param>
         /// <param name="isLittleEndian"></param>

@@ -1252,5 +1252,50 @@ namespace NProtocol.Test
                 value.ToUInt64Array(false);
             });
         }
+
+        [TestMethod]
+        public void To_Short_ArrayFromBytes_Test()
+        {
+            var buf = new byte[] { 0x01, 0xFF };
+            short[] actual = buf.ToValueArrayFromBytes<short>(true);
+            var expected = new short[] { 0x01FF };
+            CollectionAssert.AreEqual(expected, actual);
+        }
+        [TestMethod]
+        public void To_UShort_ArrayFromBytes_Test()
+        {
+            var buf = new byte[] { 0x01, 0xFF };
+            ushort[] actual = buf.ToValueArrayFromBytes<ushort>(true);
+            var expected = new ushort[] { 0x01FF };
+            CollectionAssert.AreEqual(expected, actual);
+        }
+        [TestMethod]
+        public void ToBooleansFromWord_Test()
+        {
+            var buf = new ushort[] { 0x0123, 0xEF51 };
+            bool[] actual = buf.ToBooleansFromWord(true);
+            var expected = new bool[] {
+                true, true, false, false, false, true, false, false,
+                true, false, false, false, false, false, false, false,
+
+                true, false, false, false, true, false,true, false,
+                true, true, true, true, false, true, true, true,
+            };
+            CollectionAssert.AreEqual(expected, actual);
+        }
+        [TestMethod]
+        public void ToBooleansFromWord2_Test()
+        {
+            var buf = new byte[] { 0x01, 0x23, 0xEF, 0x51 };
+            bool[] actual = buf.ToBooleansFromWord(true);
+            var expected = new bool[] {
+                true, true, false, false, false, true, false, false,
+                true, false, false, false, false, false, false, false,
+
+                true, false, false, false, true, false,true, false,
+                true, true, true, true, false, true, true, true,
+            };
+            CollectionAssert.AreEqual(expected, actual);
+        }
     }
 }

@@ -101,6 +101,21 @@ namespace NProtocol.Test
             });
         }
 
+        [TestMethod]
+        public void Flatten_Test()
+        {
+            var array = new object[] { 1, "A", new DateTime(2025, 10, 01, 10, 10, 10), TimeSpan.FromSeconds(1), new byte[] { 1, 2, 3, 4 } };
+            var actual = array.Flatten();
+
+            Assert.AreEqual(1, actual[0]);
+            Assert.AreEqual("A", actual[1]);
+            Assert.AreEqual(new DateTime(2025, 10, 01, 10, 10, 10), actual[2]);
+            Assert.AreEqual(TimeSpan.FromSeconds(1), actual[3]);
+            Assert.AreEqual((byte)1, actual[4]);
+            Assert.AreEqual((byte)2, actual[5]);
+            Assert.AreEqual((byte)3, actual[6]);
+            Assert.AreEqual((byte)4, actual[7]);
+        }
 
         [TestMethod]
         public void ToFlattenString_Test()
@@ -109,6 +124,20 @@ namespace NProtocol.Test
             var actual = array.ToFlattenString();
             string expected = "[ 1, 2, 3, 'A', '2025/10/1 10:10:10', '00:00:01', 1, 2, 3, 4 ]";
             Assert.AreEqual(expected, actual);
+        }
+
+        [TestMethod]
+        public void ChunkBy_Test()
+        {
+            var array = new int[] { 1, 2, 4, 5, 6, 9, 10, 20 };
+            var actual = array.ChunkBy(3);
+            var expected = new List<int[]>()
+            {
+                new int[]{ 1,2,4},
+                new int[]{ 5,6,9},
+                new int[]{ 10,20},
+            };
+            CollectionAssert.AreEqual(expected, actual.ToList());
         }
     }
 }
