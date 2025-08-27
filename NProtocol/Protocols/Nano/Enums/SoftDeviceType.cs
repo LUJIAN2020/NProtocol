@@ -1,0 +1,30 @@
+﻿namespace NProtocol.Protocols.Nano
+{
+    public enum SoftDeviceType
+    {
+        R,
+        B,
+        MR,
+        LR,
+        CR,
+        VB,
+        DM,
+        EM,
+        FM,
+        ZF,
+        W,
+        TM,
+        Z,
+        T,
+        TC,
+        TS,
+        C,
+        CC,
+        CS,
+        CTH,
+        CTC,
+        AT,
+        CM,
+        VM
+    }
+}
