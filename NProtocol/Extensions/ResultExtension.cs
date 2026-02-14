@@ -11,8 +11,6 @@ namespace NProtocol.Extensions
                 SendData = result.SendData,
                 ReceivedData = result.ReceivedData,
                 Payload = result.Payload,
-                StartTime = result.StartTime,
-                EndTime = result.EndTime,
             };
         }
     }

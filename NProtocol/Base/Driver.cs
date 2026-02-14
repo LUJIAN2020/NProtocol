@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Threading;
 using NProtocol.Connectors;
 using NProtocol.Enums;
@@ -118,6 +119,7 @@ namespace NProtocol.Base
         /// <exception cref="Exception"></exception>
         protected Result NoLockExecute(byte[] writeData)
         {
+            var now = DateTime.Now;
             var result = new Result() { SendData = writeData };
             Write(writeData);
             int offset = 0;
@@ -135,7 +137,6 @@ namespace NProtocol.Base
                     {
                         result.ReceivedData = readData;
                         result.Payload = payload;
-                        result.EndTime = DateTime.Now;
                         return result;
                     }
                 }
@@ -143,7 +144,7 @@ namespace NProtocol.Base
                 {
                     Thread.Sleep(1);
                 }
-                ThrowLoopTimeoutException(result.StartTime);
+                ThrowLoopTimeoutException(now);
             }
         }
 
@@ -168,9 +169,8 @@ namespace NProtocol.Base
         /// <returns></returns>
         protected Result NoLockExecuteNoResponse(byte[] writeData)
         {
-            var result = new Result { SendData = writeData, StartTime = DateTime.Now };
+            var result = new Result { SendData = writeData };
             connecter.Write(writeData);
-            result.EndTime = DateTime.Now;
             return result;
         }
 
