@@ -482,7 +482,7 @@ namespace NProtocol.Protocols.S7
                 var result = ReadBytes(
                     S7MemoryAreaType.DataBlock,
                     dbNumber,
-                    startAddress,
+                    startAddress + len * i,
                     (ushort)len
                 );
                 var payload = result.Value;
