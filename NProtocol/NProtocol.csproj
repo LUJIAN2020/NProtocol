@@ -6,11 +6,11 @@
 		<Nullable>enable</Nullable>
 		<AssemblyName>NProtocol</AssemblyName>
 		<Authors>LUJIAN2020</Authors>
-		<Version>1.0.1</Version>
+		<Version>1.0.2</Version>
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <PackageReference Include="System.IO.Ports" Version="9.0.6" />
+	  <PackageReference Include="System.IO.Ports" Version="10.0.3" />
 	</ItemGroup>
 
 </Project>
