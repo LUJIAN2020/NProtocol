@@ -1,6 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using NProtocol.Exceptions;
+﻿using NProtocol.Exceptions;
+using System.Collections.Generic;
 
 namespace NProtocol.Protocols.Modbus
 {
@@ -20,11 +19,11 @@ namespace NProtocol.Protocols.Modbus
             string msg = string.Empty;
             if (AbnormalFuncCodeValues.TryGetValue(abnormalCode, out var abnormalMsg))
             {
-                msg.Concat($"AbnormalCode:{abnormalCode:X2},AbnormalMessage：{abnormalMsg}.");
+                msg += $"AbnormalCode:{abnormalCode:X2},AbnormalMessage：{abnormalMsg}.";
             }
             if (ErrorCodeValues.TryGetValue(errorCode, out var errorMsg))
             {
-                msg.Concat($"ErrorCode：{errorCode},ErrorMessage:{errorMsg}.");
+                msg += $"ErrorCode：{errorCode},ErrorMessage:{errorMsg}.";
             }
             return msg;
         }
