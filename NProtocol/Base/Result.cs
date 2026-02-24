@@ -9,18 +9,18 @@ namespace NProtocol.Base
         public byte[] SendData { get; internal set; } = Array.Empty<byte>();
         public byte[] ReceivedData { get; internal set; } = Array.Empty<byte>();
         public byte[] Payload { get; internal set; } = Array.Empty<byte>();
-        public string SendDataHexString => SendData.ToHexString();
-        public string ReceivedDataHexString => ReceivedData.ToHexString();
-        public string SendDataAsciiString => SendData.ToAsciiString();
-        public string ReceivedDataAsciiString => ReceivedData.ToAsciiString();
         public override string ToString()
         {
             var sb = new StringBuilder();
-            sb.AppendLine($"TX-HEX [{SendData.Length}] : {SendDataHexString}")
-                .AppendLine($"RX-HEX [{ReceivedData.Length}] : {ReceivedDataHexString}")
-                .AppendLine($"TX-ASCII : {SendDataAsciiString}")
-                .AppendLine($"RX-ASCII : {ReceivedDataAsciiString}");
+            sb.AppendLine($"TX-HEX [{SendData.Length}] : {GetSendDataHexString()}")
+                .AppendLine($"RX-HEX [{ReceivedData.Length}] : {GetReceivedDataHexString()}")
+                .AppendLine($"TX-ASCII : {GetSendDataAsciiString()}")
+                .AppendLine($"RX-ASCII : {GetReceivedDataAsciiString()}");
             return sb.ToString();
         }
+        public string GetSendDataAsciiString() => SendData.ToAsciiString();
+        public string GetReceivedDataAsciiString() => ReceivedData.ToAsciiString();
+        public string GetSendDataHexString() => SendData.ToHexString();
+        public string GetReceivedDataHexString() => ReceivedData.ToHexString();
     }
 }

@@ -16,10 +16,10 @@ namespace NProtocol.Base
         public override string ToString()
         {
             var sb = new StringBuilder();
-            sb.AppendLine($"TX-HEX [{SendData.Length}] : {SendDataHexString}")
-                .AppendLine($"RX-HEX [{ReceivedData.Length}] : {ReceivedDataHexString}")
-                .AppendLine($"TX-ASCII : {SendDataAsciiString}")
-                .AppendLine($"RX-ASCII : {ReceivedDataAsciiString}");
+            sb.AppendLine($"TX-HEX [{SendData.Length}] : {GetSendDataHexString()}")
+               .AppendLine($"RX-HEX [{ReceivedData.Length}] : {GetReceivedDataHexString()}")
+               .AppendLine($"TX-ASCII : {GetSendDataAsciiString()}")
+               .AppendLine($"RX-ASCII : {GetReceivedDataAsciiString()}");
             if (Value is Array array)
             {
                 sb.AppendLine($"VALUE : {array.ToFlattenString()}");
