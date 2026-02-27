@@ -1,13 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using NProtocol.Base;
+﻿using NProtocol.Base;
 using NProtocol.Connectors;
 using NProtocol.Enums;
 using NProtocol.Exceptions;
 using NProtocol.Extensions;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading;
 
 namespace NProtocol.Protocols.Fins
 {
@@ -135,21 +135,21 @@ namespace NProtocol.Protocols.Fins
                 switch (dataType)
                 {
                     case DataType.Bit:
-                    {
-                        int bitLen = addressBit + length;
-                        dataLength = bitLen % 16 == 0 ? bitLen / 16 : bitLen / 16 + 1;
-                        break;
-                    }
+                        {
+                            int bitLen = addressBit + length;
+                            dataLength = bitLen % 16 == 0 ? bitLen / 16 : bitLen / 16 + 1;
+                            break;
+                        }
                     case DataType.Word:
                         dataLength = length;
                         break;
                     case DataType.String:
-                    {
-                        dataLength = stringFormat is StringFormatType.H or StringFormatType.L
-                            ? stringLength / 2
-                            : stringLength * 2;
-                        break;
-                    }
+                        {
+                            dataLength = stringFormat is StringFormatType.H or StringFormatType.L
+                                ? stringLength / 2
+                                : stringLength * 2;
+                            break;
+                        }
                 }
             }
             body[16] = (byte)(dataLength >> 8);
@@ -158,9 +158,9 @@ namespace NProtocol.Protocols.Fins
             switch (FinsConnectMode)
             {
                 case FinsConnectMode.FinsTcp:
-                {
-                    var header = new byte[16]
                     {
+                        var header = new byte[16]
+                        {
                         70,
                         73,
                         78,
@@ -177,34 +177,34 @@ namespace NProtocol.Protocols.Fins
                         0,
                         0,
                         0,
-                    }; //错误代码；
-                    //读 固定长度0x1A
-                    if (!isWrite) //读
-                    {
-                        header[6] = 0;
-                        header[7] = 0x1A;
+                        }; //错误代码；
+                           //读 固定长度0x1A
+                        if (!isWrite) //读
+                        {
+                            header[6] = 0;
+                            header[7] = 0x1A;
+                        }
+                        else //写
+                        {
+                            int byteLength =
+                                dataType == DataType.Bit ? length + 0x1A : length * 2 + 0x1A;
+                            header[6] = (byte)(byteLength >> 8);
+                            header[7] = (byte)byteLength;
+                        }
+                        if (writeData is not null)
+                        {
+                            return header.Combine(body, writeData);
+                        }
+                        return header.Combine(body);
                     }
-                    else //写
-                    {
-                        int byteLength =
-                            dataType == DataType.Bit ? length + 0x1A : length * 2 + 0x1A;
-                        header[6] = (byte)(byteLength >> 8);
-                        header[7] = (byte)byteLength;
-                    }
-                    if (writeData is not null)
-                    {
-                        return header.Combine(body, writeData);
-                    }
-                    return header.Combine(body);
-                }
                 case FinsConnectMode.FinsUdp:
-                {
-                    if (writeData is not null)
                     {
-                        return body.Combine(writeData);
+                        if (writeData is not null)
+                        {
+                            return body.Combine(writeData);
+                        }
+                        return body;
                     }
-                    return body;
-                }
             }
             return Array.Empty<byte>();
         }
@@ -349,14 +349,14 @@ namespace NProtocol.Protocols.Fins
                     }
                     break;
                 case 36:
-                {
-                    byte b3 = sub;
-                    if (b3 != 1)
                     {
-                        break;
+                        byte b3 = sub;
+                        if (b3 != 1)
+                        {
+                            break;
+                        }
+                        return false;
                     }
-                    return false;
-                }
                 case 37:
                     switch (sub)
                     {
@@ -391,23 +391,23 @@ namespace NProtocol.Protocols.Fins
                     }
                     break;
                 case 48:
-                {
-                    byte b2 = sub;
-                    if (b2 != 1)
                     {
-                        break;
+                        byte b2 = sub;
+                        if (b2 != 1)
+                        {
+                            break;
+                        }
+                        return false;
                     }
-                    return false;
-                }
                 case 64:
-                {
-                    byte b = sub;
-                    if (b != 1)
                     {
-                        break;
+                        byte b = sub;
+                        if (b != 1)
+                        {
+                            break;
+                        }
+                        return false;
                     }
-                    return false;
-                }
             }
             return false;
         }
@@ -448,29 +448,22 @@ namespace NProtocol.Protocols.Fins
             };
         }
 
-        protected override byte[]? ExtractPayload(byte[] writeData, byte[] readData)
+        protected override ReadOnlySpan<byte> ExtractPayload(ReadOnlySpan<byte> writeData, ReadOnlySpan<byte> readData)
         {
             if (ValidateReceiveData(readData))
             {
                 SID--;
                 return readData;
             }
-            return default;
+            return ReadOnlySpan<byte>.Empty;
         }
 
-        private byte[] ValidateReceiveDataToPayload(byte[] sendData, byte[] receiveData) =>
-            FinsConnectMode switch
-            {
-                FinsConnectMode.FinsTcp => ValidateReceiveDataToPayloadFinsTcp(
-                    sendData,
-                    receiveData
-                ),
-                FinsConnectMode.FinsUdp => ValidateReceiveDataToPayloadFinsUdp(
-                    sendData,
-                    receiveData
-                ),
-                _ => Array.Empty<byte>(),
-            };
+        private byte[] ValidateReceiveDataToPayload(byte[] sendData, byte[] receiveData) => FinsConnectMode switch
+        {
+            FinsConnectMode.FinsTcp => ValidateReceiveDataToPayloadFinsTcp(sendData, receiveData),
+            FinsConnectMode.FinsUdp => ValidateReceiveDataToPayloadFinsUdp(sendData, receiveData),
+            _ => Array.Empty<byte>(),
+        };
 
         private byte[] ValidateReceiveDataToPayloadFinsTcp(byte[] sendData, byte[] receiveData)
         {
@@ -514,7 +507,7 @@ namespace NProtocol.Protocols.Fins
             return receiveData.Slice(14);
         }
 
-        private bool ValidateReceiveData(byte[] receiveData) =>
+        private bool ValidateReceiveData(ReadOnlySpan<byte> receiveData) =>
             FinsConnectMode switch
             {
                 FinsConnectMode.FinsTcp => ValidateReceiveDataFinsTcp(receiveData),
@@ -522,10 +515,10 @@ namespace NProtocol.Protocols.Fins
                 _ => false,
             };
 
-        private bool ValidateReceiveDataFinsTcp(byte[] receiveData)
+        private bool ValidateReceiveDataFinsTcp(ReadOnlySpan<byte> receiveData)
         {
             int readLength = receiveData.Length;
-            int len = receiveData.Slice(4, 4).ToInt32();
+            int len = receiveData.Slice(4, 4).ToArray().ToInt32();
             return readLength >= 30
                 && receiveData[0] == FINS[0]
                 && receiveData[1] == FINS[1]
@@ -544,7 +537,7 @@ namespace NProtocol.Protocols.Fins
                 && receiveData[25] == SID;
         }
 
-        private bool ValidateReceiveDataFinsUdp(byte[] receiveData)
+        private bool ValidateReceiveDataFinsUdp(ReadOnlySpan<byte> receiveData)
         {
             return receiveData.Length >= 14
                 && receiveData[0] == ICF_RESPONSE
@@ -592,25 +585,25 @@ namespace NProtocol.Protocols.Fins
                     //采用由低到高字节排序的字符串
                     return encoding.GetString(payload.Reverse().ToArray());
                 case StringFormatType.D:
-                {
-                    //仅使用每个字的高位字节
-                    byte[] buffer = new byte[payload.Length / 2];
-                    for (int i = 0; i < payload.Length; i += 2)
                     {
-                        buffer[i / 2] = payload[i];
+                        //仅使用每个字的高位字节
+                        byte[] buffer = new byte[payload.Length / 2];
+                        for (int i = 0; i < payload.Length; i += 2)
+                        {
+                            buffer[i / 2] = payload[i];
+                        }
+                        return encoding.GetString(buffer);
                     }
-                    return encoding.GetString(buffer);
-                }
                 case StringFormatType.E:
-                {
-                    //仅使用每个字的低位字节
-                    byte[] buffer = new byte[payload.Length / 2];
-                    for (int i = 0; i < payload.Length; i += 2)
                     {
-                        buffer[i / 2] = payload[i + 1];
+                        //仅使用每个字的低位字节
+                        byte[] buffer = new byte[payload.Length / 2];
+                        for (int i = 0; i < payload.Length; i += 2)
+                        {
+                            buffer[i / 2] = payload[i + 1];
+                        }
+                        return encoding.GetString(buffer);
                     }
-                    return encoding.GetString(buffer);
-                }
                 default:
                     throw new ArgumentNullException(nameof(format));
             }
@@ -619,11 +612,7 @@ namespace NProtocol.Protocols.Fins
         public Result ReadBytes(FinsAddress finsAddress, ushort count)
         {
             if (count == 0)
-                throw new ArgumentOutOfRangeException(
-                    nameof(count),
-                    count,
-                    "The number of reads must be > 0"
-                );
+                throw new ArgumentOutOfRangeException(nameof(count), count, "The number of reads must be > 0");
 
             return EnqueueExecute(() =>
             {
@@ -649,10 +638,7 @@ namespace NProtocol.Protocols.Fins
         public string ReadToString(FinsAddress finsAddress)
         {
             if (finsAddress.DataType != DataType.String)
-                throw new ArgumentException(
-                    nameof(finsAddress.DataType),
-                    "The data type must be `String`"
-                );
+                throw new ArgumentException(nameof(finsAddress.DataType), "The data type must be `String`");
 
             return EnqueueExecute(() =>
             {
@@ -695,103 +681,103 @@ namespace NProtocol.Protocols.Fins
             switch (t)
             {
                 case bool:
-                {
-                    if (
-                        finsAddress.PlcMemory == PlcMemory.C
-                        || finsAddress.PlcMemory == PlcMemory.T
-                    )
-                        throw new ArgumentException(
-                            "Timer (T), Counter (C) do not support bit operation",
-                            nameof(finsAddress.PlcMemory)
-                        );
-                    var result = ReadBytes(finsAddress, count);
-                    var bs = result
-                        .Payload.ToBooleansFromWord()
-                        .Slice(finsAddress.AddressBit, count);
-                    if (bs is T[] val)
-                        return result.ToResult(val);
-                    break;
-                }
+                    {
+                        if (
+                            finsAddress.PlcMemory == PlcMemory.C
+                            || finsAddress.PlcMemory == PlcMemory.T
+                        )
+                            throw new ArgumentException(
+                                "Timer (T), Counter (C) do not support bit operation",
+                                nameof(finsAddress.PlcMemory)
+                            );
+                        var result = ReadBytes(finsAddress, count);
+                        var bs = result
+                            .Payload.ToBooleansFromWord()
+                            .Slice(finsAddress.AddressBit, count);
+                        if (bs is T[] val)
+                            return result.ToResult(val);
+                        break;
+                    }
                 case byte:
-                {
-                    const int wordSize = 1;
-                    var result = ReadBytes(finsAddress, (ushort)(count * wordSize));
-                    if (result.Payload is T[] val)
-                        return result.ToResult(val);
-                    break;
-                }
+                    {
+                        const int wordSize = 1;
+                        var result = ReadBytes(finsAddress, (ushort)(count * wordSize));
+                        if (result.Payload is T[] val)
+                            return result.ToResult(val);
+                        break;
+                    }
                 case short:
-                {
-                    const int wordSize = 1;
-                    var result = ReadBytes(finsAddress, (ushort)(count * wordSize));
-                    var payload = result.Payload;
-                    if (payload.ToInt16Array() is T[] val)
-                        return result.ToResult(val);
-                    break;
-                }
+                    {
+                        const int wordSize = 1;
+                        var result = ReadBytes(finsAddress, (ushort)(count * wordSize));
+                        var payload = result.Payload;
+                        if (payload.ToInt16Array() is T[] val)
+                            return result.ToResult(val);
+                        break;
+                    }
                 case ushort:
-                {
-                    const int wordSize = 1;
-                    var result = ReadBytes(finsAddress, (ushort)(count * wordSize));
-                    var payload = result.Payload;
-                    if (payload.ToUInt16Array() is T[] val)
-                        return result.ToResult(val);
-                    break;
-                }
+                    {
+                        const int wordSize = 1;
+                        var result = ReadBytes(finsAddress, (ushort)(count * wordSize));
+                        var payload = result.Payload;
+                        if (payload.ToUInt16Array() is T[] val)
+                            return result.ToResult(val);
+                        break;
+                    }
                 case int:
-                {
-                    const int wordSize = 2;
-                    var result = ReadBytes(finsAddress, (ushort)(count * wordSize));
-                    var payload = result.Payload;
-                    if (payload.ToInt32Array() is T[] val)
-                        return result.ToResult(val);
-                    break;
-                }
+                    {
+                        const int wordSize = 2;
+                        var result = ReadBytes(finsAddress, (ushort)(count * wordSize));
+                        var payload = result.Payload;
+                        if (payload.ToInt32Array() is T[] val)
+                            return result.ToResult(val);
+                        break;
+                    }
                 case uint:
-                {
-                    const int wordSize = 2;
-                    var result = ReadBytes(finsAddress, (ushort)(count * wordSize));
-                    var payload = result.Payload;
-                    if (payload.ToUInt32Array() is T[] val)
-                        return result.ToResult(val);
-                    break;
-                }
+                    {
+                        const int wordSize = 2;
+                        var result = ReadBytes(finsAddress, (ushort)(count * wordSize));
+                        var payload = result.Payload;
+                        if (payload.ToUInt32Array() is T[] val)
+                            return result.ToResult(val);
+                        break;
+                    }
                 case float:
-                {
-                    const int wordSize = 2;
-                    var result = ReadBytes(finsAddress, (ushort)(count * wordSize));
-                    var payload = result.Payload;
-                    if (payload.ToFloatArray() is T[] val)
-                        return result.ToResult(val);
-                    break;
-                }
+                    {
+                        const int wordSize = 2;
+                        var result = ReadBytes(finsAddress, (ushort)(count * wordSize));
+                        var payload = result.Payload;
+                        if (payload.ToFloatArray() is T[] val)
+                            return result.ToResult(val);
+                        break;
+                    }
                 case double:
-                {
-                    const int wordSize = 4;
-                    var result = ReadBytes(finsAddress, (ushort)(count * wordSize));
-                    var payload = result.Payload;
-                    if (payload.ToDoubleArray() is T[] val)
-                        return result.ToResult(val);
-                    break;
-                }
+                    {
+                        const int wordSize = 4;
+                        var result = ReadBytes(finsAddress, (ushort)(count * wordSize));
+                        var payload = result.Payload;
+                        if (payload.ToDoubleArray() is T[] val)
+                            return result.ToResult(val);
+                        break;
+                    }
                 case long:
-                {
-                    const int wordSize = 4;
-                    var result = ReadBytes(finsAddress, (ushort)(count * wordSize));
-                    var payload = result.Payload;
-                    if (payload.ToInt64Array() is T[] val)
-                        return result.ToResult(val);
-                    break;
-                }
+                    {
+                        const int wordSize = 4;
+                        var result = ReadBytes(finsAddress, (ushort)(count * wordSize));
+                        var payload = result.Payload;
+                        if (payload.ToInt64Array() is T[] val)
+                            return result.ToResult(val);
+                        break;
+                    }
                 case ulong:
-                {
-                    const int wordSize = 4;
-                    var result = ReadBytes(finsAddress, (ushort)(count * wordSize));
-                    var payload = result.Payload;
-                    if (payload.ToUInt64Array() is T[] val)
-                        return result.ToResult(val);
-                    break;
-                }
+                    {
+                        const int wordSize = 4;
+                        var result = ReadBytes(finsAddress, (ushort)(count * wordSize));
+                        var payload = result.Payload;
+                        if (payload.ToUInt64Array() is T[] val)
+                            return result.ToResult(val);
+                        break;
+                    }
                 default:
                     break;
             }
@@ -826,24 +812,12 @@ namespace NProtocol.Protocols.Fins
             return EnqueueExecute(() =>
             {
                 if (values.Length % 2 > 0)
-                    throw new ArgumentOutOfRangeException(
-                        nameof(values.Length),
-                        values.Length,
-                        "The minimum write data unit is 1Word=2Byte"
-                    );
+                    throw new ArgumentOutOfRangeException(nameof(values.Length), values.Length, "The minimum write data unit is 1Word=2Byte");
 
                 if (finsAddress.DataType == DataType.Bit)
-                    throw new ArgumentException(
-                        $"This method does not support bit write,{finsAddress}",
-                        nameof(finsAddress)
-                    );
+                    throw new ArgumentException($"This method does not support bit write,{finsAddress}", nameof(finsAddress));
 
-                var sendData = CreateCommand(
-                    FinsCommand.WriteMemoryArea,
-                    finsAddress,
-                    (ushort)(values.Length / 2),
-                    values
-                );
+                var sendData = CreateCommand(FinsCommand.WriteMemoryArea, finsAddress, (ushort)(values.Length / 2), values);
                 var result = NoLockExecute(sendData);
                 result.Payload = ValidateReceiveDataToPayload(result.SendData, result.ReceivedData);
                 return result;
@@ -861,18 +835,10 @@ namespace NProtocol.Protocols.Fins
             return EnqueueExecute(() =>
             {
                 if (finsAddress.DataType != DataType.Bit)
-                    throw new ArgumentException(
-                        $"The write address must be a bit address,{finsAddress}",
-                        nameof(finsAddress)
-                    );
+                    throw new ArgumentException($"The write address must be a bit address,{finsAddress}", nameof(finsAddress));
 
                 var writeData = values.Select(c => c ? (byte)1 : byte.MinValue).ToArray();
-                var sendData = CreateCommand(
-                    FinsCommand.WriteMemoryArea,
-                    finsAddress,
-                    (ushort)values.Length,
-                    writeData
-                );
+                var sendData = CreateCommand(FinsCommand.WriteMemoryArea, finsAddress, (ushort)values.Length, writeData);
                 var result = NoLockExecute(sendData);
                 result.Payload = ValidateReceiveDataToPayload(result.SendData, result.ReceivedData);
                 return result;
@@ -912,56 +878,34 @@ namespace NProtocol.Protocols.Fins
 
         private readonly byte[] handshakeCommand =
         {
-            0x46,
-            0x49,
-            0x4E,
-            0x53, // 'F' 'I' 'N' 'S'
-            0x00,
-            0x00,
-            0x00,
-            0x0C, // 指后面跟的字节长度；
-            0x00,
-            0x00,
-            0x00,
-            0x00, // 固定命令； (0 client to server, 1 server to client)
-            0x00,
-            0x00,
-            0x00,
-            0x00, // 错误代码；
-            0x00,
-            0x00,
-            0x00,
-            0x00, // PC节点IP，当设置为0时，会自动获取节点IP。
+            0x46,0x49,0x4E,0x53, // 'F' 'I' 'N' 'S'
+            0x00,0x00,0x00,0x0C, // 指后面跟的字节长度；
+            0x00,0x00,0x00,0x00, // 固定命令； (0 client to server, 1 server to client)
+            0x00,0x00,0x00,0x00, // 错误代码；
+            0x00,0x00,0x00,0x00, // PC节点IP，当设置为0时，会自动获取节点IP。
         };
 
         public void SendHandshakeCommand(int timeout = 1000)
         {
             if (FinsConnectMode == FinsConnectMode.FinsUdp)
-                throw new Exception(
-                    "FinsUdp does not support Handshake and does not need to be called"
-                );
+                throw new Exception("FinsUdp does not support Handshake and does not need to be called");
 
             Write(handshakeCommand);
             Thread.Sleep(10);
             int offset = 0;
-            var receivedData = new byte[24];
+            Span<byte> receivedData = stackalloc byte[24];
             var now = DateTime.Now;
             while (true)
             {
                 var received = Read();
-                Array.Copy(received, 0, receivedData, offset, received.Length);
+                received.CopyTo(receivedData.Slice(offset));
                 offset += received.Length;
                 if (offset == 24)
                 {
-                    byte[] error = received.Slice(12, 4);
-                    int errorCode = BitConverter.ToInt32(error, 0);
+                    var error = receivedData.Slice(12, 4);
+                    int errorCode = BitConverter.ToInt32(error.ToArray(), 0);
                     if (errorCode > 0)
-                        throw new ExecuteException(
-                            $"Handshake exception,error code:{error.ToHexString()}",
-                            handshakeCommand,
-                            received,
-                            DriverId
-                        );
+                        throw new ExecuteException($"Handshake exception,error code:{error.ToArray().ToHexString()}", handshakeCommand, received.ToArray(), DriverId);
                     SA1 = received[19];
                     DA1 = received[23];
                     break;

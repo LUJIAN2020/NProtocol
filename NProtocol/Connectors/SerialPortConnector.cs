@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Buffers;
 using System.IO.Ports;
 
 namespace NProtocol.Connectors
@@ -86,13 +87,20 @@ namespace NProtocol.Connectors
             serialPort.Dispose();
         }
 
-        public byte[] Read()
+        public ReadOnlySpan<byte> Read()
         {
             Connect();
             int len = serialPort.BytesToRead;
-            var buffer = new byte[len];
-            int rlen = serialPort.Read(buffer, 0, len);
-            return buffer;
+            var rentBuf = ArrayPool<byte>.Shared.Rent(len);
+            try
+            {
+                int rlen = serialPort.Read(rentBuf, 0, len);
+                return rentBuf.AsSpan().Slice(0, rlen);
+            }
+            finally
+            {
+                ArrayPool<byte>.Shared.Return(rentBuf);
+            }
         }
 
         public int Write(byte[] buffer)

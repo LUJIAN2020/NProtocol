@@ -1,13 +1,14 @@
-﻿using System;
-using System.Diagnostics;
-using System.Threading;
-using NProtocol.Connectors;
+﻿using NProtocol.Connectors;
 using NProtocol.Enums;
 using NProtocol.Exceptions;
 using NProtocol.Extensions;
+using System;
+using System.Buffers;
+using System.Threading;
 
 namespace NProtocol.Base
 {
+    public delegate void LogReadWriteRaw(string driverId, RW rw, ReadOnlySpan<byte> data);
     public abstract class DriverBase : IDriver
     {
         private int readTimeout = 1000;
@@ -18,7 +19,7 @@ namespace NProtocol.Base
         /// <summary>
         /// Records read/write raw message data, performance loss, do not enable if not necessary
         /// </summary>
-        public event Action<string, RW, byte[]>? LogReadWriteRaw;
+        public LogReadWriteRaw? LogReadWriteRawHandler { get; set; }
 
         public DriverBase(IParameter parameter, ConnectMode mode)
         {
@@ -83,7 +84,7 @@ namespace NProtocol.Base
         /// <param name="writeData">Write data</param>
         /// <param name="readData">Read data</param>
         /// <returns></returns>
-        protected abstract byte[]? ExtractPayload(byte[] writeData, byte[] readData);
+        protected abstract ReadOnlySpan<byte> ExtractPayload(ReadOnlySpan<byte> writeData, ReadOnlySpan<byte> readData);
 
         /// <summary>
         /// Join the team and execute
@@ -123,28 +124,36 @@ namespace NProtocol.Base
             var result = new Result() { SendData = writeData };
             Write(writeData);
             int offset = 0;
-            var data = new byte[ReceivedBufferSize];
-            while (true)
+            var rentBuf = ArrayPool<byte>.Shared.Rent(ReceivedBufferSize);
+            try
             {
-                var buffer = Read();
-                if (buffer.Length > 0)
+                while (true)
                 {
-                    Array.Copy(buffer, 0, data, offset, buffer.Length);
-                    offset += buffer.Length;
-                    var readData = data.Slice(0, offset);
-                    var payload = ExtractPayload(writeData, readData);
-                    if (payload != null && payload.Length > 0)
+                    var buffer = Read();
+                    if (buffer.Length > 0)
                     {
-                        result.ReceivedData = readData;
-                        result.Payload = payload;
-                        return result;
+                        var span = rentBuf.AsSpan();
+                        buffer.CopyTo(span.Slice(offset));
+                        offset += buffer.Length;
+                        var readData = span.Slice(0, offset);
+                        var payload = ExtractPayload(writeData, readData);
+                        if (!payload.IsEmpty && payload.Length > 0)
+                        {
+                            result.ReceivedData = readData.ToArray();
+                            result.Payload = payload.ToArray();
+                            return result;
+                        }
                     }
+                    else
+                    {
+                        Thread.Sleep(1);
+                    }
+                    ThrowLoopTimeoutException(now);
                 }
-                else
-                {
-                    Thread.Sleep(1);
-                }
-                ThrowLoopTimeoutException(now);
+            }
+            finally
+            {
+                ArrayPool<byte>.Shared.Return(rentBuf);
             }
         }
 
@@ -191,14 +200,14 @@ namespace NProtocol.Base
 
         public int Write(byte[] writeData)
         {
-            LogReadWriteRaw?.Invoke(DriverId, RW.W, writeData);
+            LogReadWriteRawHandler?.Invoke(DriverId, RW.W, writeData);
             return connecter.Write(writeData);
         }
 
-        public byte[] Read()
+        public ReadOnlySpan<byte> Read()
         {
             var buffer = connecter.Read();
-            LogReadWriteRaw?.Invoke(DriverId, RW.R, buffer);
+            LogReadWriteRawHandler?.Invoke(DriverId, RW.R, buffer);
             return buffer;
         }
 

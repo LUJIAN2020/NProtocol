@@ -29,14 +29,14 @@ namespace NProtocol.Protocols.Nano
             : this(SerialPortParameter.Create(portName, baudRate, dataBits, parity, stopBits))
         {
         }
-        protected override byte[]? ExtractPayload(byte[] writeData, byte[] readData)
+        protected override ReadOnlySpan<byte> ExtractPayload(ReadOnlySpan<byte> writeData, ReadOnlySpan<byte> readData)
         {
             int rlen = readData.Length;
             if (rlen > 2 && readData[rlen - 2] == '\r' && readData[rlen - 1] == '\n')
             {
                 return readData;
             }
-            return default;
+            return ReadOnlySpan<byte>.Empty;
         }
         public Encoding DefaultEncoding { get; set; } = Encoding.ASCII;
         public Result ChangeMode(RunMode mode)

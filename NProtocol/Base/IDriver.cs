@@ -1,11 +1,10 @@
 ﻿using System;
-using NProtocol.Enums;
 
 namespace NProtocol.Base
 {
     public interface IDriver : IDisposable
     {
-        event Action<string, RW, byte[]>? LogReadWriteRaw;
+        LogReadWriteRaw? LogReadWriteRawHandler { get; set; }
         int ReadTimeout { get; set; }
         int WriteTimeout { get; set; }
         bool Connected { get; }
@@ -13,7 +12,7 @@ namespace NProtocol.Base
         void Connect();
         void Close();
         int Write(byte[] writeData);
-        byte[] Read();
+        ReadOnlySpan<byte> Read();
         void DiscardBuffer(int timeout);
     }
 }

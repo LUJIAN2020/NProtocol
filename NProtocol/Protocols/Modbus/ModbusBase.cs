@@ -367,7 +367,7 @@ namespace NProtocol.Protocols.Modbus
         /// <param name="readData"></param>
         /// <returns></returns>
         /// <exception cref="Exception"></exception>
-        protected override byte[]? ExtractPayload(byte[] writeData, byte[] readData)
+        protected override ReadOnlySpan<byte> ExtractPayload(ReadOnlySpan<byte> writeData, ReadOnlySpan<byte> readData)
         {
             var mode = ModbusConnectMode;
             switch (mode)
@@ -375,14 +375,14 @@ namespace NProtocol.Protocols.Modbus
                 case ModbusConnectMode.Rtu:
                 case ModbusConnectMode.RtuOverTcp:
                 case ModbusConnectMode.RtuOverUdp:
-                {
-                    var data = ValidateReceivedModbusRtuData(writeData, readData);
-                    if (data.Length != 0)
                     {
-                        return data;
+                        var data = ValidateReceivedModbusRtuData(writeData, readData);
+                        if (data.Length != 0)
+                        {
+                            return data;
+                        }
+                        break;
                     }
-                    break;
-                }
                 case ModbusConnectMode.Tcp:
                 case ModbusConnectMode.Udp:
                     if (readData.Length >= 9)
@@ -397,7 +397,7 @@ namespace NProtocol.Protocols.Modbus
                 default:
                     throw new Exception($"Unsupported connection mode,{mode}");
             }
-            return Array.Empty<byte>();
+            return ReadOnlySpan<byte>.Empty;
         }
 
         /// <summary>
@@ -407,7 +407,7 @@ namespace NProtocol.Protocols.Modbus
         /// <param name="receiveData"></param>
         /// <returns></returns>
         /// <exception cref="ReceivedException"></exception>
-        private byte[] ValidateReceivedModbusRtuData(byte[] sendData, byte[] receiveData)
+        private ReadOnlySpan<byte> ValidateReceivedModbusRtuData(ReadOnlySpan<byte> sendData, ReadOnlySpan<byte> receiveData)
         {
             if (receiveData[0] == sendData[0])
             {
@@ -422,41 +422,41 @@ namespace NProtocol.Protocols.Modbus
                         case FuncCode.ReadHoldingRegisters:
                         case FuncCode.ReadInputRegisters:
                         case FuncCode.ReadWriteMultipleRegisters:
-                        {
-                            //读数据会返回数据长度和数据
-                            //设备Id+功能码+数据长度+数据+CRC
-                            if (receiveData[2] + 5 == receiveData.Length)
                             {
-                                //返回长度一致后校验CRC，不正常抛异常
-                                ValidateCrcFromRtu(sendData, receiveData, receiveData.Length);
+                                //读数据会返回数据长度和数据
+                                //设备Id+功能码+数据长度+数据+CRC
+                                if (receiveData[2] + 5 == receiveData.Length)
+                                {
+                                    //返回长度一致后校验CRC，不正常抛异常
+                                    ValidateCrcFromRtu(sendData, receiveData, receiveData.Length);
 
-                                //正确返回，直接返回
-                                return receiveData.Slice(3, receiveData[2]);
+                                    //正确返回，直接返回
+                                    return receiveData.Slice(3, receiveData[2]);
+                                }
+                                break;
                             }
-                            break;
-                        }
                         case FuncCode.WriteSingleCoil:
                         case FuncCode.WriteSingleRegister:
                         case FuncCode.WriteMultipleCoils:
                         case FuncCode.WriteMultipleRegisters:
-                        {
-                            //写入数据会将写入的报文原样返回
-                            //正确返回，直接返回
-                            if (
-                                sendData[2] == receiveData[2]
-                                && sendData[3] == receiveData[3]
-                                && sendData[4] == receiveData[4]
-                                && sendData[5] == receiveData[5]
-                            )
                             {
-                                //返回长度一致后校验CRC，不正常抛异常
-                                ValidateCrcFromRtu(sendData, receiveData, receiveData.Length);
-
+                                //写入数据会将写入的报文原样返回
                                 //正确返回，直接返回
-                                return receiveData.Slice(0, receiveData.Length);
+                                if (
+                                    sendData[2] == receiveData[2]
+                                    && sendData[3] == receiveData[3]
+                                    && sendData[4] == receiveData[4]
+                                    && sendData[5] == receiveData[5]
+                                )
+                                {
+                                    //返回长度一致后校验CRC，不正常抛异常
+                                    ValidateCrcFromRtu(sendData, receiveData, receiveData.Length);
+
+                                    //正确返回，直接返回
+                                    return receiveData.Slice(0, receiveData.Length);
+                                }
+                                break;
                             }
-                            break;
-                        }
                     }
                 }
                 else if (receiveData[1] == sendData[1] + 0x80)
@@ -467,8 +467,8 @@ namespace NProtocol.Protocols.Modbus
                     throw new ModbusErrorCodeException(
                         abnormalCode,
                         errorCode,
-                        sendData,
-                        receiveData,
+                        sendData.ToArray(),
+                        receiveData.ToArray(),
                         DriverId
                     );
                 }
@@ -476,8 +476,8 @@ namespace NProtocol.Protocols.Modbus
                 {
                     throw new ReceivedException(
                         "Returns data parsing exception",
-                        sendData,
-                        receiveData,
+                        sendData.ToArray(),
+                        receiveData.ToArray(),
                         DriverId
                     );
                 }
@@ -486,13 +486,13 @@ namespace NProtocol.Protocols.Modbus
             {
                 throw new ReceivedException(
                     "The function codes for sending and replying are inconsistent",
-                    sendData,
-                    receiveData,
+                    sendData.ToArray(),
+                    receiveData.ToArray(),
                     DriverId
                 );
             }
 
-            return Array.Empty<byte>();
+            return ReadOnlySpan<byte>.Empty;
         }
 
         /// <summary>
@@ -502,14 +502,14 @@ namespace NProtocol.Protocols.Modbus
         /// <param name="receiveData"></param>
         /// <param name="offset"></param>
         /// <exception cref="ReceivedException"></exception>
-        private void ValidateCrcFromRtu(byte[] sendData, byte[] receiveData, int offset)
+        private void ValidateCrcFromRtu(ReadOnlySpan<byte> sendData, ReadOnlySpan<byte> receiveData, int offset)
         {
-            var crc = receiveData.Slice(0, offset - 2).ToCrc();
+            var crc = receiveData.Slice(0, offset - 2).ToArray().ToCrc();
             if (receiveData[offset - 2] != crc[0] && receiveData[offset - 1] != crc[1])
                 throw new ReceivedException(
                     "Returns data CRC error",
-                    sendData,
-                    receiveData,
+                    sendData.ToArray(),
+                    receiveData.ToArray(),
                     DriverId
                 );
         }
@@ -521,7 +521,7 @@ namespace NProtocol.Protocols.Modbus
         /// <param name="receiveData"></param>
         /// <returns></returns>
         /// <exception cref="ValidateReceivedDataException"></exception>
-        private byte[] ValidateReceivedModbusTcpData(byte[] sendData, byte[] receiveData)
+        private ReadOnlySpan<byte> ValidateReceivedModbusTcpData(ReadOnlySpan<byte> sendData, ReadOnlySpan<byte> receiveData)
         {
             if (
                 receiveData[0] == sendData[0]
@@ -544,45 +544,45 @@ namespace NProtocol.Protocols.Modbus
                     case FuncCode.ReadHoldingRegisters:
                     case FuncCode.ReadInputRegisters:
                     case FuncCode.ReadWriteMultipleRegisters:
-                    {
-                        //读数据会返回数据长度和数据
-                        //设备Id+功能码+数据长度+数据+CRC
-                        if (receiveData[8] + 9 == receiveData.Length)
                         {
-                            //正确返回，直接返回
-                            return receiveData.Slice(9, receiveData[8]);
+                            //读数据会返回数据长度和数据
+                            //设备Id+功能码+数据长度+数据+CRC
+                            if (receiveData[8] + 9 == receiveData.Length)
+                            {
+                                //正确返回，直接返回
+                                return receiveData.Slice(9, receiveData[8]);
+                            }
+                            break;
                         }
-                        break;
-                    }
                     case FuncCode.WriteSingleCoil:
                     case FuncCode.WriteSingleRegister:
                     case FuncCode.WriteMultipleCoils:
                     case FuncCode.WriteMultipleRegisters:
-                    {
-                        //写入数据会讲写入的报文原样返回
-                        //正确返回，直接返回
-                        if (
-                            sendData[8] == receiveData[8]
-                            && sendData[9] == receiveData[9]
-                            && sendData[10] == receiveData[10]
-                            && sendData[11] == receiveData[11]
-                        )
                         {
+                            //写入数据会讲写入的报文原样返回
                             //正确返回，直接返回
-                            return receiveData.Slice(0, receiveData.Length);
+                            if (
+                                sendData[8] == receiveData[8]
+                                && sendData[9] == receiveData[9]
+                                && sendData[10] == receiveData[10]
+                                && sendData[11] == receiveData[11]
+                            )
+                            {
+                                //正确返回，直接返回
+                                return receiveData.Slice(0, receiveData.Length);
+                            }
+                            break;
                         }
-                        break;
-                    }
                 }
             }
             else if (receiveData[7] == sendData[7] + 0x80)
             {
                 //错误回复，直接返回
-                var errorCode = string.Join(" ", receiveData.Slice(7, 2).Select(c => $"0x{c:X2}"));
+                var errorCode = string.Join(" ", receiveData.Slice(7, 2).ToArray().Select(c => $"0x{c:X2}"));
                 throw new ReceivedException(
                     $"Return data error, error code：{errorCode}",
-                    sendData,
-                    receiveData,
+                    sendData.ToArray(),
+                    receiveData.ToArray(),
                     DriverId
                 );
             }
@@ -590,12 +590,12 @@ namespace NProtocol.Protocols.Modbus
             {
                 throw new ReceivedException(
                     "Returns data parsing exception",
-                    sendData,
-                    receiveData,
+                    sendData.ToArray(),
+                    receiveData.ToArray(),
                     DriverId
                 );
             }
-            return Array.Empty<byte>();
+            return ReadOnlySpan<byte>.Empty;
         }
 
         /// <summary>

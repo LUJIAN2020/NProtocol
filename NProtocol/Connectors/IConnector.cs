@@ -10,7 +10,7 @@ namespace NProtocol.Connectors
         string DriverId { get; }
         void Connect();
         void Close();
-        byte[] Read();
+        ReadOnlySpan<byte> Read();
         int Write(byte[] buffer);
         void DiscardBuffer(int timeout);
     }

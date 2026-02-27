@@ -1,7 +1,8 @@
-﻿using System;
+﻿using NProtocol.Extensions;
+using System;
+using System.Buffers;
 using System.Net;
 using System.Net.Sockets;
-using NProtocol.Extensions;
 
 namespace NProtocol.Connectors
 {
@@ -23,9 +24,7 @@ namespace NProtocol.Connectors
             }
             else
             {
-                throw new Exception(
-                    "Type error. The parameter type is not the udp network parameter type"
-                );
+                throw new Exception("Type error. The parameter type is not the udp network parameter type");
             }
         }
 
@@ -43,13 +42,20 @@ namespace NProtocol.Connectors
             client.SafeClose();
         }
 
-        public byte[] Read()
+        public ReadOnlySpan<byte> Read()
         {
-            var buffer = new byte[1024];
-            EndPoint remote = new IPEndPoint(IPAddress.Any, 0);
-            int len = client.ReceiveFrom(buffer, ref remote);
-            Local = client.LocalEndPoint;
-            return buffer.Slice(0, len);
+            var rentBuf = ArrayPool<byte>.Shared.Rent(1024);
+            try
+            {
+                EndPoint remote = new IPEndPoint(IPAddress.Any, 0);
+                int len = client.ReceiveFrom(rentBuf, ref remote);
+                Local = client.LocalEndPoint;
+                return rentBuf.AsSpan().Slice(0, len);
+            }
+            finally
+            {
+                ArrayPool<byte>.Shared.Return(rentBuf);
+            }
         }
 
         public int Write(byte[] buffer)

@@ -436,16 +436,16 @@ namespace NProtocol.Protocols.Mc
             return WriteValues(address, new T[] { value });
         }
 
-        protected override byte[]? ExtractPayload(byte[] writeData, byte[] readData)
+        protected override ReadOnlySpan<byte> ExtractPayload(ReadOnlySpan<byte> writeData, ReadOnlySpan<byte> readData)
         {
             if (ValidateReceivedData(writeData, readData))
             {
                 return readData;
             }
-            return default;
+            return ReadOnlySpan<byte>.Empty;
         }
 
-        private bool ValidateReceivedData(byte[] sendData, byte[] receivedData)
+        private bool ValidateReceivedData(ReadOnlySpan<byte> sendData, ReadOnlySpan<byte> receivedData)
         {
             if (
                 receivedData.Length == 4
@@ -454,12 +454,12 @@ namespace NProtocol.Protocols.Mc
             )
             {
                 //错误结束
-                var errorCode = receivedData.Slice(2, 2).ToHexString();
-                var errorData = receivedData.Slice(3).ToHexString();
+                var errorCode = receivedData.Slice(2, 2).ToArray().ToHexString();
+                var errorData = receivedData.Slice(3).ToArray().ToHexString();
                 throw new ReceivedException(
                     $"Response data error, error code:{errorCode},error data:{errorData}",
-                    sendData,
-                    receivedData,
+                    sendData.ToArray(),
+                    receivedData.ToArray(),
                     DriverId
                 );
             }

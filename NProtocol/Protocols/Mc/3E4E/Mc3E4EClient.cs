@@ -1,10 +1,10 @@
-﻿using System;
-using System.Linq;
-using NProtocol.Base;
+﻿using NProtocol.Base;
 using NProtocol.Connectors;
 using NProtocol.Enums;
 using NProtocol.Exceptions;
 using NProtocol.Extensions;
+using System;
+using System.Linq;
 
 namespace NProtocol.Protocols.Mc
 {
@@ -72,95 +72,95 @@ namespace NProtocol.Protocols.Mc
             switch (McFrame)
             {
                 case McFrame.MC3E:
-                {
-                    buffer = writeData is not null ? new byte[21 + writeData.Length] : new byte[21];
+                    {
+                        buffer = writeData is not null ? new byte[21 + writeData.Length] : new byte[21];
 
-                    //副头部
-                    buffer[0] = 0x50;
-                    buffer[1] = 0x00;
-                    buffer[2] = NetworkNumber; //网络编号
-                    buffer[3] = PlcNumber; //可编程控制器编号
+                        //副头部
+                        buffer[0] = 0x50;
+                        buffer[1] = 0x00;
+                        buffer[2] = NetworkNumber; //网络编号
+                        buffer[3] = PlcNumber; //可编程控制器编号
 
-                    //Q头部
-                    buffer[4] = (byte)IoNumber; //请求目标模块I/O编号
-                    buffer[5] = (byte)(IoNumber >> 8);
-                    buffer[6] = StationNumber; //请求目标模块站号
-                    buffer[7] = 0x00; //请求数据长度
-                    buffer[8] = 0x00;
-                    buffer[9] = (byte)CpuTimer; //CPU监视定时器
-                    buffer[10] = (byte)(CpuTimer >> 8);
+                        //Q头部
+                        buffer[4] = (byte)IoNumber; //请求目标模块I/O编号
+                        buffer[5] = (byte)(IoNumber >> 8);
+                        buffer[6] = StationNumber; //请求目标模块站号
+                        buffer[7] = 0x00; //请求数据长度
+                        buffer[8] = 0x00;
+                        buffer[9] = (byte)CpuTimer; //CPU监视定时器
+                        buffer[10] = (byte)(CpuTimer >> 8);
 
-                    //主指令
-                    buffer[11] = (byte)main;
-                    buffer[12] = (byte)(((ushort)main) >> 8);
+                        //主指令
+                        buffer[11] = (byte)main;
+                        buffer[12] = (byte)(((ushort)main) >> 8);
 
-                    //子指令
-                    buffer[13] = (byte)sub;
-                    buffer[14] = (byte)(((ushort)sub) >> 8);
+                        //子指令
+                        buffer[13] = (byte)sub;
+                        buffer[14] = (byte)(((ushort)sub) >> 8);
 
-                    //请求数据部分
-                    buffer[15] = (byte)startAddress; //起始软元件
-                    buffer[16] = (byte)(startAddress >> 8);
-                    buffer[17] = (byte)(startAddress >> 16);
-                    buffer[18] = (byte)memory; //软元件代码
-                    buffer[19] = count; //软元件点数
-                    buffer[20] = 0; //读取默认为0
-                    if (writeData is not null)
-                        Array.Copy(writeData, 0, buffer, 21, writeData.Length);
+                        //请求数据部分
+                        buffer[15] = (byte)startAddress; //起始软元件
+                        buffer[16] = (byte)(startAddress >> 8);
+                        buffer[17] = (byte)(startAddress >> 16);
+                        buffer[18] = (byte)memory; //软元件代码
+                        buffer[19] = count; //软元件点数
+                        buffer[20] = 0; //读取默认为0
+                        if (writeData is not null)
+                            Array.Copy(writeData, 0, buffer, 21, writeData.Length);
 
-                    //数据长度
-                    int len = buffer.Length - 9;
-                    buffer[7] = (byte)len;
-                    buffer[8] = (byte)(len >> 8);
-                    break;
-                }
+                        //数据长度
+                        int len = buffer.Length - 9;
+                        buffer[7] = (byte)len;
+                        buffer[8] = (byte)(len >> 8);
+                        break;
+                    }
                 case McFrame.MC4E:
-                {
-                    buffer = writeData is not null ? new byte[25 + writeData.Length] : new byte[25];
+                    {
+                        buffer = writeData is not null ? new byte[25 + writeData.Length] : new byte[25];
 
-                    //副头部
-                    buffer[0] = 0x54;
-                    buffer[1] = 0x00;
-                    buffer[2] = (byte)SerialNumber; //串行编号
-                    buffer[3] = (byte)(SerialNumber >> 8);
-                    buffer[4] = 0x00; //固定值
-                    buffer[5] = 0x00;
+                        //副头部
+                        buffer[0] = 0x54;
+                        buffer[1] = 0x00;
+                        buffer[2] = (byte)SerialNumber; //串行编号
+                        buffer[3] = (byte)(SerialNumber >> 8);
+                        buffer[4] = 0x00; //固定值
+                        buffer[5] = 0x00;
 
-                    //Q头部
-                    buffer[6] = NetworkNumber; //网络编号
-                    buffer[7] = PlcNumber; //可编程控制器编号
-                    buffer[8] = (byte)IoNumber; //请求目标模块I/O编号
-                    buffer[9] = (byte)(IoNumber >> 8);
-                    buffer[10] = StationNumber; //请求目标模块站号
-                    buffer[11] = 0x00; //请求数据长度
-                    buffer[12] = 0x00;
-                    buffer[13] = (byte)CpuTimer; //CPU监视定时器
-                    buffer[14] = (byte)(CpuTimer >> 8);
+                        //Q头部
+                        buffer[6] = NetworkNumber; //网络编号
+                        buffer[7] = PlcNumber; //可编程控制器编号
+                        buffer[8] = (byte)IoNumber; //请求目标模块I/O编号
+                        buffer[9] = (byte)(IoNumber >> 8);
+                        buffer[10] = StationNumber; //请求目标模块站号
+                        buffer[11] = 0x00; //请求数据长度
+                        buffer[12] = 0x00;
+                        buffer[13] = (byte)CpuTimer; //CPU监视定时器
+                        buffer[14] = (byte)(CpuTimer >> 8);
 
-                    //主指令
-                    buffer[15] = (byte)main;
-                    buffer[16] = (byte)(((ushort)main) >> 8);
+                        //主指令
+                        buffer[15] = (byte)main;
+                        buffer[16] = (byte)(((ushort)main) >> 8);
 
-                    //子指令
-                    buffer[17] = (byte)sub;
-                    buffer[18] = (byte)(((ushort)sub) >> 8);
+                        //子指令
+                        buffer[17] = (byte)sub;
+                        buffer[18] = (byte)(((ushort)sub) >> 8);
 
-                    //请求数据部分
-                    buffer[19] = (byte)startAddress; //起始软元件
-                    buffer[20] = (byte)(startAddress >> 8);
-                    buffer[21] = (byte)(startAddress >> 16);
-                    buffer[22] = (byte)memory; //软元件代码
-                    buffer[23] = count; //软元件点数
-                    buffer[24] = 0; //读取默认为0
-                    if (writeData is not null)
-                        Array.Copy(writeData, 0, buffer, 25, writeData.Length);
+                        //请求数据部分
+                        buffer[19] = (byte)startAddress; //起始软元件
+                        buffer[20] = (byte)(startAddress >> 8);
+                        buffer[21] = (byte)(startAddress >> 16);
+                        buffer[22] = (byte)memory; //软元件代码
+                        buffer[23] = count; //软元件点数
+                        buffer[24] = 0; //读取默认为0
+                        if (writeData is not null)
+                            Array.Copy(writeData, 0, buffer, 25, writeData.Length);
 
-                    //数据长度
-                    int len = buffer.Length - 13;
-                    buffer[11] = (byte)len;
-                    buffer[12] = (byte)(len >> 8);
-                    break;
-                }
+                        //数据长度
+                        int len = buffer.Length - 13;
+                        buffer[11] = (byte)len;
+                        buffer[12] = (byte)(len >> 8);
+                        break;
+                    }
             }
             return buffer;
         }
@@ -294,113 +294,113 @@ namespace NProtocol.Protocols.Mc
             switch (t)
             {
                 case bool:
-                {
-                    uint start =
-                        address.StartAddress % 16 > 0
-                            ? address.StartAddress - (address.StartAddress % 16)
-                            : address.StartAddress;
+                    {
+                        uint start =
+                            address.StartAddress % 16 > 0
+                                ? address.StartAddress - (address.StartAddress % 16)
+                                : address.StartAddress;
 
-                    byte _count =
-                        (address.StartAddress + count - start) % 16 > 0
-                            ? (byte)((address.StartAddress + count - start) / 16 + 1)
-                            : (byte)((address.StartAddress + count - start) / 16);
+                        byte _count =
+                            (address.StartAddress + count - start) % 16 > 0
+                                ? (byte)((address.StartAddress + count - start) / 16 + 1)
+                                : (byte)((address.StartAddress + count - start) / 16);
 
-                    var addr = new McAddress3E4E(address.Memory, start);
-                    var result = ReadBytes(addr, _count);
-                    result.Payload = result.ReceivedData.Slice(sliceStart);
-                    var values = result.Payload.ToBooleansFromWord(IsLittleEndian);
-                    var bs = values.Slice((int)(address.StartAddress - start), count);
-                    if (bs is T[] val)
-                        return result.ToResult(val);
-                    break;
-                }
+                        var addr = new McAddress3E4E(address.Memory, start);
+                        var result = ReadBytes(addr, _count);
+                        result.Payload = result.ReceivedData.Slice(sliceStart);
+                        var values = result.Payload.ToBooleansFromWord(IsLittleEndian);
+                        var bs = values.Slice((int)(address.StartAddress - start), count);
+                        if (bs is T[] val)
+                            return result.ToResult(val);
+                        break;
+                    }
                 case byte:
-                {
-                    var result = ReadBytes(address, count);
-                    result.Payload = result.ReceivedData.Slice(sliceStart);
-                    var values = result.Payload;
-                    if (values is T[] val)
-                        return result.ToResult(val);
-                    break;
-                }
+                    {
+                        var result = ReadBytes(address, count);
+                        result.Payload = result.ReceivedData.Slice(sliceStart);
+                        var values = result.Payload;
+                        if (values is T[] val)
+                            return result.ToResult(val);
+                        break;
+                    }
                 case short:
-                {
-                    var result = ReadBytes(address, count);
-                    result.Payload = result.ReceivedData.Slice(sliceStart);
-                    var values = result.Payload.ToInt16Array(IsLittleEndian);
-                    if (values is T[] val)
-                        return result.ToResult(val);
-                    break;
-                }
+                    {
+                        var result = ReadBytes(address, count);
+                        result.Payload = result.ReceivedData.Slice(sliceStart);
+                        var values = result.Payload.ToInt16Array(IsLittleEndian);
+                        if (values is T[] val)
+                            return result.ToResult(val);
+                        break;
+                    }
                 case ushort:
-                {
-                    var result = ReadBytes(address, count);
-                    result.Payload = result.ReceivedData.Slice(sliceStart);
-                    var values = result.Payload.ToUInt16Array(IsLittleEndian);
-                    if (values is T[] val)
-                        return result.ToResult(val);
-                    break;
-                }
+                    {
+                        var result = ReadBytes(address, count);
+                        result.Payload = result.ReceivedData.Slice(sliceStart);
+                        var values = result.Payload.ToUInt16Array(IsLittleEndian);
+                        if (values is T[] val)
+                            return result.ToResult(val);
+                        break;
+                    }
                 case int:
-                {
-                    const int byteSize = 2;
-                    var result = ReadBytes(address, (byte)(count * byteSize));
-                    result.Payload = result.ReceivedData.Slice(sliceStart);
-                    var values = result.Payload.ToInt32Array(IsLittleEndian);
-                    if (values is T[] val)
-                        return result.ToResult(val);
-                    break;
-                }
+                    {
+                        const int byteSize = 2;
+                        var result = ReadBytes(address, (byte)(count * byteSize));
+                        result.Payload = result.ReceivedData.Slice(sliceStart);
+                        var values = result.Payload.ToInt32Array(IsLittleEndian);
+                        if (values is T[] val)
+                            return result.ToResult(val);
+                        break;
+                    }
                 case uint:
-                {
-                    const int byteSize = 2;
-                    var result = ReadBytes(address, (byte)(count * byteSize));
-                    result.Payload = result.ReceivedData.Slice(sliceStart);
-                    var values = result.Payload.ToUInt32Array(IsLittleEndian);
-                    if (values is T[] val)
-                        return result.ToResult(val);
-                    break;
-                }
+                    {
+                        const int byteSize = 2;
+                        var result = ReadBytes(address, (byte)(count * byteSize));
+                        result.Payload = result.ReceivedData.Slice(sliceStart);
+                        var values = result.Payload.ToUInt32Array(IsLittleEndian);
+                        if (values is T[] val)
+                            return result.ToResult(val);
+                        break;
+                    }
                 case float:
-                {
-                    const int byteSize = 2;
-                    var result = ReadBytes(address, (byte)(count * byteSize));
-                    result.Payload = result.ReceivedData.Slice(sliceStart);
-                    var values = result.Payload.ToFloatArray(IsLittleEndian);
-                    if (values is T[] val)
-                        return result.ToResult(val);
-                    break;
-                }
+                    {
+                        const int byteSize = 2;
+                        var result = ReadBytes(address, (byte)(count * byteSize));
+                        result.Payload = result.ReceivedData.Slice(sliceStart);
+                        var values = result.Payload.ToFloatArray(IsLittleEndian);
+                        if (values is T[] val)
+                            return result.ToResult(val);
+                        break;
+                    }
                 case long:
-                {
-                    const int byteSize = 4;
-                    var result = ReadBytes(address, (byte)(count * byteSize));
-                    result.Payload = result.ReceivedData.Slice(sliceStart);
-                    var values = result.Payload.ToInt64Array(IsLittleEndian);
-                    if (values is T[] val)
-                        return result.ToResult(val);
-                    break;
-                }
+                    {
+                        const int byteSize = 4;
+                        var result = ReadBytes(address, (byte)(count * byteSize));
+                        result.Payload = result.ReceivedData.Slice(sliceStart);
+                        var values = result.Payload.ToInt64Array(IsLittleEndian);
+                        if (values is T[] val)
+                            return result.ToResult(val);
+                        break;
+                    }
                 case ulong:
-                {
-                    const int byteSize = 4;
-                    var result = ReadBytes(address, (byte)(count * byteSize));
-                    result.Payload = result.ReceivedData.Slice(sliceStart);
-                    var values = result.Payload.ToUInt64Array(IsLittleEndian);
-                    if (values is T[] val)
-                        return result.ToResult(val);
-                    break;
-                }
+                    {
+                        const int byteSize = 4;
+                        var result = ReadBytes(address, (byte)(count * byteSize));
+                        result.Payload = result.ReceivedData.Slice(sliceStart);
+                        var values = result.Payload.ToUInt64Array(IsLittleEndian);
+                        if (values is T[] val)
+                            return result.ToResult(val);
+                        break;
+                    }
                 case double:
-                {
-                    const int byteSize = 4;
-                    var result = ReadBytes(address, (byte)(count * byteSize));
-                    result.Payload = result.ReceivedData.Slice(sliceStart);
-                    var values = result.Payload.ToDoubleArray(IsLittleEndian);
-                    if (values is T[] val)
-                        return result.ToResult(val);
-                    break;
-                }
+                    {
+                        const int byteSize = 4;
+                        var result = ReadBytes(address, (byte)(count * byteSize));
+                        result.Payload = result.ReceivedData.Slice(sliceStart);
+                        var values = result.Payload.ToDoubleArray(IsLittleEndian);
+                        if (values is T[] val)
+                            return result.ToResult(val);
+                        break;
+                    }
                 default:
                     break;
             }
@@ -472,79 +472,79 @@ namespace NProtocol.Protocols.Mc
             switch (writeData)
             {
                 case bool[] bs:
-                {
-                    if (writeData.Length % 2 > 0)
-                        throw new ArgumentOutOfRangeException(
-                            nameof(writeData.Length),
-                            writeData.Length,
-                            "Write length is a multiple of 2"
-                        );
-
-                    int count = writeData.Length;
-                    var bytes = new byte[count / 2];
-                    for (int i = 0; i < bs.Length; i += 2)
                     {
-                        byte left = bs[i] ? (byte)0x10 : byte.MinValue;
-                        byte right = bs[i + 1] ? (byte)0x01 : byte.MinValue;
-                        bytes[i / 2] = (byte)(left + right);
+                        if (writeData.Length % 2 > 0)
+                            throw new ArgumentOutOfRangeException(
+                                nameof(writeData.Length),
+                                writeData.Length,
+                                "Write length is a multiple of 2"
+                            );
+
+                        int count = writeData.Length;
+                        var bytes = new byte[count / 2];
+                        for (int i = 0; i < bs.Length; i += 2)
+                        {
+                            byte left = bs[i] ? (byte)0x10 : byte.MinValue;
+                            byte right = bs[i + 1] ? (byte)0x01 : byte.MinValue;
+                            bytes[i / 2] = (byte)(left + right);
+                        }
+                        return WriteBytes(
+                            Command3E4E.BatchWrite,
+                            SubCommand3E4E.Bit,
+                            address.Memory,
+                            address.StartAddress,
+                            (byte)count,
+                            bytes
+                        );
                     }
-                    return WriteBytes(
-                        Command3E4E.BatchWrite,
-                        SubCommand3E4E.Bit,
-                        address.Memory,
-                        address.StartAddress,
-                        (byte)count,
-                        bytes
-                    );
-                }
                 case short[] values:
-                {
-                    int count = writeData.Length;
-                    var data = values.ToBytes(!IsLittleEndian);
-                    return WriteBytes(address, data);
-                }
+                    {
+                        int count = writeData.Length;
+                        var data = values.ToBytes(!IsLittleEndian);
+                        return WriteBytes(address, data);
+                    }
                 case ushort[] values:
-                {
-                    int count = writeData.Length;
-                    var data = values.ToBytes(!IsLittleEndian);
-                    return WriteBytes(address, data);
-                }
+                    {
+                        int count = writeData.Length;
+                        var data = values.ToBytes(!IsLittleEndian);
+                        return WriteBytes(address, data);
+                    }
                 case int[] values:
-                {
-                    int count = writeData.Length / 2;
-                    var data = values.ToBytes(!IsLittleEndian);
-                    return WriteBytes(address, data);
-                }
+                    {
+                        int count = writeData.Length / 2;
+                        var data = values.ToBytes(!IsLittleEndian);
+                        return WriteBytes(address, data);
+                    }
                 case uint[] values:
-                {
-                    int count = writeData.Length / 2;
-                    var data = values.ToBytes(!IsLittleEndian);
-                    return WriteBytes(address, data);
-                }
+                    {
+                        int count = writeData.Length / 2;
+                        var data = values.ToBytes(!IsLittleEndian);
+                        return WriteBytes(address, data);
+                    }
                 case float[] values:
-                {
-                    int count = writeData.Length / 2;
-                    var data = values.ToBytes(!IsLittleEndian);
-                    return WriteBytes(address, data);
-                }
+                    {
+                        int count = writeData.Length / 2;
+                        var data = values.ToBytes(!IsLittleEndian);
+                        return WriteBytes(address, data);
+                    }
                 case long[] values:
-                {
-                    int count = writeData.Length / 4;
-                    var data = values.ToBytes(!IsLittleEndian);
-                    return WriteBytes(address, data);
-                }
+                    {
+                        int count = writeData.Length / 4;
+                        var data = values.ToBytes(!IsLittleEndian);
+                        return WriteBytes(address, data);
+                    }
                 case ulong[] values:
-                {
-                    int count = writeData.Length / 4;
-                    var data = values.ToBytes(!IsLittleEndian);
-                    return WriteBytes(address, data);
-                }
+                    {
+                        int count = writeData.Length / 4;
+                        var data = values.ToBytes(!IsLittleEndian);
+                        return WriteBytes(address, data);
+                    }
                 case double[] values:
-                {
-                    int count = writeData.Length / 4;
-                    var data = values.ToBytes(!IsLittleEndian);
-                    return WriteBytes(address, data);
-                }
+                    {
+                        int count = writeData.Length / 4;
+                        var data = values.ToBytes(!IsLittleEndian);
+                        return WriteBytes(address, data);
+                    }
                 default:
                     throw new ArgumentException("Type not supported", t.GetType().ToString());
             }
@@ -562,90 +562,90 @@ namespace NProtocol.Protocols.Mc
             return WriteValues(address, new T[] { value });
         }
 
-        protected override byte[]? ExtractPayload(byte[] writeData, byte[] readData)
+        protected override ReadOnlySpan<byte> ExtractPayload(ReadOnlySpan<byte> writeData, ReadOnlySpan<byte> readData)
         {
             if (ValidateReceivedData(writeData, readData))
             {
                 return readData;
             }
-            return default;
+            return ReadOnlySpan<byte>.Empty;
         }
 
-        private bool ValidateReceivedData(byte[] sendData, byte[] receivedData)
+        private bool ValidateReceivedData(ReadOnlySpan<byte> sendData, ReadOnlySpan<byte> receivedData)
         {
             if (receivedData.Length < 11)
                 return false;
             switch (McFrame)
             {
                 case McFrame.MC3E:
-                {
-                    int dataLen = receivedData[7] + receivedData[8] * 256;
-                    int endCode = receivedData[9] + receivedData[10] * 256;
-                    if (
-                        sendData[0] + 0x80 == receivedData[0]
-                        && sendData[1] == receivedData[1]
-                        && sendData[2] == receivedData[2]
-                        && sendData[3] == receivedData[3]
-                        && sendData[4] == receivedData[4]
-                        && sendData[5] == receivedData[5]
-                        && sendData[6] == receivedData[6]
-                        && dataLen == receivedData.Length - 9
-                        && endCode == 0
-                    )
                     {
-                        //写入只会有返回数据
-                        //读取会有数据负载在后面
-                        return true;
+                        int dataLen = receivedData[7] + receivedData[8] * 256;
+                        int endCode = receivedData[9] + receivedData[10] * 256;
+                        if (
+                            sendData[0] + 0x80 == receivedData[0]
+                            && sendData[1] == receivedData[1]
+                            && sendData[2] == receivedData[2]
+                            && sendData[3] == receivedData[3]
+                            && sendData[4] == receivedData[4]
+                            && sendData[5] == receivedData[5]
+                            && sendData[6] == receivedData[6]
+                            && dataLen == receivedData.Length - 9
+                            && endCode == 0
+                        )
+                        {
+                            //写入只会有返回数据
+                            //读取会有数据负载在后面
+                            return true;
+                        }
+                        else
+                        {
+                            var errorCode = receivedData.Slice(9, 2).ToArray().ToHexString();
+                            var errorData = receivedData.Slice(11).ToArray().ToHexString();
+                            throw new ReceivedException(
+                                $"Response data error, error code:{errorCode},error data:{errorData}",
+                                sendData.ToArray(),
+                                receivedData.ToArray(),
+                                DriverId
+                            );
+                        }
                     }
-                    else
-                    {
-                        var errorCode = receivedData.Slice(9, 2).ToHexString();
-                        var errorData = receivedData.Slice(11).ToHexString();
-                        throw new ReceivedException(
-                            $"Response data error, error code:{errorCode},error data:{errorData}",
-                            sendData,
-                            receivedData,
-                            DriverId
-                        );
-                    }
-                }
                 case McFrame.MC4E:
-                {
-                    int sn = receivedData[2] + receivedData[3] * 256;
-                    int dataLen = receivedData[11] + receivedData[12] * 256;
-                    int endCode = receivedData[13] + receivedData[14] * 256;
-                    if (
-                        sendData[0] + 0x80 == receivedData[0]
-                        && sendData[1] == receivedData[1]
-                        && sn == SerialNumber
-                        && sendData[4] == receivedData[4]
-                        && sendData[5] == receivedData[5]
-                        && sendData[6] == receivedData[6]
-                        && sendData[7] == receivedData[7]
-                        && sendData[8] == receivedData[8]
-                        && sendData[9] == receivedData[9]
-                        && sendData[10] == receivedData[10]
-                        && dataLen == receivedData.Length - 13
-                        && endCode == 0
-                    )
                     {
-                        SerialNumber++;
-                        //写入只会有返回数据
-                        //读取会有数据负载在后面
-                        return true;
+                        int sn = receivedData[2] + receivedData[3] * 256;
+                        int dataLen = receivedData[11] + receivedData[12] * 256;
+                        int endCode = receivedData[13] + receivedData[14] * 256;
+                        if (
+                            sendData[0] + 0x80 == receivedData[0]
+                            && sendData[1] == receivedData[1]
+                            && sn == SerialNumber
+                            && sendData[4] == receivedData[4]
+                            && sendData[5] == receivedData[5]
+                            && sendData[6] == receivedData[6]
+                            && sendData[7] == receivedData[7]
+                            && sendData[8] == receivedData[8]
+                            && sendData[9] == receivedData[9]
+                            && sendData[10] == receivedData[10]
+                            && dataLen == receivedData.Length - 13
+                            && endCode == 0
+                        )
+                        {
+                            SerialNumber++;
+                            //写入只会有返回数据
+                            //读取会有数据负载在后面
+                            return true;
+                        }
+                        else
+                        {
+                            var errorCode = receivedData.Slice(13, 2).ToArray();
+                            var errorData = receivedData.Slice(15).ToArray().ToHexString();
+                            throw new ReceivedException(
+                                $"Response data error, error code:{string.Join("", errorCode.Select(c => c.ToString("X2")))},error data:{errorData}",
+                                sendData.ToArray(),
+                                receivedData.ToArray(),
+                                DriverId
+                            );
+                        }
                     }
-                    else
-                    {
-                        var errorCode = receivedData.Slice(13, 2);
-                        var errorData = receivedData.Slice(15).ToHexString();
-                        throw new ReceivedException(
-                            $"Response data error, error code:{errorCode},error data:{errorData}",
-                            sendData,
-                            receivedData,
-                            DriverId
-                        );
-                    }
-                }
                 default:
                     return false;
             }

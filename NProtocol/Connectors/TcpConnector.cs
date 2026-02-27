@@ -1,7 +1,8 @@
-﻿using System;
+﻿using NProtocol.Extensions;
+using System;
+using System.Buffers;
 using System.Net;
 using System.Net.Sockets;
-using NProtocol.Extensions;
 
 namespace NProtocol.Connectors
 {
@@ -9,11 +10,7 @@ namespace NProtocol.Connectors
     {
         private int readTimeout = 1000;
         private int writeTimeout = 1000;
-        private Socket client = new(
-            AddressFamily.InterNetwork,
-            SocketType.Stream,
-            ProtocolType.Tcp
-        );
+        private Socket client = new(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
         public EtherNetParameter Parameter { get; set; }
         public EndPoint? Local => client != null ? client.LocalEndPoint : default;
         public EndPoint? Remote => client != null ? client.RemoteEndPoint : default;
@@ -50,12 +47,19 @@ namespace NProtocol.Connectors
             client.SafeClose();
         }
 
-        public byte[] Read()
+        public ReadOnlySpan<byte> Read()
         {
             ValidateConnected();
-            var buffer = new byte[1024];
-            int len = client.Receive(buffer);
-            return buffer.Slice(0, len);
+            var rentBuf = ArrayPool<byte>.Shared.Rent(1024);
+            try
+            {
+                int len = client.Receive(rentBuf);
+                return rentBuf.AsSpan().Slice(0, len);
+            }
+            finally
+            {
+                ArrayPool<byte>.Shared.Return(rentBuf);
+            }
         }
 
         public int Write(byte[] buffer)

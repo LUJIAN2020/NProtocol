@@ -90,17 +90,17 @@ namespace NProtocol.Protocols.S7
             TsapPair = tsapPair;
         }
 
-        protected override byte[]? ExtractPayload(byte[] writeData, byte[] readData)
+        protected override ReadOnlySpan<byte> ExtractPayload(ReadOnlySpan<byte> writeData, ReadOnlySpan<byte> readData)
         {
             if (ValidateReceivedData(writeData, readData))
             {
                 ProtocolDataUnitReference++;
                 return readData;
             }
-            return default;
+            return ReadOnlySpan<byte>.Empty;
         }
 
-        private bool ValidateReceivedData(byte[] sendData, byte[] receiveData)
+        private bool ValidateReceivedData(ReadOnlySpan<byte> sendData, ReadOnlySpan<byte> receiveData)
         {
             if (receiveData.Length < 4)
                 return false;
@@ -172,8 +172,8 @@ namespace NProtocol.Protocols.S7
                                     S7ErrorCode s7ErrorCode = (S7ErrorCode)receiveData[18];
                                     throw new ReceivedException(
                                         $"The header message is incorrect，S7ErrorClass：{s7ErrorClass},S7ErrorCode：{s7ErrorCode}",
-                                        sendData,
-                                        receiveData,
+                                        sendData.ToArray(),
+                                        receiveData.ToArray(),
                                         DriverId
                                     );
                                 }
@@ -209,8 +209,8 @@ namespace NProtocol.Protocols.S7
                                     {
                                         throw new ReceivedException(
                                             $"The header message is incorrect，S7ErrorClass：{s7ErrorClass},S7ErrorCode：{s7ErrorCode}",
-                                            sendData,
-                                            receiveData,
+                                            sendData.ToArray(),
+                                            receiveData.ToArray(),
                                             DriverId
                                         );
                                     }
