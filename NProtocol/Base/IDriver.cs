@@ -4,7 +4,7 @@ namespace NProtocol.Base
 {
     public interface IDriver : IDisposable
     {
-        LogReadWriteRaw? LogReadWriteRawHandler { get; set; }
+        LogReadWriteRawHandler? LogReadWriteRaw { get; set; }
         int ReadTimeout { get; set; }
         int WriteTimeout { get; set; }
         bool Connected { get; }

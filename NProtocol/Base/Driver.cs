@@ -8,7 +8,7 @@ using System.Threading;
 
 namespace NProtocol.Base
 {
-    public delegate void LogReadWriteRaw(string driverId, RW rw, ReadOnlySpan<byte> data);
+    public delegate void LogReadWriteRawHandler(string driverId, RW rw, ReadOnlySpan<byte> data);
     public abstract class DriverBase : IDriver
     {
         private int readTimeout = 1000;
@@ -19,7 +19,7 @@ namespace NProtocol.Base
         /// <summary>
         /// Records read/write raw message data, performance loss, do not enable if not necessary
         /// </summary>
-        public LogReadWriteRaw? LogReadWriteRawHandler { get; set; }
+        public LogReadWriteRawHandler? LogReadWriteRaw { get; set; }
 
         public DriverBase(IParameter parameter, ConnectMode mode)
         {
@@ -200,14 +200,14 @@ namespace NProtocol.Base
 
         public int Write(byte[] writeData)
         {
-            LogReadWriteRawHandler?.Invoke(DriverId, RW.W, writeData);
+            LogReadWriteRaw?.Invoke(DriverId, RW.W, writeData);
             return connecter.Write(writeData);
         }
 
         public ReadOnlySpan<byte> Read()
         {
             var buffer = connecter.Read();
-            LogReadWriteRawHandler?.Invoke(DriverId, RW.R, buffer);
+            LogReadWriteRaw?.Invoke(DriverId, RW.R, buffer);
             return buffer;
         }
 
