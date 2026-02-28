@@ -21,13 +21,10 @@ namespace NProtocol.Extensions
             if (length == 0)
                 return Array.Empty<T>();
 
-            var buffer = new T[length];
-            Array.Copy(array, start, buffer, 0, length);
-            return buffer;
+            return array.AsSpan().Slice(start, length).ToArray();
         }
 
-        public static T[] Combine<T>(this T[] firstArray, T[] nextArray)
-            where T : struct
+        public static T[] Combine<T>(this T[] firstArray, T[] nextArray) where T : struct
         {
             if (nextArray.Length == 0)
                 return firstArray;
@@ -40,8 +37,7 @@ namespace NProtocol.Extensions
             return combined;
         }
 
-        public static T[] Combine<T>(this T[] firstArray, params T[][] nextArray)
-            where T : struct
+        public static T[] Combine<T>(this T[] firstArray, params T[][] nextArray) where T : struct
         {
             if (nextArray.Length == 0)
                 return firstArray;
@@ -92,11 +88,7 @@ namespace NProtocol.Extensions
             for (int i = 0; i < flattened.Count; i++)
             {
                 var type = flattened[i].GetType();
-                if (
-                    type.Name == nameof(String)
-                    || type.Name == nameof(TimeSpan)
-                    || type.Name == nameof(DateTime)
-                )
+                if (type.Name == nameof(String) || type.Name == nameof(TimeSpan) || type.Name == nameof(DateTime))
                 {
                     sb.Append($"'{flattened[i]}'");
                 }
@@ -125,9 +117,7 @@ namespace NProtocol.Extensions
             for (int i = 0; i < array.Length; i += size)
             {
                 int segmentLength = Math.Min(size, array.Length - i);
-                T[] chunk = new T[segmentLength];
-                Array.Copy(array, i, chunk, 0, segmentLength);
-                yield return chunk;
+                yield return array.AsSpan().Slice(i, segmentLength).ToArray();
             }
         }
     }

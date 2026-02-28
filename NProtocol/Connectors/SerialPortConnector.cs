@@ -52,10 +52,7 @@ namespace NProtocol.Connectors
             }
             else
             {
-                throw new ArgumentException(
-                    "Type error. The parameter type is not the serial port parameter type.",
-                    nameof(parameter)
-                );
+                throw new ArgumentException("Type error. The parameter type is not the serial port parameter type.", nameof(parameter));
             }
         }
 

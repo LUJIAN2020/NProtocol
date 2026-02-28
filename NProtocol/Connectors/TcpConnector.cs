@@ -23,10 +23,7 @@ namespace NProtocol.Connectors
             }
             else
             {
-                throw new ArgumentException(
-                    "Type error. The parameter type is not the tcp network parameter type",
-                    nameof(parameter)
-                );
+                throw new ArgumentException("Type error. The parameter type is not the tcp network parameter type", nameof(parameter));
             }
         }
 

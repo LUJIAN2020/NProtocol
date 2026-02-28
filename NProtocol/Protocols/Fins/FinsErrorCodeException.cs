@@ -1,16 +1,11 @@
-﻿using System.Collections.Generic;
-using NProtocol.Exceptions;
+﻿using NProtocol.Exceptions;
+using System.Collections.Generic;
 
 namespace NProtocol.Protocols.Fins
 {
     public class FinsErrorCodeException : ReceivedException
     {
-        public FinsErrorCodeException(
-            ushort code,
-            byte[] sendData,
-            byte[] receiveData,
-            string driverId
-        )
+        public FinsErrorCodeException(ushort code, byte[] sendData, byte[] receiveData, string driverId)
             : base(GetErrorMessage(code), sendData, receiveData, driverId) { }
 
         public static string GetErrorMessage(ushort code)

@@ -1,21 +1,13 @@
-﻿using System;
-using System.Linq;
-using NProtocol.Exceptions;
+﻿using NProtocol.Exceptions;
 using NProtocol.Extensions;
+using System;
+using System.Linq;
 
 namespace NProtocol.Protocols.Fins
 {
     public readonly struct FinsAddress
     {
-        public FinsAddress(
-            PlcMemory memory,
-            DataType dataType,
-            ushort addressWord,
-            byte addressBit = 0,
-            byte? bank = default,
-            ushort stringLength = 0,
-            StringFormatType? stringFormat = default
-        )
+        public FinsAddress(PlcMemory memory, DataType dataType, ushort addressWord, byte addressBit = 0, byte? bank = default, ushort stringLength = 0, StringFormatType? stringFormat = default)
         {
             PlcMemory = memory;
             DataType = dataType;
@@ -24,30 +16,13 @@ namespace NProtocol.Protocols.Fins
             Bank = bank;
             StringLength = stringLength;
             StringFormat = stringFormat;
-            Address = ToFinsAddress(
-                memory,
-                dataType,
-                addressWord,
-                addressBit,
-                bank,
-                stringLength,
-                stringFormat
-            );
+            Address = ToFinsAddress(memory, dataType, addressWord, addressBit, bank, stringLength, stringFormat);
         }
 
         public FinsAddress(string address)
         {
             Address = address;
-            ParseFinsAddress(
-                address,
-                out PlcMemory memory,
-                out DataType dataType,
-                out ushort addressWord,
-                out byte addressBit,
-                out byte? bank,
-                out ushort stringLength,
-                out StringFormatType? stringFormatType
-            );
+            ParseFinsAddress(address, out PlcMemory memory, out DataType dataType, out ushort addressWord, out byte addressBit, out byte? bank, out ushort stringLength, out StringFormatType? stringFormatType);
             PlcMemory = memory;
             DataType = dataType;
             AddressWord = addressWord;
@@ -67,16 +42,7 @@ namespace NProtocol.Protocols.Fins
         public ushort StringLength { get; }
         public StringFormatType? StringFormat { get; }
 
-        public static void ParseFinsAddress(
-            string address,
-            out PlcMemory memory,
-            out DataType dataType,
-            out ushort addressWord,
-            out byte addressBit,
-            out byte? bank,
-            out ushort stringLength,
-            out StringFormatType? stringFormatType
-        )
+        public static void ParseFinsAddress(string address, out PlcMemory memory, out DataType dataType, out ushort addressWord, out byte addressBit, out byte? bank, out ushort stringLength, out StringFormatType? stringFormatType)
         {
             address.ThrowIsNullOrWhiteSpace(nameof(address));
 
@@ -102,10 +68,7 @@ namespace NProtocol.Protocols.Fins
             string leftAddr = string.Empty;
             if (address.Contains('.'))
             {
-                var splitDot = address.Split(
-                    new char[] { '.' },
-                    StringSplitOptions.RemoveEmptyEntries
-                );
+                var splitDot = address.Split(new char[] { '.' }, StringSplitOptions.RemoveEmptyEntries);
                 if (splitDot.Length != 2)
                     throw new AddressParseException("Address format error", address);
 
@@ -121,11 +84,7 @@ namespace NProtocol.Protocols.Fins
                     string lenStr = rightAddr.Remove(rightAddr.Length - 1, 1);
                     int bytesLength = Convert.ToUInt16(lenStr);
                     if (bytesLength % 2 > 0)
-                        throw new ArgumentOutOfRangeException(
-                            nameof(bytesLength),
-                            bytesLength,
-                            $"E Read the address. The value ranges from 1 to 256 characters. The address format must range from 2H to 512H,{address}"
-                        );
+                        throw new ArgumentOutOfRangeException(nameof(bytesLength), bytesLength, $"E Read the address. The value ranges from 1 to 256 characters. The address format must range from 2H to 512H,{address}");
 
                     if (lastChar == 'H' || lastChar == 'L')
                     {
@@ -143,11 +102,7 @@ namespace NProtocol.Protocols.Fins
                     dataType = DataType.Bit;
                     addressBit = Convert.ToByte(splitDot[1]);
                     if (addressBit > 15)
-                        throw new ArgumentOutOfRangeException(
-                            nameof(addressBit),
-                            addressBit,
-                            $"The bit address format is incorrect, ranging from 0 to 15,{address}"
-                        );
+                        throw new ArgumentOutOfRangeException(nameof(addressBit), addressBit, $"The bit address format is incorrect, ranging from 0 to 15,{address}");
                 }
             }
             else
@@ -156,10 +111,7 @@ namespace NProtocol.Protocols.Fins
                 leftAddr = address;
             }
 
-            var splitColon = leftAddr.Split(
-                new char[] { ':' },
-                StringSplitOptions.RemoveEmptyEntries
-            );
+            var splitColon = leftAddr.Split(new char[] { ':' }, StringSplitOptions.RemoveEmptyEntries);
 
             if (address.Contains(':') && splitColon.Length != 2)
                 throw new AddressParseException("Address format error", address);
@@ -174,13 +126,8 @@ namespace NProtocol.Protocols.Fins
                         addressWord = Convert.ToUInt16(leftAddr.Substring(3));
                         break;
                     case string adr
-                        when adr.Contains("W")
-                            || adr.Contains("H")
-                            || adr.Contains("A")
-                            || adr.Contains("D")
-                            || adr.Contains("T")
-                            || adr.Contains("C")
-                            || adr.Contains("E"):
+                        when adr.Contains("W") || adr.Contains("H") || adr.Contains("A") || adr.Contains("D") ||
+                             adr.Contains("T") || adr.Contains("C") || adr.Contains("E"):
                         memory = (PlcMemory)Enum.Parse(typeof(PlcMemory), leftAddr.Substring(0, 1));
                         addressWord = Convert.ToUInt16(leftAddr.Substring(1));
                         break;
@@ -197,11 +144,8 @@ namespace NProtocol.Protocols.Fins
 
                 bank = Convert.ToByte(leftColon.Substring(1));
                 if (bank > 12)
-                    throw new ArgumentOutOfRangeException(
-                        nameof(bank),
-                        bank,
-                        $"Bank range: 0-12 {address}"
-                    );
+                    throw new ArgumentOutOfRangeException(nameof(bank), bank, $"Bank range: 0-12 {address}");
+
                 addressWord = Convert.ToUInt16(rightColon);
             }
             else
@@ -215,114 +159,75 @@ namespace NProtocol.Protocols.Fins
 
         public override string ToString() => Address;
 
-        private static string ToFinsAddress(
-            PlcMemory memory,
-            DataType dataType,
-            ushort addressWord,
-            byte addressBit,
-            byte? bank,
-            ushort stringLength,
-            StringFormatType? stringFormat
-        )
+        private static string ToFinsAddress(PlcMemory memory, DataType dataType, ushort addressWord, byte addressBit, byte? bank, ushort stringLength, StringFormatType? stringFormat)
         {
             string address = string.Empty;
             if (addressBit > 15)
-                throw new ArgumentOutOfRangeException(
-                    nameof(addressBit),
-                    addressBit,
-                    "The bit address must 0 - 15"
-                );
+                throw new ArgumentOutOfRangeException(nameof(addressBit), addressBit, "The bit address must 0 - 15");
 
             switch (dataType)
             {
                 case DataType.Bit:
-                {
-                    if (memory == PlcMemory.T || memory == PlcMemory.C)
-                        throw new ArgumentException(
-                            "Timer(T), Counter(C) do not support bit operation",
-                            nameof(memory)
-                        );
-
-                    if (memory == PlcMemory.EB)
                     {
-                        if (bank is null && bank > 12)
-                            throw new ArgumentOutOfRangeException(
-                                nameof(bank),
-                                bank,
-                                "Bank ranges of 0-12"
-                            );
+                        if (memory == PlcMemory.T || memory == PlcMemory.C)
+                            throw new ArgumentException("Timer(T), Counter(C) do not support bit operation", nameof(memory));
 
-                        address = $"E{bank:00}:{addressWord:00000}.{addressBit:00}";
+                        if (memory == PlcMemory.EB)
+                        {
+                            if (bank is null && bank > 12)
+                                throw new ArgumentOutOfRangeException(nameof(bank), bank, "Bank ranges of 0-12");
+
+                            address = $"E{bank:00}:{addressWord:00000}.{addressBit:00}";
+                        }
+                        else
+                        {
+                            address = $"{memory}{addressWord:00000}.{addressBit:00}";
+                        }
+                        break;
                     }
-                    else
-                    {
-                        address = $"{memory}{addressWord:00000}.{addressBit:00}";
-                    }
-                    break;
-                }
                 case DataType.Word:
-                {
-                    if (memory == PlcMemory.EB)
                     {
-                        if (bank is null && bank > 12)
-                            throw new ArgumentOutOfRangeException(
-                                nameof(bank),
-                                bank,
-                                "Bank ranges of 0-12"
-                            );
-                        address = $"E{bank:00}:{addressWord:00000}";
+                        if (memory == PlcMemory.EB)
+                        {
+                            if (bank is null && bank > 12)
+                                throw new ArgumentOutOfRangeException(nameof(bank), bank, "Bank ranges of 0-12");
+
+                            address = $"E{bank:00}:{addressWord:00000}";
+                        }
+                        else
+                        {
+                            address = $"{memory}{addressWord:00000}";
+                        }
+                        break;
                     }
-                    else
-                    {
-                        address = $"{memory}{addressWord:00000}";
-                    }
-                    break;
-                }
                 case DataType.String:
-                {
-                    if (stringFormat is null)
-                        throw new ArgumentNullException(
-                            nameof(stringFormat),
-                            "StringFormat cannot be empty"
-                        );
-                    if (stringFormat == StringFormatType.H || stringFormat == StringFormatType.L)
                     {
-                        if (stringLength % 2 > 0 && stringLength < 2 && stringLength > 512)
-                            throw new ArgumentOutOfRangeException(
-                                nameof(stringLength),
-                                stringLength,
-                                "The H and L string are 2 to 512 in length and must be even"
-                            );
+                        if (stringFormat is null)
+                            throw new ArgumentNullException(nameof(stringFormat), "StringFormat cannot be empty");
+
+                        if (stringFormat == StringFormatType.H || stringFormat == StringFormatType.L)
+                        {
+                            if (stringLength % 2 > 0 && stringLength < 2 && stringLength > 512)
+                                throw new ArgumentOutOfRangeException(nameof(stringLength), stringLength, "The H and L string are 2 to 512 in length and must be even");
+                        }
+                        else if (stringFormat == StringFormatType.D || stringFormat == StringFormatType.E)
+                        {
+                            if (stringLength < 1 && stringLength > 256)
+                                throw new ArgumentOutOfRangeException(nameof(stringLength), stringLength, "The H and L string are 1 to 256 in length");
+                        }
+                        if (memory == PlcMemory.EB)
+                        {
+                            if (bank is null && bank > 12)
+                                throw new ArgumentOutOfRangeException(nameof(bank), bank, "Bank ranges of 0-12");
+
+                            address = $"E{bank:00}:{addressWord:00000}.{stringLength:000}{stringFormat}";
+                        }
+                        else
+                        {
+                            address = $"{memory}{addressWord:00000}.{stringLength:000}{stringFormat}";
+                        }
+                        break;
                     }
-                    else if (
-                        stringFormat == StringFormatType.D
-                        || stringFormat == StringFormatType.E
-                    )
-                    {
-                        if (stringLength < 1 && stringLength > 256)
-                            throw new ArgumentOutOfRangeException(
-                                nameof(stringLength),
-                                stringLength,
-                                "The H and L string are 1 to 256 in length"
-                            );
-                    }
-                    if (memory == PlcMemory.EB)
-                    {
-                        if (bank is null && bank > 12)
-                            throw new ArgumentOutOfRangeException(
-                                nameof(bank),
-                                bank,
-                                "Bank ranges of 0-12"
-                            );
-                        address =
-                            $"E{bank:00}:{addressWord:00000}.{stringLength:000}{stringFormat}";
-                    }
-                    else
-                    {
-                        address = $"{memory}{addressWord:00000}.{stringLength:000}{stringFormat}";
-                    }
-                    break;
-                }
             }
             return address;
         }

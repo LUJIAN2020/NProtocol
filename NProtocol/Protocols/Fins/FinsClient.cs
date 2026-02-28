@@ -13,25 +13,21 @@ namespace NProtocol.Protocols.Fins
 {
     public class FinsClient : DriverBase
     {
-        public FinsClient(EtherNetParameter parameter, FinsConnectMode mode)
-            : base(parameter, GetConnectMode(mode))
+        public FinsClient(EtherNetParameter parameter, FinsConnectMode mode) : base(parameter, GetConnectMode(mode))
         {
             FinsConnectMode = mode;
         }
 
-        public FinsClient(string ip, ushort port, FinsConnectMode mode)
-            : this(EtherNetParameter.Create(ip, port), mode) { }
+        public FinsClient(string ip, ushort port, FinsConnectMode mode) : this(EtherNetParameter.Create(ip, port), mode) { }
 
-        public FinsClient(string ip, FinsConnectMode mode)
-            : this(ip, 9600, mode) { }
+        public FinsClient(string ip, FinsConnectMode mode) : this(ip, 9600, mode) { }
 
-        private static ConnectMode GetConnectMode(FinsConnectMode mode) =>
-            mode switch
-            {
-                FinsConnectMode.FinsTcp => ConnectMode.Tcp,
-                FinsConnectMode.FinsUdp => ConnectMode.Udp,
-                _ => throw new ArgumentException($"Unsupported modbus connect mode `{mode}`"),
-            };
+        private static ConnectMode GetConnectMode(FinsConnectMode mode) => mode switch
+        {
+            FinsConnectMode.FinsTcp => ConnectMode.Tcp,
+            FinsConnectMode.FinsUdp => ConnectMode.Udp,
+            _ => throw new ArgumentException($"Unsupported modbus connect mode `{mode}`"),
+        };
 
         public const string FINS = "FINS";
         public const byte ICF_COMMAND = 0x80;
@@ -47,41 +43,16 @@ namespace NProtocol.Protocols.Fins
         public byte SID { get; internal set; } = byte.MaxValue;
         public bool IsLittleEndian { get; } = true;
         public FinsConnectMode FinsConnectMode { get; }
-
-        private byte[] CreateCommand(
-            FinsCommand finsCommand,
-            FinsAddress finsAddress,
-            ushort length = 1,
-            byte[]? writeData = null
-        )
+        private byte[] CreateCommand(FinsCommand finsCommand, FinsAddress finsAddress, ushort length = 1, byte[]? writeData = null)
         {
-            return CreateCommand(
-                finsCommand,
-                finsAddress.PlcMemory,
-                finsAddress.DataType,
-                finsAddress.AddressWord,
-                finsAddress.AddressBit,
-                finsAddress.Bank,
-                finsAddress.StringLength,
-                finsAddress.StringFormat,
-                length,
-                writeData
-            );
-        }
+            var bank = finsAddress.Bank;
+            var memory = finsAddress.PlcMemory;
+            var dataType = finsAddress.DataType;
+            ushort addressWord = finsAddress.AddressWord;
+            byte addressBit = finsAddress.AddressBit;
+            var stringFormat = finsAddress.StringFormat;
+            ushort stringLength = finsAddress.StringLength;
 
-        private byte[] CreateCommand(
-            FinsCommand finsCommand,
-            PlcMemory memory,
-            DataType dataType,
-            ushort addressWord,
-            byte addressBit = 0,
-            byte? bank = null,
-            ushort stringLength = 0,
-            StringFormatType? stringFormat = null,
-            ushort length = 1,
-            byte[]? writeData = null
-        )
-        {
             byte[] body = new byte[18];
             body[0] = ICF_COMMAND; //ICF 10000000:command 11000000:response；
             body[1] = RSV; //RSV；
@@ -161,24 +132,12 @@ namespace NProtocol.Protocols.Fins
                     {
                         var header = new byte[16]
                         {
-                        70,
-                        73,
-                        78,
-                        83, //FINS
-                        0,
-                        0,
-                        0,
-                        0, //指后面跟的字节长度；
-                        0,
-                        0,
-                        0,
-                        0x02, //固定命令；
-                        0,
-                        0,
-                        0,
-                        0,
-                        }; //错误代码；
-                           //读 固定长度0x1A
+                            0x46, 0x49, 0x4E, 0x53, //FINS
+                            0x00, 0x00, 0x00, 0x00, //指后面跟的字节长度；
+                            0x00, 0x00, 0x00, 0x02, //固定命令；
+                            0x00, 0x00, 0x00, 0x00  //错误代码；
+                        };
+                        //读 固定长度0x1A
                         if (!isWrite) //读
                         {
                             header[6] = 0;
@@ -186,8 +145,7 @@ namespace NProtocol.Protocols.Fins
                         }
                         else //写
                         {
-                            int byteLength =
-                                dataType == DataType.Bit ? length + 0x1A : length * 2 + 0x1A;
+                            int byteLength = dataType == DataType.Bit ? length + 0x1A : length * 2 + 0x1A;
                             header[6] = (byte)(byteLength >> 8);
                             header[7] = (byte)byteLength;
                         }
@@ -214,188 +172,106 @@ namespace NProtocol.Protocols.Fins
             switch (main)
             {
                 case 0:
-                    switch (sub)
+                    return sub switch
                     {
-                        case 0:
-                        case 0x40: //错误码64，是因为PLC中产生了报警，但是数据还是能正常读到的，屏蔽64报警或清除plc错误可解决
-                            return true;
-                        case 1:
-                            return false;
-                    }
-                    break;
+                        //错误码64，是因为PLC中产生了报警，但是数据还是能正常读到的，屏蔽64报警或清除plc错误可解决
+                        0 or 0x40 => true,
+                        1 => false,
+                        _ => false,
+                    };
                 case 1:
-                    switch (sub)
+                    return sub switch
                     {
-                        case 1:
-                        case 2:
-                        case 3:
-                        case 4:
-                        case 5:
-                        case 6:
-                            return false;
-                    }
-                    break;
+                        1 or 2 or 3 or 4 or 5 or 6 => false,
+                        _ => false,
+                    };
                 case 2:
-                    switch (sub)
+                    return sub switch
                     {
-                        case 1:
-                        case 2:
-                        case 3:
-                        case 4:
-                        case 5:
-                            return false;
-                    }
-                    break;
+                        1 or 2 or 3 or 4 or 5 => false,
+                        _ => false,
+                    };
                 case 3:
-                    switch (sub)
+                    return sub switch
                     {
-                        case 1:
-                        case 2:
-                        case 3:
-                        case 4:
-                            return false;
-                    }
-                    break;
+                        1 or 2 or 3 or 4 => false,
+                        _ => false,
+                    };
                 case 4:
-                    switch (sub)
+                    return sub switch
                     {
-                        case 1:
-                        case 2:
-                            return false;
-                    }
-                    break;
+                        1 or 2 => false,
+                        _ => false,
+                    };
                 case 5:
-                    switch (sub)
+                    return sub switch
                     {
-                        case 1:
-                        case 2:
-                        case 3:
-                        case 4:
-                            return false;
-                    }
-                    break;
+                        1 or 2 or 3 or 4 => false,
+                        _ => false,
+                    };
                 case 16:
-                    switch (sub)
+                    return sub switch
                     {
-                        case 1:
-                        case 2:
-                        case 3:
-                        case 4:
-                        case 5:
-                            return false;
-                    }
-                    break;
+                        1 or 2 or 3 or 4 or 5 => false,
+                        _ => false,
+                    };
                 case 17:
-                    switch (sub)
+                    return sub switch
                     {
-                        case 1:
-                        case 2:
-                        case 3:
-                        case 4:
-                        case 6:
-                        case 9:
-                        case 10:
-                        case 11:
-                        case 12:
-                            return false;
-                    }
-                    break;
+                        1 or 2 or 3 or 4 or 6 or 9 or 10 or 11 or 12 => false,
+                        _ => false,
+                    };
                 case 32:
-                    switch (sub)
+                    return sub switch
                     {
-                        case 2:
-                        case 3:
-                        case 4:
-                        case 5:
-                        case 6:
-                        case 7:
-                            return false;
-                    }
-                    break;
+                        2 or 3 or 4 or 5 or 6 or 7 => false,
+                        _ => false,
+                    };
                 case 33:
-                    switch (sub)
+                    return sub switch
                     {
-                        case 1:
-                        case 2:
-                        case 3:
-                        case 5:
-                        case 6:
-                        case 7:
-                        case 8:
-                            return false;
-                    }
-                    break;
+                        1 or 2 or 3 or 5 or 6 or 7 or 8 => false,
+                        _ => false,
+                    };
                 case 34:
-                    switch (sub)
+                    return sub switch
                     {
-                        case 1:
-                        case 2:
-                        case 3:
-                        case 4:
-                        case 5:
-                        case 6:
-                        case 7:
-                        case 8:
-                            return false;
-                    }
-                    break;
+                        1 or 2 or 3 or 4 or 5 or 6 or 7 or 8 => false,
+                        _ => false,
+                    };
                 case 35:
-                    switch (sub)
+                    return sub switch
                     {
-                        case 1:
-                        case 2:
-                        case 3:
-                            return false;
-                    }
-                    break;
+                        1 or 2 or 3 => false,
+                        _ => false,
+                    };
                 case 36:
                     {
                         byte b3 = sub;
                         if (b3 != 1)
                         {
-                            break;
+                            return false;
                         }
                         return false;
                     }
                 case 37:
-                    switch (sub)
+                    return sub switch
                     {
-                        case 2:
-                        case 3:
-                        case 4:
-                        case 5:
-                        case 6:
-                        case 7:
-                        case 9:
-                        case 10:
-                        case 13:
-                        case 15:
-                        case 16:
-                            return false;
-                    }
-                    break;
+                        2 or 3 or 4 or 5 or 6 or 7 or 9 or 10 or 13 or 15 or 16 => false,
+                        _ => false,
+                    };
                 case 38:
-                    switch (sub)
+                    return sub switch
                     {
-                        case 1:
-                        case 2:
-                        case 4:
-                        case 5:
-                        case 6:
-                        case 7:
-                        case 8:
-                        case 9:
-                        case 10:
-                        case 11:
-                            return false;
-                    }
-                    break;
+                        1 or 2 or 4 or 5 or 6 or 7 or 8 or 9 or 10 or 11 => false,
+                        _ => false,
+                    };
                 case 48:
                     {
                         byte b2 = sub;
                         if (b2 != 1)
                         {
-                            break;
+                            return false;
                         }
                         return false;
                     }
@@ -404,12 +280,13 @@ namespace NProtocol.Protocols.Fins
                         byte b = sub;
                         if (b != 1)
                         {
-                            break;
+                            return false;
                         }
                         return false;
                     }
+                default:
+                    return false;
             }
-            return false;
         }
 
         private byte GetMemoryCode(PlcMemory plcMemory, DataType dataType, bool isWrite)
@@ -426,9 +303,7 @@ namespace NProtocol.Protocols.Fins
                     PlcMemory.T => 0x09,
                     PlcMemory.C => 0x09,
                     PlcMemory.EB => 0x20, //EB地址需要加上bank号码
-                    _ => throw new NotSupportedException(
-                        $"Register type:{plcMemory}, data type:{dataType} not supported"
-                    ),
+                    _ => throw new NotSupportedException($"Register type:{plcMemory}, data type:{dataType} not supported"),
                 };
             }
             return plcMemory switch
@@ -442,9 +317,7 @@ namespace NProtocol.Protocols.Fins
                 PlcMemory.C => 0x89,
                 PlcMemory.E => 0x98, //E地址只支持word
                 PlcMemory.EB => 0xA0, //EB地址需要加上bank号码
-                _ => throw new NotSupportedException(
-                    $"Register type:{plcMemory}, data type:{dataType} not supported"
-                ),
+                _ => throw new NotSupportedException($"Register type:{plcMemory}, data type:{dataType} not supported"),
             };
         }
 
@@ -458,46 +331,41 @@ namespace NProtocol.Protocols.Fins
             return false;
         }
 
-        private byte[] ValidateReceiveDataToPayload(byte[] sendData, byte[] readData) => FinsConnectMode switch
+        private ReadOnlySpan<byte> ValidateReceiveDataToPayload(ReadOnlySpan<byte> sendData, ReadOnlySpan<byte> readData) => FinsConnectMode switch
         {
             FinsConnectMode.FinsTcp => ValidateReceiveDataToPayloadFinsTcp(sendData, readData),
             FinsConnectMode.FinsUdp => ValidateReceiveDataToPayloadFinsUdp(sendData, readData),
             _ => Array.Empty<byte>(),
         };
 
-        private byte[] ValidateReceiveDataToPayloadFinsTcp(byte[] sendData, byte[] readData)
+        private ReadOnlySpan<byte> ValidateReceiveDataToPayloadFinsTcp(ReadOnlySpan<byte> sendData, ReadOnlySpan<byte> readData)
         {
             if (!ValidateFrameCode(readData[28], readData[29]))
             {
-                var errorCode = readData.Slice(28, 2).ToUInt16();
+                var errorCode = readData.Slice(28, 2).ToArray().ToUInt16();
                 if (errorCode != 0)
                 {
-                    throw new FinsErrorCodeException(errorCode, sendData, readData, DriverId);
+                    throw new FinsErrorCodeException(errorCode, sendData.ToArray(), readData.ToArray(), DriverId);
                 }
             }
             if (readData.Length < 29)
-                throw new ReceivedException($"The response data length error,length:{readData.Length}", sendData, readData, DriverId);
+                throw new ReceivedException($"The response data length error,length:{readData.Length}", sendData.ToArray(), readData.ToArray(), DriverId);
 
             return readData.Slice(30);
         }
 
-        private byte[] ValidateReceiveDataToPayloadFinsUdp(byte[] sendData, byte[] readData)
+        private ReadOnlySpan<byte> ValidateReceiveDataToPayloadFinsUdp(ReadOnlySpan<byte> sendData, ReadOnlySpan<byte> readData)
         {
             if (!ValidateFrameCode(readData[12], readData[13]))
             {
-                var errorCode = readData.Slice(12, 2).ToUInt16();
+                var errorCode = readData.Slice(12, 2).ToArray().ToUInt16();
                 if (errorCode != 0)
                 {
-                    throw new FinsErrorCodeException(errorCode, sendData, readData, DriverId);
+                    throw new FinsErrorCodeException(errorCode, sendData.ToArray(), readData.ToArray(), DriverId);
                 }
             }
             if (readData.Length < 14)
-                throw new ReceivedException(
-                    $"The response data length error,length:{readData.Length}",
-                    sendData,
-                    readData,
-                    DriverId
-                );
+                throw new ReceivedException($"The response data length error,length:{readData.Length}", sendData.ToArray(), readData.ToArray(), DriverId);
 
             return readData.Slice(14);
         }
@@ -609,7 +477,7 @@ namespace NProtocol.Protocols.Fins
                 var sendData = CreateCommand(FinsCommand.ReadMemoryArea, finsAddress, count);
                 var result = NoLockExecute(sendData);
                 var payload = ValidateReceiveDataToPayload(result.SendData, result.ReceivedData);
-                return result.ToResult(payload);
+                return result.ToResult(payload.ToArray());
             });
         }
 
@@ -644,11 +512,10 @@ namespace NProtocol.Protocols.Fins
 
                 //E10:200.10E
                 //80 00 02 00 2C 00 00 2C 00 03 01 01 AA 00 C8 00 00 0A
-                var sendData = CreateCommand(FinsCommand.ReadMemoryArea, finsAddress.PlcMemory, finsAddress.DataType, finsAddress.AddressWord, 0,
-                    finsAddress.Bank, finsAddress.StringLength, finsAddress.StringFormat);
+                var sendData = CreateCommand(FinsCommand.ReadMemoryArea, finsAddress);
                 var result = NoLockExecute(sendData);
                 var payload = ValidateReceiveDataToPayload(result.SendData, result.ReceivedData);
-                return GetPayloadToString(payload, finsAddress.StringFormat, FinsStringEncoding);
+                return GetPayloadToString(payload.ToArray(), finsAddress.StringFormat, FinsStringEncoding);
             });
         }
 
@@ -746,23 +613,20 @@ namespace NProtocol.Protocols.Fins
             throw new ArgumentException("Type not supported", nameof(T));
         }
 
-        public Result<T[]> Read<T>(string address, ushort count)
-            where T : struct
+        public Result<T[]> Read<T>(string address, ushort count) where T : struct
         {
             var addr = new FinsAddress(address);
             return Read<T>(addr, count);
         }
 
-        public Result<T> Read<T>(string address)
-            where T : struct
+        public Result<T> Read<T>(string address) where T : struct
         {
             var result = Read<T>(address, 1);
             var first = result.Value.FirstOrDefault();
             return result.ToResult(first);
         }
 
-        public Result<T> Read<T>(FinsAddress finsAddress)
-            where T : struct
+        public Result<T> Read<T>(FinsAddress finsAddress) where T : struct
         {
             var result = Read<T>(finsAddress, 1);
             var first = result.Value.FirstOrDefault();
@@ -811,26 +675,22 @@ namespace NProtocol.Protocols.Fins
             return WriteBooleans(addr, values);
         }
 
-        public Result Write<T>(FinsAddress finsAddress, params T[] values)
+        public Result Write<T>(FinsAddress finsAddress, params T[] values) => values switch
         {
-            return values switch
-            {
-                bool[] vals => WriteBooleans(finsAddress, vals),
-                byte[] vals => WriteBytes(finsAddress, vals),
-                short[] vals => WriteBytes(finsAddress, vals.ToBytes(false)),
-                ushort[] vals => WriteBytes(finsAddress, vals.ToBytes(false)),
-                int[] vals => WriteBytes(finsAddress, vals.ToBytes(false)),
-                uint[] vals => WriteBytes(finsAddress, vals.ToBytes(false)),
-                float[] vals => WriteBytes(finsAddress, vals.ToBytes(false)),
-                double[] vals => WriteBytes(finsAddress, vals.ToBytes(false)),
-                long[] vals => WriteBytes(finsAddress, vals.ToBytes(false)),
-                ulong[] vals => WriteBytes(finsAddress, vals.ToBytes(false)),
-                _ => throw new ArgumentException("Type not supported", nameof(T)),
-            };
-        }
+            bool[] vals => WriteBooleans(finsAddress, vals),
+            byte[] vals => WriteBytes(finsAddress, vals),
+            short[] vals => WriteBytes(finsAddress, vals.ToBytes(false)),
+            ushort[] vals => WriteBytes(finsAddress, vals.ToBytes(false)),
+            int[] vals => WriteBytes(finsAddress, vals.ToBytes(false)),
+            uint[] vals => WriteBytes(finsAddress, vals.ToBytes(false)),
+            float[] vals => WriteBytes(finsAddress, vals.ToBytes(false)),
+            double[] vals => WriteBytes(finsAddress, vals.ToBytes(false)),
+            long[] vals => WriteBytes(finsAddress, vals.ToBytes(false)),
+            ulong[] vals => WriteBytes(finsAddress, vals.ToBytes(false)),
+            _ => throw new ArgumentException("Type not supported", nameof(T)),
+        };
 
-        public Result Write<T>(string address, params T[] values)
-            where T : struct
+        public Result Write<T>(string address, params T[] values) where T : struct
         {
             var addr = new FinsAddress(address);
             return Write(addr, values);
@@ -890,26 +750,11 @@ namespace NProtocol.Protocols.Fins
         /// </summary>
         private byte[] handshakeCmd = new byte[]
         {
-            0x46,
-            0x49,
-            0x4E,
-            0x53, // 'F' 'I' 'N' 'S'
-            0x00,
-            0x00,
-            0x00,
-            0x0C, // 指后面跟的字节长度；
-            0x00,
-            0x00,
-            0x00,
-            0x00, // 固定命令； (0 client to server, 1 server to client)
-            0x00,
-            0x00,
-            0x00,
-            0x00, // 错误代码；
-            0x00,
-            0x00,
-            0x00,
-            0x00, // PC节点IP，当设置为0时，会自动获取节点IP。
+            0x46,0x49,0x4E,0x53, // 'F' 'I' 'N' 'S'
+            0x00,0x00,0x00,0x0C, // 指后面跟的字节长度；
+            0x00,0x00,0x00,0x00, // 固定命令； (0 client to server, 1 server to client)
+            0x00,0x00,0x00,0x00, // 错误代码；
+            0x00,0x00,0x00,0x00, // PC节点IP，当设置为0时，会自动获取节点IP。
         };
 
         /// <summary>
@@ -917,30 +762,12 @@ namespace NProtocol.Protocols.Fins
         /// </summary>
         private byte[] handshakeResponse = new byte[]
         {
-            0x46,
-            0x49,
-            0x4E,
-            0x53, // 'F' 'I' 'N' 'S'
-            0x00,
-            0x00,
-            0x00,
-            0x10, // 指后面跟的字节长度；
-            0x00,
-            0x00,
-            0x00,
-            0x01, // 固定命令； (0 client to server, 1 server to client)
-            0x00,
-            0x00,
-            0x00,
-            0x00, // 错误代码；
-            0x00,
-            0x00,
-            0x00,
-            0x18, // 本机电脑节点IP；
-            0x00,
-            0x00,
-            0x00,
-            0x17, // PLC节点IP。
+            0x46,0x49,0x4E,0x53, // 'F' 'I' 'N' 'S'
+            0x00,0x00,0x00,0x10, // 指后面跟的字节长度；
+            0x00,0x00,0x00,0x01, // 固定命令； (0 client to server, 1 server to client)
+            0x00,0x00,0x00,0x00, // 错误代码；
+            0x00,0x00,0x00,0x18, // 本机电脑节点IP；
+            0x00,0x00,0x00,0x17, // PLC节点IP。
         };
 
         #endregion
@@ -952,22 +779,10 @@ namespace NProtocol.Protocols.Fins
         /// </summary>
         private byte[] readFinsTcpCmd = new byte[]
         {
-            70,
-            73,
-            78,
-            83, //FINS
-            0,
-            0,
-            0,
-            0, //指后面跟的字节长度；
-            0,
-            0,
-            0,
-            0, //固定命令；
-            0,
-            0,
-            0,
-            0, //错误代码；
+            70,73,78,83, //FINS
+            0,0,0,0, //指后面跟的字节长度；
+            0,0,0,0, //固定命令；
+            0,0,0,0, //错误代码；
             0, //ICF；
             0, //RSV；
             0, //GCT；
@@ -978,14 +793,10 @@ namespace NProtocol.Protocols.Fins
             0, //PC节点地址；
             0, //PC单元地址；
             0, //SID；
-            01,
-            01, //读指令；
+            01,01, //读指令；
             0, //读地址区(D位:02,D字:82,W位:31,C位:30,W字:B1,C字:B0)；
-            0,
-            0,
-            0, //起始地址；
-            0,
-            0, //读个数。最多100个地址
+            0,0,0, //起始地址；
+            0,0, //读个数。最多100个地址
         };
 
         /// <summary>
@@ -993,22 +804,10 @@ namespace NProtocol.Protocols.Fins
         /// </summary>
         private byte[] readFinsTcpResponse = new byte[]
         {
-            70,
-            73,
-            78,
-            83, //FINS
-            0,
-            0,
-            0,
-            0, //指后面跟的字节长度；
-            0,
-            0,
-            0,
-            0, //固定命令；
-            0,
-            0,
-            0,
-            0, //错误代码；
+            70,73,78,83, //FINS
+            0,0,0,0, //指后面跟的字节长度；
+            0,0,0,0, //固定命令；
+            0,0,0,0, //错误代码；
             0, //ICF；
             0, //RSV；
             0, //GCT；
@@ -1019,12 +818,9 @@ namespace NProtocol.Protocols.Fins
             0, //PLC节点地址；
             0, //PLC单元地址；
             0, //SID；
-            01,
-            01, //读指令；
-            0,
-            0, //读取成功标识；
-            0,
-            0, //读到的数据，最小单位一个字，2个字节
+            01,01, //读指令；
+            0,0, //读取成功标识；
+            0,0, //读到的数据，最小单位一个字，2个字节
         };
 
         /// <summary>
@@ -1045,14 +841,11 @@ namespace NProtocol.Protocols.Fins
             0xC0, //SA1 PC节点地址；
             0, //SA2 PC单元地址；
             0, //SID；
-            01,
-            01, //读指令；
+            01,01, //读指令；
             0x82, //读地址区(D位:02,D字:82,W位:31,C位:30,W字:B1,C字:B0)；
-            0,
-            0x64,
+            0,0x64,
             0, //起始地址；
-            0,
-            1, //读个数。最多100个地址
+            0,1, //读个数。最多100个地址
         };
 
         /// <summary>
@@ -1073,12 +866,9 @@ namespace NProtocol.Protocols.Fins
             3, //DA1 PLC节点号；
             0, //DA2 PLC单元号；PLC 侧直接对 CPU 操作，与以太网模块实际单元号没有关系，固定为 0。
             0, //SID；
-            01,
-            01, //读指令；
-            0,
-            0, //读取成功标识；
-            0x01,
-            0x23, //读到的数据，最小单位一个字，2个字节
+            01,01, //读指令；
+            0,0, //读取成功标识；
+            0x01,0x23, //读到的数据，最小单位一个字，2个字节
         };
 
         #endregion
@@ -1090,22 +880,10 @@ namespace NProtocol.Protocols.Fins
         /// </summary>
         private byte[] writeFinsTcpCmd = new byte[]
         {
-            70,
-            73,
-            78,
-            83, //FINS
-            0,
-            0,
-            0,
-            0, //指后面跟的字节长度；
-            0,
-            0,
-            0,
-            0, //固定命令；
-            0,
-            0,
-            0,
-            0, //错误代码；
+            70,73,78,83, //FINS
+            0,0,0,0, //指后面跟的字节长度；
+            0,0,0,0, //固定命令；
+            0,0,0,0, //错误代码；
             0, //ICF；
             0, //RSV；
             0, //GCT；
@@ -1116,16 +894,11 @@ namespace NProtocol.Protocols.Fins
             0, //PC节点地址；
             0, //PC单元地址；
             0, //SID；
-            01,
-            02, //写指令；
+            01,02, //写指令；
             0, //读地址区(D位:02,D字:82,W位:31,C位:30,W字:B1,C字:B0)；
-            0,
-            0,
-            0, //起始地址；
-            0,
-            1, //写个数。一个字=2个字节
-            0XFF,
-            0XFF,
+            0,0,0, //起始地址；
+            0,1, //写个数。一个字=2个字节
+            0XFF,0XFF,
         };
 
         /// <summary>
@@ -1133,22 +906,10 @@ namespace NProtocol.Protocols.Fins
         /// </summary>
         private byte[] writeFinsTcpResponse = new byte[]
         {
-            70,
-            73,
-            78,
-            83, //FINS
-            0,
-            0,
-            0,
-            0, //指后面跟的字节长度；
-            0,
-            0,
-            0,
-            0, //固定命令；
-            0,
-            0,
-            0,
-            0, //错误代码；
+            70,73,78,83, //FINS
+            0,0,0,0, //指后面跟的字节长度；
+            0,0,0,0, //固定命令；
+            0,0,0,0, //错误代码；
             0, //ICF；
             0, //RSV；
             0, //GCT；
@@ -1159,10 +920,8 @@ namespace NProtocol.Protocols.Fins
             0, //PLC节点地址；
             0, //PLC单元地址；
             0, //SID；
-            01,
-            02, //写指令；
-            0,
-            0, //写入成功指令
+            01,02, //写指令；
+            0,0, //写入成功指令
         };
 
         /// <summary>
@@ -1183,14 +942,10 @@ namespace NProtocol.Protocols.Fins
             0xC0, //SA1 PC节点地址；
             0, //SA2 PC单元地址；
             0, //SID；
-            01,
-            02, //写指令；
+            01,02, //写指令；
             0x31, //读地址区(D位:02,D字:82,W位:31,C位:30,W字:B1,C字:B0)；
-            0,
-            0,
-            5, //起始地址；
-            0,
-            1, //写个数。一个Word=2个字节；单个位的话一个字节
+            0,0,5, //起始地址；
+            0,1, //写个数。一个Word=2个字节；单个位的话一个字节
             1,
         };
 
@@ -1212,10 +967,8 @@ namespace NProtocol.Protocols.Fins
             3, //DA1 PLC节点号；
             0, //DA2 PLC单元号；PLC 侧直接对 CPU 操作，与以太网模块实际单元号没有关系，固定为 0。
             0, //SID；
-            01,
-            02, //写指令；
-            0,
-            0, //写入成功指令
+            01,02, //写指令；
+            0,0, //写入成功指令
         };
 
         #endregion
