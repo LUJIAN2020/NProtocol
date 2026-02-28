@@ -1,9 +1,9 @@
-﻿using System;
-using NProtocol.Base;
+﻿using NProtocol.Base;
 using NProtocol.Connectors;
 using NProtocol.Enums;
 using NProtocol.Exceptions;
 using NProtocol.Protocols.S7.Enums;
+using System;
 
 namespace NProtocol.Protocols.S7
 {
@@ -90,17 +90,17 @@ namespace NProtocol.Protocols.S7
             TsapPair = tsapPair;
         }
 
-        protected override ReadOnlySpan<byte> ExtractPayload(ReadOnlySpan<byte> writeData, ReadOnlySpan<byte> readData)
+        protected override bool ValidateReceivedData(ReadOnlySpan<byte> sendData, ReadOnlySpan<byte> receiveData)
         {
-            if (ValidateReceivedData(writeData, readData))
+            if (ValidateReadData(sendData, receiveData))
             {
                 ProtocolDataUnitReference++;
-                return readData;
+                return true;
             }
-            return ReadOnlySpan<byte>.Empty;
+            return false;
         }
 
-        private bool ValidateReceivedData(ReadOnlySpan<byte> sendData, ReadOnlySpan<byte> receiveData)
+        private bool ValidateReadData(ReadOnlySpan<byte> sendData, ReadOnlySpan<byte> receiveData)
         {
             if (receiveData.Length < 4)
                 return false;
@@ -128,100 +128,77 @@ namespace NProtocol.Protocols.S7
                 case CotpPduType.DisconnectConfirm:
                     break;
                 case CotpPduType.ConnectConfirm: //连接请求
-                {
-                    if (
-                        receiveData.Length - 5 == receiveData[4]
-                        && receiveData[10] == 0x00
-                        && receiveData[11] == 0xC0
-                        && receiveData[12] == 0x01
-                        && receiveData[13] == 0x0A
-                        && receiveData[14] == 0xC1
-                        && receiveData[15] == 0x02
-                        && receiveData[16] == TsapPair.Local.FirstByte
-                        && receiveData[17] == TsapPair.Local.SecondByte
-                        && receiveData[18] == 0xC2
-                        && receiveData[19] == 0x02
-                        && receiveData[20] == TsapPair.Remote.FirstByte
-                        && receiveData[21] == TsapPair.Remote.SecondByte
-                    )
                     {
-                        return true;
+                        if (receiveData.Length - 5 == receiveData[4] &&
+                            receiveData[10] == 0x00 &&
+                            receiveData[11] == 0xC0 &&
+                            receiveData[12] == 0x01 &&
+                            receiveData[13] == 0x0A &&
+                            receiveData[14] == 0xC1 &&
+                            receiveData[15] == 0x02 &&
+                            receiveData[16] == TsapPair.Local.FirstByte &&
+                            receiveData[17] == TsapPair.Local.SecondByte &&
+                            receiveData[18] == 0xC2 &&
+                            receiveData[19] == 0x02 &&
+                            receiveData[20] == TsapPair.Remote.FirstByte &&
+                            receiveData[21] == TsapPair.Remote.SecondByte)
+                        {
+                            return true;
+                        }
+                        break;
                     }
-                    break;
-                }
                 case CotpPduType.ConnectRequest:
                     break;
                 case CotpPduType.Data: //数据传输
-                {
-                    var s7CommPduType = (S7CommPduType)receiveData[8];
-                    switch (s7CommPduType)
                     {
-                        case S7CommPduType.AckData:
-                        case S7CommPduType.Job:
-                        case S7CommPduType.Ack:
+                        var s7CommPduType = (S7CommPduType)receiveData[8];
+                        switch (s7CommPduType)
                         {
-                            if (
-                                receiveData[4] == 2
-                                && receiveData[6] == 0x80
-                                && receiveData[7] == ProtocolId
-                            )
-                            {
-                                if (receiveData[17] != 0 || receiveData[18] != 0)
+                            case S7CommPduType.AckData:
+                            case S7CommPduType.Job:
+                            case S7CommPduType.Ack:
                                 {
-                                    S7ErrorClass s7ErrorClass = (S7ErrorClass)receiveData[17];
-                                    S7ErrorCode s7ErrorCode = (S7ErrorCode)receiveData[18];
-                                    throw new ReceivedException(
-                                        $"The header message is incorrect，S7ErrorClass：{s7ErrorClass},S7ErrorCode：{s7ErrorCode}",
-                                        sendData.ToArray(),
-                                        receiveData.ToArray(),
-                                        DriverId
-                                    );
-                                }
-
-                                //ReturnCode
-                                var func = (S7CommFuncCode)receiveData[19];
-                                if (
-                                    func == S7CommFuncCode.WriteVar
-                                    || func == S7CommFuncCode.ReadVar
-                                )
-                                {
-                                    var rc = (S7CommReturnCode)receiveData[21];
-                                    ValidateReturnCode(rc);
-                                }
-
-                                return true;
-                            }
-                            break;
-                        }
-                        case S7CommPduType.UserData:
-                        {
-                            if (
-                                receiveData[4] == 2
-                                && receiveData[6] == 0x80
-                                && receiveData[7] == ProtocolId
-                            )
-                            {
-                                if ((receiveData[15] * 256) + receiveData[16] > 0)
-                                {
-                                    S7ErrorClass s7ErrorClass = (S7ErrorClass)receiveData[17];
-                                    S7ErrorCode s7ErrorCode = (S7ErrorCode)receiveData[18];
-                                    if (receiveData[27] != 0 || receiveData[28] != 0)
+                                    if (receiveData[4] == 2 && receiveData[6] == 0x80 && receiveData[7] == ProtocolId)
                                     {
-                                        throw new ReceivedException(
-                                            $"The header message is incorrect，S7ErrorClass：{s7ErrorClass},S7ErrorCode：{s7ErrorCode}",
-                                            sendData.ToArray(),
-                                            receiveData.ToArray(),
-                                            DriverId
-                                        );
+                                        if (receiveData[17] != 0 || receiveData[18] != 0)
+                                        {
+                                            S7ErrorClass s7ErrorClass = (S7ErrorClass)receiveData[17];
+                                            S7ErrorCode s7ErrorCode = (S7ErrorCode)receiveData[18];
+                                            throw new ReceivedException($"The header message is incorrect，S7ErrorClass：{s7ErrorClass},S7ErrorCode：{s7ErrorCode}", sendData.ToArray(), receiveData.ToArray(), DriverId);
+                                        }
+
+                                        //ReturnCode
+                                        var func = (S7CommFuncCode)receiveData[19];
+                                        if (func == S7CommFuncCode.WriteVar || func == S7CommFuncCode.ReadVar)
+                                        {
+                                            var rc = (S7CommReturnCode)receiveData[21];
+                                            ValidateReturnCode(rc);
+                                        }
+
+                                        return true;
                                     }
+                                    break;
                                 }
-                                return true;
-                            }
-                            break;
+                            case S7CommPduType.UserData:
+                                {
+                                    if (receiveData[4] == 2 && receiveData[6] == 0x80 && receiveData[7] == ProtocolId)
+                                    {
+                                        if ((receiveData[15] * 256) + receiveData[16] > 0)
+                                        {
+                                            S7ErrorClass s7ErrorClass = (S7ErrorClass)receiveData[17];
+                                            S7ErrorCode s7ErrorCode = (S7ErrorCode)receiveData[18];
+                                            if (receiveData[27] != 0 || receiveData[28] != 0)
+                                            {
+                                                throw new ReceivedException($"The header message is incorrect，S7ErrorClass：{s7ErrorClass},S7ErrorCode：{s7ErrorCode}", sendData.ToArray(), receiveData.ToArray(), DriverId);
+                                            }
+                                        }
+                                        return true;
+                                    }
+                                    break;
+                                }
                         }
+                        break;
                     }
-                    break;
-                }
             }
             return false;
         }
@@ -260,10 +237,10 @@ namespace NProtocol.Protocols.S7
                     throw new Exception("Received error from PLC: Hardware fault.");
                 case S7CommReturnCode.Success:
                     break;
+                case S7CommReturnCode.Reserved:
+                    break;
                 default:
-                    throw new Exception(
-                        $"Invalid response from PLC: statusCode={(byte)statusCode}."
-                    );
+                    throw new Exception($"Invalid response from PLC: statusCode={(byte)statusCode}.");
             }
         }
     }

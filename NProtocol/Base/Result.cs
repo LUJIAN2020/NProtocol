@@ -8,7 +8,6 @@ namespace NProtocol.Base
     {
         public byte[] SendData { get; internal set; } = Array.Empty<byte>();
         public byte[] ReceivedData { get; internal set; } = Array.Empty<byte>();
-        public byte[] Payload { get; internal set; } = Array.Empty<byte>();
         public override string ToString()
         {
             var sb = new StringBuilder();

@@ -10,7 +10,6 @@ namespace NProtocol.Extensions
             {
                 SendData = result.SendData,
                 ReceivedData = result.ReceivedData,
-                Payload = result.Payload,
             };
         }
     }

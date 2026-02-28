@@ -1,10 +1,10 @@
-﻿using System;
-using System.Linq;
-using NProtocol.Base;
+﻿using NProtocol.Base;
 using NProtocol.Connectors;
 using NProtocol.Enums;
 using NProtocol.Exceptions;
 using NProtocol.Extensions;
+using System;
+using System.Linq;
 
 namespace NProtocol.Protocols.Modbus
 {
@@ -359,15 +359,7 @@ namespace NProtocol.Protocols.Modbus
             }
             return adu;
         }
-
-        /// <summary>
-        /// Extract payload data
-        /// </summary>
-        /// <param name="writeData"></param>
-        /// <param name="readData"></param>
-        /// <returns></returns>
-        /// <exception cref="Exception"></exception>
-        protected override ReadOnlySpan<byte> ExtractPayload(ReadOnlySpan<byte> writeData, ReadOnlySpan<byte> readData)
+        protected override bool ValidateReceivedData(ReadOnlySpan<byte> writeData, ReadOnlySpan<byte> readData)
         {
             var mode = ModbusConnectMode;
             switch (mode)
@@ -376,125 +368,18 @@ namespace NProtocol.Protocols.Modbus
                 case ModbusConnectMode.RtuOverTcp:
                 case ModbusConnectMode.RtuOverUdp:
                     {
-                        var data = ValidateReceivedModbusRtuData(writeData, readData);
-                        if (data.Length != 0)
-                        {
-                            return data;
-                        }
-                        break;
+                        return ValidateReceivedModbusRtuData(writeData, readData);
                     }
                 case ModbusConnectMode.Tcp:
                 case ModbusConnectMode.Udp:
                     if (readData.Length >= 9)
                     {
-                        var data = ValidateReceivedModbusTcpData(writeData, readData);
-                        if (data.Length != 0)
-                        {
-                            return data;
-                        }
+                        return ValidateReceivedModbusTcpData(writeData, readData);
                     }
                     break;
-                default:
-                    throw new Exception($"Unsupported connection mode,{mode}");
             }
-            return ReadOnlySpan<byte>.Empty;
+            return false;
         }
-
-        /// <summary>
-        /// Check the modbus RTU return data
-        /// </summary>
-        /// <param name="sendData"></param>
-        /// <param name="receiveData"></param>
-        /// <returns></returns>
-        /// <exception cref="ReceivedException"></exception>
-        private ReadOnlySpan<byte> ValidateReceivedModbusRtuData(ReadOnlySpan<byte> sendData, ReadOnlySpan<byte> receiveData)
-        {
-            if (receiveData[0] == sendData[0])
-            {
-                if (receiveData[1] == sendData[1])
-                {
-                    //正确回复
-                    var funcCode = (FuncCode)receiveData[1];
-                    switch (funcCode)
-                    {
-                        case FuncCode.ReadCoils:
-                        case FuncCode.ReadDiscreteInputs:
-                        case FuncCode.ReadHoldingRegisters:
-                        case FuncCode.ReadInputRegisters:
-                        case FuncCode.ReadWriteMultipleRegisters:
-                            {
-                                //读数据会返回数据长度和数据
-                                //设备Id+功能码+数据长度+数据+CRC
-                                if (receiveData[2] + 5 == receiveData.Length)
-                                {
-                                    //返回长度一致后校验CRC，不正常抛异常
-                                    ValidateCrcFromRtu(sendData, receiveData, receiveData.Length);
-
-                                    //正确返回，直接返回
-                                    return receiveData.Slice(3, receiveData[2]);
-                                }
-                                break;
-                            }
-                        case FuncCode.WriteSingleCoil:
-                        case FuncCode.WriteSingleRegister:
-                        case FuncCode.WriteMultipleCoils:
-                        case FuncCode.WriteMultipleRegisters:
-                            {
-                                //写入数据会将写入的报文原样返回
-                                //正确返回，直接返回
-                                if (
-                                    sendData[2] == receiveData[2]
-                                    && sendData[3] == receiveData[3]
-                                    && sendData[4] == receiveData[4]
-                                    && sendData[5] == receiveData[5]
-                                )
-                                {
-                                    //返回长度一致后校验CRC，不正常抛异常
-                                    ValidateCrcFromRtu(sendData, receiveData, receiveData.Length);
-
-                                    //正确返回，直接返回
-                                    return receiveData.Slice(0, receiveData.Length);
-                                }
-                                break;
-                            }
-                    }
-                }
-                else if (receiveData[1] == sendData[1] + 0x80)
-                {
-                    //错误回复，有错误码，抛异常
-                    byte abnormalCode = receiveData[1];
-                    byte errorCode = receiveData[2];
-                    throw new ModbusErrorCodeException(
-                        abnormalCode,
-                        errorCode,
-                        sendData.ToArray(),
-                        receiveData.ToArray(),
-                        DriverId
-                    );
-                }
-                else
-                {
-                    throw new ReceivedException(
-                        "Returns data parsing exception",
-                        sendData.ToArray(),
-                        receiveData.ToArray(),
-                        DriverId
-                    );
-                }
-            }
-            else
-            {
-                throw new ReceivedException(
-                    "The function codes for sending and replying are inconsistent",
-                    sendData.ToArray(),
-                    receiveData.ToArray(),
-                    DriverId
-                );
-            }
-
-            return ReadOnlySpan<byte>.Empty;
-        }
-
         /// <summary>
         /// Verify the CRC of RTU message
         /// </summary>
@@ -506,98 +391,8 @@ namespace NProtocol.Protocols.Modbus
         {
             var crc = receiveData.Slice(0, offset - 2).ToArray().ToCrc();
             if (receiveData[offset - 2] != crc[0] && receiveData[offset - 1] != crc[1])
-                throw new ReceivedException(
-                    "Returns data CRC error",
-                    sendData.ToArray(),
-                    receiveData.ToArray(),
-                    DriverId
-                );
+                throw new ReceivedException("Returns data CRC error", sendData.ToArray(), receiveData.ToArray(), DriverId);
         }
-
-        /// <summary>
-        /// Verify tcp/udp packets
-        /// </summary>
-        /// <param name="sendData"></param>
-        /// <param name="receiveData"></param>
-        /// <returns></returns>
-        /// <exception cref="ValidateReceivedDataException"></exception>
-        private ReadOnlySpan<byte> ValidateReceivedModbusTcpData(ReadOnlySpan<byte> sendData, ReadOnlySpan<byte> receiveData)
-        {
-            if (
-                receiveData[0] == sendData[0]
-                && receiveData[1] == sendData[1]
-                && receiveData[2] == sendData[2]
-                && receiveData[3] == sendData[3]
-                && receiveData[5] + receiveData[4] * 256 + 6 == receiveData.Length
-                && receiveData[6] == sendData[6]
-                && receiveData[7] == sendData[7]
-            )
-            {
-                TransactionId++;
-
-                //正确回复
-                var funcCode = (FuncCode)receiveData[7];
-                switch (funcCode)
-                {
-                    case FuncCode.ReadCoils:
-                    case FuncCode.ReadDiscreteInputs:
-                    case FuncCode.ReadHoldingRegisters:
-                    case FuncCode.ReadInputRegisters:
-                    case FuncCode.ReadWriteMultipleRegisters:
-                        {
-                            //读数据会返回数据长度和数据
-                            //设备Id+功能码+数据长度+数据+CRC
-                            if (receiveData[8] + 9 == receiveData.Length)
-                            {
-                                //正确返回，直接返回
-                                return receiveData.Slice(9, receiveData[8]);
-                            }
-                            break;
-                        }
-                    case FuncCode.WriteSingleCoil:
-                    case FuncCode.WriteSingleRegister:
-                    case FuncCode.WriteMultipleCoils:
-                    case FuncCode.WriteMultipleRegisters:
-                        {
-                            //写入数据会讲写入的报文原样返回
-                            //正确返回，直接返回
-                            if (
-                                sendData[8] == receiveData[8]
-                                && sendData[9] == receiveData[9]
-                                && sendData[10] == receiveData[10]
-                                && sendData[11] == receiveData[11]
-                            )
-                            {
-                                //正确返回，直接返回
-                                return receiveData.Slice(0, receiveData.Length);
-                            }
-                            break;
-                        }
-                }
-            }
-            else if (receiveData[7] == sendData[7] + 0x80)
-            {
-                //错误回复，直接返回
-                var errorCode = string.Join(" ", receiveData.Slice(7, 2).ToArray().Select(c => $"0x{c:X2}"));
-                throw new ReceivedException(
-                    $"Return data error, error code：{errorCode}",
-                    sendData.ToArray(),
-                    receiveData.ToArray(),
-                    DriverId
-                );
-            }
-            else
-            {
-                throw new ReceivedException(
-                    "Returns data parsing exception",
-                    sendData.ToArray(),
-                    receiveData.ToArray(),
-                    DriverId
-                );
-            }
-            return ReadOnlySpan<byte>.Empty;
-        }
-
         /// <summary>
         /// Verify the length of read and write data
         /// </summary>
@@ -651,6 +446,196 @@ namespace NProtocol.Protocols.Modbus
                     break;
             }
         }
+        private bool ValidateReceivedModbusRtuData(ReadOnlySpan<byte> sendData, ReadOnlySpan<byte> receiveData)
+        {
+            //站号不一致，抛异常
+            if (receiveData[0] != sendData[0])
+                throw new ReceivedException("The station numbers for sending and receiving are inconsistent", sendData.ToArray(), receiveData.ToArray(), DriverId);
+
+            //功能码错误，抛异常
+            if (receiveData[1] == sendData[1] + 0x80)
+            {
+                //错误回复，有错误码，抛异常
+                byte abnormalCode = receiveData[1];
+                byte errorCode = receiveData[2];
+                throw new ModbusErrorCodeException(abnormalCode, errorCode, sendData.ToArray(), receiveData.ToArray(), DriverId);
+            }
+
+            //功能码不一致，抛异常
+            if (receiveData[1] != sendData[1])
+                throw new ReceivedException("The function codes for sending and receiving are inconsistent", sendData.ToArray(), receiveData.ToArray(), DriverId);
+
+            //正确回复
+            var funcCode = (FuncCode)receiveData[1];
+            switch (funcCode)
+            {
+                case FuncCode.ReadCoils:
+                case FuncCode.ReadDiscreteInputs:
+                case FuncCode.ReadHoldingRegisters:
+                case FuncCode.ReadInputRegisters:
+                case FuncCode.ReadWriteMultipleRegisters:
+                    {
+                        //读数据会返回数据长度和数据
+                        //设备Id+功能码+数据长度+数据+CRC
+                        if (receiveData[2] + 5 == receiveData.Length)
+                        {
+                            //返回长度一致后校验CRC，不正常抛异常
+                            ValidateCrcFromRtu(sendData, receiveData, receiveData.Length);
+
+                            //正确返回，直接返回
+                            return true;
+                        }
+                        break;
+                    }
+                case FuncCode.WriteSingleCoil:
+                case FuncCode.WriteSingleRegister:
+                case FuncCode.WriteMultipleCoils:
+                case FuncCode.WriteMultipleRegisters:
+                    {
+                        //写入数据会将写入的报文原样返回
+                        //正确返回，直接返回
+                        if (sendData[2] == receiveData[2]
+                            && sendData[3] == receiveData[3]
+                            && sendData[4] == receiveData[4]
+                            && sendData[5] == receiveData[5])
+                        {
+                            //返回长度一致后校验CRC，不正常抛异常
+                            ValidateCrcFromRtu(sendData, receiveData, receiveData.Length);
+
+                            //正确返回，直接返回
+                            return true;
+                        }
+                        break;
+                    }
+            }
+            return false;
+        }
+        private bool ValidateReceivedModbusTcpData(ReadOnlySpan<byte> sendData, ReadOnlySpan<byte> receiveData)
+        {
+            if (receiveData[0] == sendData[0] &&
+                receiveData[1] == sendData[1] &&
+                receiveData[2] == sendData[2] &&
+                receiveData[3] == sendData[3] &&
+                receiveData[5] + receiveData[4] * 256 + 6 == receiveData.Length &&
+                receiveData[6] == sendData[6] &&
+                receiveData[7] == sendData[7])
+            {
+                TransactionId++;
+
+                //正确回复
+                var funcCode = (FuncCode)receiveData[7];
+                switch (funcCode)
+                {
+                    case FuncCode.ReadCoils:
+                    case FuncCode.ReadDiscreteInputs:
+                    case FuncCode.ReadHoldingRegisters:
+                    case FuncCode.ReadInputRegisters:
+                    case FuncCode.ReadWriteMultipleRegisters:
+                        {
+                            //读数据会返回数据长度和数据
+                            //设备Id+功能码+数据长度+数据+CRC
+                            if (receiveData[8] + 9 == receiveData.Length)
+                            {
+                                //正确返回，直接返回
+                                return true;
+                            }
+                            break;
+                        }
+                    case FuncCode.WriteSingleCoil:
+                    case FuncCode.WriteSingleRegister:
+                    case FuncCode.WriteMultipleCoils:
+                    case FuncCode.WriteMultipleRegisters:
+                        {
+                            //写入数据会讲写入的报文原样返回
+                            //正确返回，直接返回
+                            if (sendData[8] == receiveData[8] &&
+                                sendData[9] == receiveData[9] &&
+                                sendData[10] == receiveData[10] &&
+                                sendData[11] == receiveData[11])
+                            {
+                                //正确返回，直接返回
+                                return true;
+                            }
+                            break;
+                        }
+                }
+            }
+            else if (receiveData[7] == sendData[7] + 0x80)
+            {
+                //错误回复，直接返回
+                var errorCode = string.Join(" ", receiveData.Slice(7, 2).ToArray().Select(c => $"0x{c:X2}"));
+                throw new ReceivedException($"Return data error, error code：{errorCode}", sendData.ToArray(), receiveData.ToArray(), DriverId);
+            }
+            else
+            {
+                throw new ReceivedException("Returns data parsing exception", sendData.ToArray(), receiveData.ToArray(), DriverId);
+            }
+            return false;
+        }
+        private ReadOnlySpan<byte> GetPayloadData(ReadOnlySpan<byte> readData)
+        {
+            var mode = ModbusConnectMode;
+            switch (mode)
+            {
+                case ModbusConnectMode.Rtu:
+                case ModbusConnectMode.RtuOverTcp:
+                case ModbusConnectMode.RtuOverUdp:
+                    {
+                        return GetModbusRtuPayloadData(readData);
+                    }
+                case ModbusConnectMode.Tcp:
+                case ModbusConnectMode.Udp:
+                    return GetModbusTcpData(readData);
+                default:
+                    throw new Exception($"Unsupported connection mode,{mode}");
+            }
+        }
+        private ReadOnlySpan<byte> GetModbusRtuPayloadData(ReadOnlySpan<byte> receiveData)
+        {
+            var funcCode = (FuncCode)receiveData[1];
+            switch (funcCode)
+            {
+                case FuncCode.ReadCoils:
+                case FuncCode.ReadDiscreteInputs:
+                case FuncCode.ReadHoldingRegisters:
+                case FuncCode.ReadInputRegisters:
+                case FuncCode.ReadWriteMultipleRegisters:
+                    {
+                        return receiveData.Slice(3, receiveData[2]);
+                    }
+                case FuncCode.WriteSingleCoil:
+                case FuncCode.WriteSingleRegister:
+                case FuncCode.WriteMultipleCoils:
+                case FuncCode.WriteMultipleRegisters:
+                    {
+                        return receiveData.Slice(0, receiveData.Length);
+                    }
+            }
+            return ReadOnlySpan<byte>.Empty;
+        }
+        private ReadOnlySpan<byte> GetModbusTcpData(ReadOnlySpan<byte> receiveData)
+        {
+            var funcCode = (FuncCode)receiveData[7];
+            switch (funcCode)
+            {
+                case FuncCode.ReadCoils:
+                case FuncCode.ReadDiscreteInputs:
+                case FuncCode.ReadHoldingRegisters:
+                case FuncCode.ReadInputRegisters:
+                case FuncCode.ReadWriteMultipleRegisters:
+                    {
+                        return receiveData.Slice(9, receiveData[8]);
+                    }
+                case FuncCode.WriteSingleCoil:
+                case FuncCode.WriteSingleRegister:
+                case FuncCode.WriteMultipleCoils:
+                case FuncCode.WriteMultipleRegisters:
+                    {
+                        return receiveData.Slice(0, receiveData.Length);
+                    }
+            }
+            return ReadOnlySpan<byte>.Empty;
+        }
 
         /// <summary>
         /// Read
@@ -660,19 +645,14 @@ namespace NProtocol.Protocols.Modbus
         /// <param name="beginAddress"></param>
         /// <param name="length"></param>
         /// <returns></returns>
-        private Result ReadBytes(FuncCode funcCode, byte unitId, ushort beginAddress, ushort length)
+        private Result<byte[]> ReadBytes(FuncCode funcCode, byte unitId, ushort beginAddress, ushort length)
         {
             return EnqueueExecute(() =>
             {
-                var sendData = CreateADU(
-                    ReadOrWrite.Read,
-                    ModbusConnectMode,
-                    unitId,
-                    funcCode,
-                    beginAddress,
-                    length
-                );
-                return NoLockExecute(sendData);
+                var sendData = CreateADU(ReadOrWrite.Read, ModbusConnectMode, unitId, funcCode, beginAddress, length);
+                var result = NoLockExecute(sendData);
+                var payload = GetPayloadData(result.ReceivedData);
+                return result.ToResult(payload.ToArray());
             });
         }
 
@@ -684,15 +664,10 @@ namespace NProtocol.Protocols.Modbus
         /// <param name="beginAddress"></param>
         /// <param name="length"></param>
         /// <returns></returns>
-        private Result<bool[]> ReadBooleans(
-            FuncCode funcCode,
-            byte unitId,
-            ushort beginAddress,
-            ushort length
-        )
+        private Result<bool[]> ReadBooleans(FuncCode funcCode, byte unitId, ushort beginAddress, ushort length)
         {
             var result = ReadBytes(funcCode, unitId, beginAddress, length);
-            var values = result.Payload.ToBooleans().Slice(0, length);
+            var values = result.Value.ToBooleans().Slice(0, length);
             return result.ToResult(values);
         }
 
@@ -729,8 +704,7 @@ namespace NProtocol.Protocols.Modbus
         /// <returns></returns>
         public Result<byte[]> ReadHoldingRegisters(byte unitId, ushort beginAddress, ushort length)
         {
-            var result = ReadBytes(FuncCode.ReadHoldingRegisters, unitId, beginAddress, length);
-            return result.ToResult(result.Payload);
+            return ReadBytes(FuncCode.ReadHoldingRegisters, unitId, beginAddress, length);
         }
 
         /// <summary>
@@ -773,7 +747,7 @@ namespace NProtocol.Protocols.Modbus
             ValidateTypeFromByteFormat<T>(format);
             int wordSize = GetWordSize(format);
             var result = ReadHoldingRegisters(unitId, beginAddress, (byte)(length * wordSize));
-            var values = GetValuesFromByteFormat<T>(result.Payload, format);
+            var values = GetValuesFromByteFormat<T>(result.Value, format);
             return result.ToResult(values);
         }
 
@@ -786,8 +760,7 @@ namespace NProtocol.Protocols.Modbus
         /// <returns></returns>
         public Result<byte[]> ReadInputRegisters(byte unitId, ushort beginAddress, ushort length)
         {
-            var result = ReadBytes(FuncCode.ReadInputRegisters, unitId, beginAddress, length);
-            return result.ToResult(result.Payload);
+            return ReadBytes(FuncCode.ReadInputRegisters, unitId, beginAddress, length);
         }
 
         /// <summary>
@@ -819,23 +792,12 @@ namespace NProtocol.Protocols.Modbus
         /// <param name="length"></param>
         /// <param name="format"></param>
         /// <returns></returns>
-        public Result<T[]> ReadInputRegisters<T>(
-            byte unitId,
-            ushort beginAddress,
-            byte length,
-            ByteFormat format = ByteFormat.AB
-        )
-            where T : struct
+        public Result<T[]> ReadInputRegisters<T>(byte unitId, ushort beginAddress, byte length, ByteFormat format = ByteFormat.AB) where T : struct
         {
             ValidateTypeFromByteFormat<T>(format);
             int wordSize = GetWordSize(format);
-            var result = ReadBytes(
-                FuncCode.ReadInputRegisters,
-                unitId,
-                beginAddress,
-                (byte)(length * wordSize)
-            );
-            var values = GetValuesFromByteFormat<T>(result.Payload, format);
+            var result = ReadBytes(FuncCode.ReadInputRegisters, unitId, beginAddress, (byte)(length * wordSize));
+            var values = GetValuesFromByteFormat<T>(result.Value, format);
             return result.ToResult(values);
         }
 
@@ -1032,48 +994,22 @@ namespace NProtocol.Protocols.Modbus
             };
         }
 
-        private Result WriteMultipleValues(
-            FuncCode funcCode,
-            byte unitId,
-            ushort beginAddress,
-            ushort length,
-            byte[] writeData
-        )
+        private Result WriteMultipleValues(FuncCode funcCode, byte unitId, ushort beginAddress, ushort length, byte[] writeData)
         {
             return EnqueueExecute(() =>
             {
-                var sendData = CreateADU(
-                    ReadOrWrite.Write,
-                    ModbusConnectMode,
-                    unitId,
-                    funcCode,
-                    writeBeginAddress: beginAddress,
-                    writeLength: length,
-                    writeData: writeData
-                );
+                var sendData = CreateADU(ReadOrWrite.Write, ModbusConnectMode, unitId, funcCode, writeBeginAddress: beginAddress, writeLength: length, writeData: writeData);
                 return NoLockExecute(sendData);
             });
         }
 
-        private Result WriteMultipleCoils(
-            byte unitId,
-            ushort beginAddress,
-            ushort length,
-            byte[] writeData
-        )
+        private Result WriteMultipleCoils(byte unitId, ushort beginAddress, ushort length, byte[] writeData)
         {
             int writeDataLen = length % 8 > 0 ? length / 8 + 1 : length / 8;
             if (writeDataLen != writeData.Length)
-                throw new FormatException(
-                    "The written data does not match the write length. The minimum write length is 1 byte"
-                );
-            return WriteMultipleValues(
-                FuncCode.WriteMultipleCoils,
-                unitId,
-                beginAddress,
-                length,
-                writeData
-            );
+                throw new FormatException("The written data does not match the write length. The minimum write length is 1 byte");
+
+            return WriteMultipleValues(FuncCode.WriteMultipleCoils, unitId, beginAddress, length, writeData);
         }
 
         /// <summary>
@@ -1174,29 +1110,16 @@ namespace NProtocol.Protocols.Modbus
         /// <param name="writeBeginAddress">Write the starting address</param>
         /// <param name="writeData">Write data with a minimum write unit of 1Word=2Byte</param>
         /// <returns></returns>
-        public Result<ushort[]> ReadWriteMultipleRegisters(
-            byte unitId,
-            ushort readBeginAddress,
-            ushort readLength,
-            ushort writeBeginAddress,
-            ushort[] writeData
-        )
+        public Result<ushort[]> ReadWriteMultipleRegisters(byte unitId, ushort readBeginAddress, ushort readLength, ushort writeBeginAddress, ushort[] writeData)
         {
             return EnqueueExecute(() =>
             {
-                var sendData = CreateADU(
-                    ReadOrWrite.ReadWrite,
-                    ModbusConnectMode,
-                    unitId,
-                    FuncCode.ReadWriteMultipleRegisters,
-                    readBeginAddress,
-                    readLength,
-                    writeBeginAddress,
-                    (ushort)writeData.Length,
-                    writeData.ToBytes(false)
-                );
+                var sendData = CreateADU(ReadOrWrite.ReadWrite, ModbusConnectMode, unitId, FuncCode.ReadWriteMultipleRegisters,
+                    readBeginAddress, readLength,
+                    writeBeginAddress, (ushort)writeData.Length, writeData.ToBytes(false));
                 var result = NoLockExecute(sendData);
-                var value = result.Payload.ToUInt16Array(true);
+                var payload = GetPayloadData(result.ReceivedData);
+                var value = payload.ToArray().ToUInt16Array(true);
                 return result.ToResult(value);
             });
         }
@@ -1210,10 +1133,7 @@ namespace NProtocol.Protocols.Modbus
         {
             string name = type.FullName;
             if (name == typeof(byte).FullName)
-                throw new ArgumentException(
-                    "Type error. The minimum unit for a single write is 2 bytes",
-                    nameof(type)
-                );
+                throw new ArgumentException("Type error. The minimum unit for a single write is 2 bytes", nameof(type));
             if (
                 name != typeof(short).FullName
                 && name != typeof(ushort).FullName
@@ -1234,14 +1154,12 @@ namespace NProtocol.Protocols.Modbus
         /// <param name="t"></param>
         /// <returns></returns>
         /// <exception cref="ArgumentException"></exception>
-        private int GetWordSizeFromValueType<T>(T t)
-            where T : struct =>
-            t switch
-            {
-                short or ushort => 1,
-                int or uint or float => 2,
-                long or ulong or double => 4,
-                _ => throw new ArgumentException($"Unsupported types `{nameof(T)}`", nameof(t)),
-            };
+        private int GetWordSizeFromValueType<T>(T t) where T : struct => t switch
+        {
+            short or ushort => 1,
+            int or uint or float => 2,
+            long or ulong or double => 4,
+            _ => throw new ArgumentException($"Unsupported types `{nameof(T)}`", nameof(t)),
+        };
     }
 }

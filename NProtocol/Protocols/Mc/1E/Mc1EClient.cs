@@ -1,10 +1,10 @@
-﻿using System;
-using System.Linq;
-using NProtocol.Base;
+﻿using NProtocol.Base;
 using NProtocol.Connectors;
 using NProtocol.Enums;
 using NProtocol.Exceptions;
 using NProtocol.Extensions;
+using System;
+using System.Linq;
 
 namespace NProtocol.Protocols.Mc
 {
@@ -123,12 +123,14 @@ namespace NProtocol.Protocols.Mc
             }
         }
 
-        private Result ReadBytes(Command1E cmd, PlcMemory1E plcMemory1E, uint address, ushort count)
+        private Result<byte[]> ReadBytes(Command1E cmd, PlcMemory1E plcMemory1E, uint address, ushort count)
         {
             return EnqueueExecute(() =>
             {
                 var sendData = CreateCommand(cmd, plcMemory1E, address, count, default);
-                return NoLockExecute(sendData);
+                var result = NoLockExecute(sendData);
+                var payload = result.ReceivedData.Slice(2);
+                return result.ToResult(payload);
             });
         }
 
@@ -138,7 +140,7 @@ namespace NProtocol.Protocols.Mc
             return ReadBytes(Command1E.BatchReadWord, addr.Memory, addr.StartAddress, count);
         }
 
-        public Result ReadBytes(McAddress1E address, ushort count)
+        public Result<byte[]> ReadBytes(McAddress1E address, ushort count)
         {
             return ReadBytes(Command1E.BatchReadWord, address.Memory, address.StartAddress, count);
         }
@@ -150,8 +152,7 @@ namespace NProtocol.Protocols.Mc
             return ReadValues<T>(addr, count);
         }
 
-        public Result<T[]> ReadValues<T>(McAddress1E address, byte count)
-            where T : struct
+        public Result<T[]> ReadValues<T>(McAddress1E address, byte count) where T : struct
         {
             T t = default;
             ValidateDataType(t, address.StartAddress, address.Memory);
@@ -159,21 +160,17 @@ namespace NProtocol.Protocols.Mc
             {
                 case bool:
                     {
-                        uint start =
-                            address.StartAddress % 16 > 0
-                                ? address.StartAddress - (address.StartAddress % 16)
-                                : address.StartAddress;
+                        uint start = address.StartAddress % 16 > 0
+                            ? address.StartAddress - (address.StartAddress % 16)
+                            : address.StartAddress;
 
-                        byte _count =
-                            (address.StartAddress + count - start) % 16 > 0
-                                ? (byte)((address.StartAddress + count - start) / 16 + 1)
-                                : (byte)((address.StartAddress + count - start) / 16);
+                        byte _count = (address.StartAddress + count - start) % 16 > 0
+                            ? (byte)((address.StartAddress + count - start) / 16 + 1)
+                            : (byte)((address.StartAddress + count - start) / 16);
 
                         var addr = new McAddress1E(address.Memory, start);
                         var result = ReadBytes(addr, _count);
-                        result.Payload = result.ReceivedData.Slice(2);
-                        var bs = result
-                            .Payload.ToBooleansFromWord(IsLittleEndian)
+                        var bs = result.Value.ToBooleansFromWord(IsLittleEndian)
                             .Slice((int)(address.StartAddress - start), count);
                         if (bs is T[] val)
                             return result.ToResult(val);
@@ -182,17 +179,14 @@ namespace NProtocol.Protocols.Mc
                 case byte:
                     {
                         var result = ReadBytes(address, count);
-                        result.Payload = result.ReceivedData.Slice(2);
-                        var values = result.Payload;
-                        if (values is T[] val)
+                        if (result.Value is T[] val)
                             return result.ToResult(val);
                         break;
                     }
                 case short:
                     {
                         var result = ReadBytes(address, count);
-                        result.Payload = result.ReceivedData.Slice(2);
-                        var values = result.Payload.ToInt16Array(IsLittleEndian);
+                        var values = result.Value.ToInt16Array(IsLittleEndian);
                         if (values is T[] val)
                             return result.ToResult(val);
                         break;
@@ -200,8 +194,7 @@ namespace NProtocol.Protocols.Mc
                 case ushort:
                     {
                         var result = ReadBytes(address, count);
-                        result.Payload = result.ReceivedData.Slice(2);
-                        var values = result.Payload.ToUInt16Array(IsLittleEndian);
+                        var values = result.Value.ToUInt16Array(IsLittleEndian);
                         if (values is T[] val)
                             return result.ToResult(val);
                         break;
@@ -210,8 +203,7 @@ namespace NProtocol.Protocols.Mc
                     {
                         const int byteSize = 2;
                         var result = ReadBytes(address, (byte)(count * byteSize));
-                        result.Payload = result.ReceivedData.Slice(2);
-                        var values = result.Payload.ToInt32Array(IsLittleEndian);
+                        var values = result.Value.ToInt32Array(IsLittleEndian);
                         if (values is T[] val)
                             return result.ToResult(val);
                         break;
@@ -220,8 +212,7 @@ namespace NProtocol.Protocols.Mc
                     {
                         const int byteSize = 2;
                         var result = ReadBytes(address, (byte)(count * byteSize));
-                        result.Payload = result.ReceivedData.Slice(2);
-                        var values = result.Payload.ToUInt32Array(IsLittleEndian);
+                        var values = result.Value.ToUInt32Array(IsLittleEndian);
                         if (values is T[] val)
                             return result.ToResult(val);
                         break;
@@ -230,8 +221,7 @@ namespace NProtocol.Protocols.Mc
                     {
                         const int byteSize = 2;
                         var result = ReadBytes(address, (byte)(count * byteSize));
-                        result.Payload = result.ReceivedData.Slice(2);
-                        var values = result.Payload.ToFloatArray(IsLittleEndian);
+                        var values = result.Value.ToFloatArray(IsLittleEndian);
                         if (values is T[] val)
                             return result.ToResult(val);
                         break;
@@ -240,8 +230,7 @@ namespace NProtocol.Protocols.Mc
                     {
                         const int byteSize = 4;
                         var result = ReadBytes(address, (byte)(count * byteSize));
-                        result.Payload = result.ReceivedData.Slice(2);
-                        var values = result.Payload.ToInt64Array(IsLittleEndian);
+                        var values = result.Value.ToInt64Array(IsLittleEndian);
                         if (values is T[] val)
                             return result.ToResult(val);
                         break;
@@ -250,8 +239,7 @@ namespace NProtocol.Protocols.Mc
                     {
                         const int byteSize = 4;
                         var result = ReadBytes(address, (byte)(count * byteSize));
-                        result.Payload = result.ReceivedData.Slice(2);
-                        var values = result.Payload.ToUInt64Array(IsLittleEndian);
+                        var values = result.Value.ToUInt64Array(IsLittleEndian);
                         if (values is T[] val)
                             return result.ToResult(val);
                         break;
@@ -260,8 +248,7 @@ namespace NProtocol.Protocols.Mc
                     {
                         const int byteSize = 4;
                         var result = ReadBytes(address, (byte)(count * byteSize));
-                        result.Payload = result.ReceivedData.Slice(2);
-                        var values = result.Payload.ToDoubleArray(IsLittleEndian);
+                        var values = result.Value.ToDoubleArray(IsLittleEndian);
                         if (values is T[] val)
                             return result.ToResult(val);
                         break;
@@ -272,15 +259,13 @@ namespace NProtocol.Protocols.Mc
             throw new ArgumentException("Type not supported", nameof(T));
         }
 
-        public Result<T> ReadValue<T>(string address)
-            where T : struct
+        public Result<T> ReadValue<T>(string address) where T : struct
         {
             var addr = new McAddress1E(address);
             return ReadValue<T>(addr);
         }
 
-        public Result<T> ReadValue<T>(McAddress1E address)
-            where T : struct
+        public Result<T> ReadValue<T>(McAddress1E address) where T : struct
         {
             var result = ReadValues<T>(address, 1);
             var value = result.Value.FirstOrDefault();
@@ -436,38 +421,16 @@ namespace NProtocol.Protocols.Mc
             return WriteValues(address, new T[] { value });
         }
 
-        protected override ReadOnlySpan<byte> ExtractPayload(ReadOnlySpan<byte> writeData, ReadOnlySpan<byte> readData)
+        protected override bool ValidateReceivedData(ReadOnlySpan<byte> sendData, ReadOnlySpan<byte> writeData)
         {
-            if (ValidateReceivedData(writeData, readData))
-            {
-                return readData;
-            }
-            return ReadOnlySpan<byte>.Empty;
-        }
-
-        private bool ValidateReceivedData(ReadOnlySpan<byte> sendData, ReadOnlySpan<byte> receivedData)
-        {
-            if (
-                receivedData.Length == 4
-                && receivedData[0] == sendData[0] + 0x80
-                && receivedData[1] != OkEndCode
-            )
+            if (writeData.Length == 4 && writeData[0] == sendData[0] + 0x80 && writeData[1] != OkEndCode)
             {
                 //错误结束
-                var errorCode = receivedData.Slice(2, 2).ToArray().ToHexString();
-                var errorData = receivedData.Slice(3).ToArray().ToHexString();
-                throw new ReceivedException(
-                    $"Response data error, error code:{errorCode},error data:{errorData}",
-                    sendData.ToArray(),
-                    receivedData.ToArray(),
-                    DriverId
-                );
+                var errorCode = writeData.Slice(2, 2).ToArray().ToHexString();
+                var errorData = writeData.Slice(3).ToArray().ToHexString();
+                throw new ReceivedException($"Response data error, error code:{errorCode},error data:{errorData}", sendData.ToArray(), writeData.ToArray(), DriverId);
             }
-            else if (
-                receivedData.Length == receivedData.Length
-                && receivedData[0] == sendData[0] + 0x80
-                && receivedData[1] == OkEndCode
-            )
+            else if (writeData.Length == writeData.Length && writeData[0] == sendData[0] + 0x80 && writeData[1] == OkEndCode)
             {
                 //正确数据返回
                 return true;

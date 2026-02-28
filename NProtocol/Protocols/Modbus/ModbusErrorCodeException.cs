@@ -5,13 +5,7 @@ namespace NProtocol.Protocols.Modbus
 {
     public class ModbusErrorCodeException : ReceivedException
     {
-        public ModbusErrorCodeException(
-            byte abnormalCode,
-            byte errorCode,
-            byte[] sendData,
-            byte[] receiveData,
-            string driverId
-        )
+        public ModbusErrorCodeException(byte abnormalCode, byte errorCode, byte[] sendData, byte[] receiveData, string driverId)
             : base(GetErrorMessage(abnormalCode, errorCode), sendData, receiveData, driverId) { }
 
         public static string GetErrorMessage(byte abnormalCode, byte errorCode)

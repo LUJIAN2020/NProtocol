@@ -448,108 +448,102 @@ namespace NProtocol.Protocols.Fins
             };
         }
 
-        protected override ReadOnlySpan<byte> ExtractPayload(ReadOnlySpan<byte> writeData, ReadOnlySpan<byte> readData)
+        protected override bool ValidateReceivedData(ReadOnlySpan<byte> writeData, ReadOnlySpan<byte> readData)
         {
-            if (ValidateReceiveData(readData))
+            if (ValidateReadData(readData))
             {
                 SID--;
-                return readData;
+                return true;
             }
-            return ReadOnlySpan<byte>.Empty;
+            return false;
         }
 
-        private byte[] ValidateReceiveDataToPayload(byte[] sendData, byte[] receiveData) => FinsConnectMode switch
+        private byte[] ValidateReceiveDataToPayload(byte[] sendData, byte[] readData) => FinsConnectMode switch
         {
-            FinsConnectMode.FinsTcp => ValidateReceiveDataToPayloadFinsTcp(sendData, receiveData),
-            FinsConnectMode.FinsUdp => ValidateReceiveDataToPayloadFinsUdp(sendData, receiveData),
+            FinsConnectMode.FinsTcp => ValidateReceiveDataToPayloadFinsTcp(sendData, readData),
+            FinsConnectMode.FinsUdp => ValidateReceiveDataToPayloadFinsUdp(sendData, readData),
             _ => Array.Empty<byte>(),
         };
 
-        private byte[] ValidateReceiveDataToPayloadFinsTcp(byte[] sendData, byte[] receiveData)
+        private byte[] ValidateReceiveDataToPayloadFinsTcp(byte[] sendData, byte[] readData)
         {
-            if (!ValidateFrameCode(receiveData[28], receiveData[29]))
+            if (!ValidateFrameCode(readData[28], readData[29]))
             {
-                var errorCode = receiveData.Slice(28, 2).ToUInt16();
+                var errorCode = readData.Slice(28, 2).ToUInt16();
                 if (errorCode != 0)
                 {
-                    throw new FinsErrorCodeException(errorCode, sendData, receiveData, DriverId);
+                    throw new FinsErrorCodeException(errorCode, sendData, readData, DriverId);
                 }
             }
-            if (receiveData.Length < 29)
+            if (readData.Length < 29)
+                throw new ReceivedException($"The response data length error,length:{readData.Length}", sendData, readData, DriverId);
+
+            return readData.Slice(30);
+        }
+
+        private byte[] ValidateReceiveDataToPayloadFinsUdp(byte[] sendData, byte[] readData)
+        {
+            if (!ValidateFrameCode(readData[12], readData[13]))
+            {
+                var errorCode = readData.Slice(12, 2).ToUInt16();
+                if (errorCode != 0)
+                {
+                    throw new FinsErrorCodeException(errorCode, sendData, readData, DriverId);
+                }
+            }
+            if (readData.Length < 14)
                 throw new ReceivedException(
-                    $"The response data length error,length:{receiveData.Length}",
+                    $"The response data length error,length:{readData.Length}",
                     sendData,
-                    receiveData,
+                    readData,
                     DriverId
                 );
 
-            return receiveData.Slice(30);
+            return readData.Slice(14);
         }
 
-        private byte[] ValidateReceiveDataToPayloadFinsUdp(byte[] sendData, byte[] receiveData)
+        private bool ValidateReadData(ReadOnlySpan<byte> readData) => FinsConnectMode switch
         {
-            if (!ValidateFrameCode(receiveData[12], receiveData[13]))
-            {
-                var errorCode = receiveData.Slice(12, 2).ToUInt16();
-                if (errorCode != 0)
-                {
-                    throw new FinsErrorCodeException(errorCode, sendData, receiveData, DriverId);
-                }
-            }
-            if (receiveData.Length < 14)
-                throw new ReceivedException(
-                    $"The response data length error,length:{receiveData.Length}",
-                    sendData,
-                    receiveData,
-                    DriverId
-                );
+            FinsConnectMode.FinsTcp => ValidateReceiveDataFinsTcp(readData),
+            FinsConnectMode.FinsUdp => ValidateReceiveDataFinsUdp(readData),
+            _ => false,
+        };
 
-            return receiveData.Slice(14);
-        }
-
-        private bool ValidateReceiveData(ReadOnlySpan<byte> receiveData) =>
-            FinsConnectMode switch
-            {
-                FinsConnectMode.FinsTcp => ValidateReceiveDataFinsTcp(receiveData),
-                FinsConnectMode.FinsUdp => ValidateReceiveDataFinsUdp(receiveData),
-                _ => false,
-            };
-
-        private bool ValidateReceiveDataFinsTcp(ReadOnlySpan<byte> receiveData)
+        private bool ValidateReceiveDataFinsTcp(ReadOnlySpan<byte> readData)
         {
-            int readLength = receiveData.Length;
-            int len = receiveData.Slice(4, 4).ToArray().ToInt32();
+            int readLength = readData.Length;
+            int len = readData.Slice(4, 4).ToArray().ToInt32();
             return readLength >= 30
-                && receiveData[0] == FINS[0]
-                && receiveData[1] == FINS[1]
-                && receiveData[2] == FINS[2]
-                && receiveData[3] == FINS[3]
+                && readData[0] == FINS[0]
+                && readData[1] == FINS[1]
+                && readData[2] == FINS[2]
+                && readData[3] == FINS[3]
                 && readLength == len + 8
-                && receiveData[16] == ICF_RESPONSE
-                && receiveData[17] == RSV
-                && receiveData[18] == GCT
-                && receiveData[19] == SNA
-                && receiveData[20] == SA1
-                && receiveData[21] == SA2
-                && receiveData[22] == DNA
-                && receiveData[23] == DA1
-                && receiveData[24] == DA2
-                && receiveData[25] == SID;
+                && readData[16] == ICF_RESPONSE
+                && readData[17] == RSV
+                && readData[18] == GCT
+                && readData[19] == SNA
+                && readData[20] == SA1
+                && readData[21] == SA2
+                && readData[22] == DNA
+                && readData[23] == DA1
+                && readData[24] == DA2
+                && readData[25] == SID;
         }
 
-        private bool ValidateReceiveDataFinsUdp(ReadOnlySpan<byte> receiveData)
+        private bool ValidateReceiveDataFinsUdp(ReadOnlySpan<byte> readData)
         {
-            return receiveData.Length >= 14
-                && receiveData[0] == ICF_RESPONSE
-                && receiveData[1] == RSV
-                && receiveData[2] == GCT
-                && receiveData[3] == SNA
-                && receiveData[4] == SA1
-                && receiveData[5] == SA2
-                && receiveData[6] == DNA
-                && receiveData[7] == DA1
-                && receiveData[8] == DA2
-                && receiveData[9] == SID;
+            return readData.Length >= 14
+                && readData[0] == ICF_RESPONSE
+                && readData[1] == RSV
+                && readData[2] == GCT
+                && readData[3] == SNA
+                && readData[4] == SA1
+                && readData[5] == SA2
+                && readData[6] == DNA
+                && readData[7] == DA1
+                && readData[8] == DA2
+                && readData[9] == SID;
         }
 
         /// <summary>
@@ -570,11 +564,7 @@ namespace NProtocol.Protocols.Fins
         };
         public Encoding FinsStringEncoding { get; set; } = Encoding.ASCII;
 
-        internal static string GetPayloadToString(
-            byte[] payload,
-            StringFormatType? format,
-            Encoding encoding
-        )
+        internal static string GetPayloadToString(byte[] payload, StringFormatType? format, Encoding encoding)
         {
             switch (format)
             {
@@ -609,7 +599,7 @@ namespace NProtocol.Protocols.Fins
             }
         }
 
-        public Result ReadBytes(FinsAddress finsAddress, ushort count)
+        public Result<byte[]> ReadBytes(FinsAddress finsAddress, ushort count)
         {
             if (count == 0)
                 throw new ArgumentOutOfRangeException(nameof(count), count, "The number of reads must be > 0");
@@ -618,12 +608,12 @@ namespace NProtocol.Protocols.Fins
             {
                 var sendData = CreateCommand(FinsCommand.ReadMemoryArea, finsAddress, count);
                 var result = NoLockExecute(sendData);
-                result.Payload = ValidateReceiveDataToPayload(result.SendData, result.ReceivedData);
-                return result;
+                var payload = ValidateReceiveDataToPayload(result.SendData, result.ReceivedData);
+                return result.ToResult(payload);
             });
         }
 
-        public Result ReadBytes(string address, ushort count)
+        public Result<byte[]> ReadBytes(string address, ushort count)
         {
             var addr = new FinsAddress(address);
             return ReadBytes(addr, count);
@@ -654,46 +644,26 @@ namespace NProtocol.Protocols.Fins
 
                 //E10:200.10E
                 //80 00 02 00 2C 00 00 2C 00 03 01 01 AA 00 C8 00 00 0A
-                var sendData = CreateCommand(
-                    FinsCommand.ReadMemoryArea,
-                    finsAddress.PlcMemory,
-                    finsAddress.DataType,
-                    finsAddress.AddressWord,
-                    0,
-                    finsAddress.Bank,
-                    finsAddress.StringLength,
-                    finsAddress.StringFormat
-                );
+                var sendData = CreateCommand(FinsCommand.ReadMemoryArea, finsAddress.PlcMemory, finsAddress.DataType, finsAddress.AddressWord, 0,
+                    finsAddress.Bank, finsAddress.StringLength, finsAddress.StringFormat);
                 var result = NoLockExecute(sendData);
-                result.Payload = ValidateReceiveDataToPayload(result.SendData, result.ReceivedData);
-                return GetPayloadToString(
-                    result.Payload,
-                    finsAddress.StringFormat,
-                    FinsStringEncoding
-                );
+                var payload = ValidateReceiveDataToPayload(result.SendData, result.ReceivedData);
+                return GetPayloadToString(payload, finsAddress.StringFormat, FinsStringEncoding);
             });
         }
 
-        public Result<T[]> Read<T>(FinsAddress finsAddress, ushort count)
-            where T : struct
+        public Result<T[]> Read<T>(FinsAddress finsAddress, ushort count) where T : struct
         {
             T t = default;
             switch (t)
             {
                 case bool:
                     {
-                        if (
-                            finsAddress.PlcMemory == PlcMemory.C
-                            || finsAddress.PlcMemory == PlcMemory.T
-                        )
-                            throw new ArgumentException(
-                                "Timer (T), Counter (C) do not support bit operation",
-                                nameof(finsAddress.PlcMemory)
-                            );
+                        if (finsAddress.PlcMemory == PlcMemory.C || finsAddress.PlcMemory == PlcMemory.T)
+                            throw new ArgumentException("Timer (T), Counter (C) do not support bit operation", nameof(finsAddress.PlcMemory));
+
                         var result = ReadBytes(finsAddress, count);
-                        var bs = result
-                            .Payload.ToBooleansFromWord()
-                            .Slice(finsAddress.AddressBit, count);
+                        var bs = result.Value.ToBooleansFromWord().Slice(finsAddress.AddressBit, count);
                         if (bs is T[] val)
                             return result.ToResult(val);
                         break;
@@ -702,7 +672,7 @@ namespace NProtocol.Protocols.Fins
                     {
                         const int wordSize = 1;
                         var result = ReadBytes(finsAddress, (ushort)(count * wordSize));
-                        if (result.Payload is T[] val)
+                        if (result.Value is T[] val)
                             return result.ToResult(val);
                         break;
                     }
@@ -710,8 +680,7 @@ namespace NProtocol.Protocols.Fins
                     {
                         const int wordSize = 1;
                         var result = ReadBytes(finsAddress, (ushort)(count * wordSize));
-                        var payload = result.Payload;
-                        if (payload.ToInt16Array() is T[] val)
+                        if (result.Value.ToInt16Array() is T[] val)
                             return result.ToResult(val);
                         break;
                     }
@@ -719,8 +688,7 @@ namespace NProtocol.Protocols.Fins
                     {
                         const int wordSize = 1;
                         var result = ReadBytes(finsAddress, (ushort)(count * wordSize));
-                        var payload = result.Payload;
-                        if (payload.ToUInt16Array() is T[] val)
+                        if (result.Value.ToUInt16Array() is T[] val)
                             return result.ToResult(val);
                         break;
                     }
@@ -728,8 +696,7 @@ namespace NProtocol.Protocols.Fins
                     {
                         const int wordSize = 2;
                         var result = ReadBytes(finsAddress, (ushort)(count * wordSize));
-                        var payload = result.Payload;
-                        if (payload.ToInt32Array() is T[] val)
+                        if (result.Value.ToInt32Array() is T[] val)
                             return result.ToResult(val);
                         break;
                     }
@@ -737,8 +704,7 @@ namespace NProtocol.Protocols.Fins
                     {
                         const int wordSize = 2;
                         var result = ReadBytes(finsAddress, (ushort)(count * wordSize));
-                        var payload = result.Payload;
-                        if (payload.ToUInt32Array() is T[] val)
+                        if (result.Value.ToUInt32Array() is T[] val)
                             return result.ToResult(val);
                         break;
                     }
@@ -746,8 +712,7 @@ namespace NProtocol.Protocols.Fins
                     {
                         const int wordSize = 2;
                         var result = ReadBytes(finsAddress, (ushort)(count * wordSize));
-                        var payload = result.Payload;
-                        if (payload.ToFloatArray() is T[] val)
+                        if (result.Value.ToFloatArray() is T[] val)
                             return result.ToResult(val);
                         break;
                     }
@@ -755,8 +720,7 @@ namespace NProtocol.Protocols.Fins
                     {
                         const int wordSize = 4;
                         var result = ReadBytes(finsAddress, (ushort)(count * wordSize));
-                        var payload = result.Payload;
-                        if (payload.ToDoubleArray() is T[] val)
+                        if (result.Value.ToDoubleArray() is T[] val)
                             return result.ToResult(val);
                         break;
                     }
@@ -764,8 +728,7 @@ namespace NProtocol.Protocols.Fins
                     {
                         const int wordSize = 4;
                         var result = ReadBytes(finsAddress, (ushort)(count * wordSize));
-                        var payload = result.Payload;
-                        if (payload.ToInt64Array() is T[] val)
+                        if (result.Value.ToInt64Array() is T[] val)
                             return result.ToResult(val);
                         break;
                     }
@@ -773,8 +736,7 @@ namespace NProtocol.Protocols.Fins
                     {
                         const int wordSize = 4;
                         var result = ReadBytes(finsAddress, (ushort)(count * wordSize));
-                        var payload = result.Payload;
-                        if (payload.ToUInt64Array() is T[] val)
+                        if (result.Value.ToUInt64Array() is T[] val)
                             return result.ToResult(val);
                         break;
                     }
@@ -819,7 +781,6 @@ namespace NProtocol.Protocols.Fins
 
                 var sendData = CreateCommand(FinsCommand.WriteMemoryArea, finsAddress, (ushort)(values.Length / 2), values);
                 var result = NoLockExecute(sendData);
-                result.Payload = ValidateReceiveDataToPayload(result.SendData, result.ReceivedData);
                 return result;
             });
         }
@@ -840,7 +801,6 @@ namespace NProtocol.Protocols.Fins
                 var writeData = values.Select(c => c ? (byte)1 : byte.MinValue).ToArray();
                 var sendData = CreateCommand(FinsCommand.WriteMemoryArea, finsAddress, (ushort)values.Length, writeData);
                 var result = NoLockExecute(sendData);
-                result.Payload = ValidateReceiveDataToPayload(result.SendData, result.ReceivedData);
                 return result;
             });
         }
@@ -918,6 +878,8 @@ namespace NProtocol.Protocols.Fins
                 }
             }
         }
+
+
 
 #if DEBUG
 

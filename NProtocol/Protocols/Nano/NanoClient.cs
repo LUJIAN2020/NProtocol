@@ -29,15 +29,6 @@ namespace NProtocol.Protocols.Nano
             : this(SerialPortParameter.Create(portName, baudRate, dataBits, parity, stopBits))
         {
         }
-        protected override ReadOnlySpan<byte> ExtractPayload(ReadOnlySpan<byte> writeData, ReadOnlySpan<byte> readData)
-        {
-            int rlen = readData.Length;
-            if (rlen > 2 && readData[rlen - 2] == '\r' && readData[rlen - 1] == '\n')
-            {
-                return readData;
-            }
-            return ReadOnlySpan<byte>.Empty;
-        }
         public Encoding DefaultEncoding { get; set; } = Encoding.ASCII;
         public Result ChangeMode(RunMode mode)
         {
@@ -503,6 +494,15 @@ namespace NProtocol.Protocols.Nano
                 "E4" => throw new Exception("Write prohibited `E1`"),
                 _ => throw new Exception($"Unknown error `{res}`"),
             };
+        }
+        protected override bool ValidateReceivedData(ReadOnlySpan<byte> writeData, ReadOnlySpan<byte> readData)
+        {
+            int rlen = readData.Length;
+            if (rlen > 2 && readData[rlen - 2] == '\r' && readData[rlen - 1] == '\n')
+            {
+                return true;
+            }
+            return false;
         }
     }
 }

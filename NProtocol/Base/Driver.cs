@@ -1,7 +1,6 @@
 ﻿using NProtocol.Connectors;
 using NProtocol.Enums;
 using NProtocol.Exceptions;
-using NProtocol.Extensions;
 using System;
 using System.Buffers;
 using System.Threading;
@@ -78,13 +77,12 @@ namespace NProtocol.Base
         }
 
         /// <summary>
-        /// Extract payload data and return the read data by default. If you need to extract payload data, rewrite this method
-        /// This method can also be used for data verification, such as CRC verification, by returning null to indicate that the data verification fails
+        /// Verify whether the received data is correct
         /// </summary>
-        /// <param name="writeData">Write data</param>
-        /// <param name="readData">Read data</param>
+        /// <param name="writeData">write data</param>
+        /// <param name="readData">read data</param>
         /// <returns></returns>
-        protected abstract ReadOnlySpan<byte> ExtractPayload(ReadOnlySpan<byte> writeData, ReadOnlySpan<byte> readData);
+        protected abstract bool ValidateReceivedData(ReadOnlySpan<byte> writeData, ReadOnlySpan<byte> readData);
 
         /// <summary>
         /// Join the team and execute
@@ -120,11 +118,11 @@ namespace NProtocol.Base
         /// <exception cref="Exception"></exception>
         protected Result NoLockExecute(byte[] writeData)
         {
-            var now = DateTime.Now;
             var result = new Result() { SendData = writeData };
             Write(writeData);
             int offset = 0;
             var rentBuf = ArrayPool<byte>.Shared.Rent(ReceivedBufferSize);
+            var now = DateTime.Now;
             try
             {
                 while (true)
@@ -136,11 +134,9 @@ namespace NProtocol.Base
                         buffer.CopyTo(span.Slice(offset));
                         offset += buffer.Length;
                         var readData = span.Slice(0, offset);
-                        var payload = ExtractPayload(writeData, readData);
-                        if (!payload.IsEmpty && payload.Length > 0)
+                        if (ValidateReceivedData(writeData, readData))
                         {
                             result.ReceivedData = readData.ToArray();
-                            result.Payload = payload.ToArray();
                             return result;
                         }
                     }
