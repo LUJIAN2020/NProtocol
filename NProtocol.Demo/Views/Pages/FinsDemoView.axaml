@@ -1,0 +1,60 @@
+<UserControl d:DesignHeight="450"
+			 d:DesignWidth="800"
+			 mc:Ignorable="d"
+			 x:Class="NProtocol.Demo.Views.Pages.FinsDemoView"
+			 x:DataType="vm:FinsDemoViewModel"
+			 xmlns="https://github.com/avaloniaui"
+			 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+			 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+			 xmlns:vm="using:NProtocol.Demo.ViewModels.Pages"
+			 xmlns:views="using:NProtocol.Demo.Views"
+			 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+	<Grid RowDefinitions="auto,*" RowSpacing="10">
+		<StackPanel Orientation="Horizontal" Spacing="5">
+			<TextBox InnerLeftContent="IP:" Text="127.0.0.1" Width="200" x:Name="IPTextBox" />
+			<NumericUpDown Increment="1" InnerLeftContent="Port:" Maximum="65535" Minimum="0" Value="9600" Width="200" x:Name="PortNumericUpDown" />
+			<ComboBox ItemsSource="{Binding Modes}" Name="ModeCb" SelectedIndex="0" />
+			<Button Command="{Binding ConnectCommand}" Content="{Binding ConnectStatus}">
+				<Button.CommandParameter>
+					<MultiBinding Converter="{StaticResource MultiValueConverter}">
+						<Binding ElementName="IPTextBox" Path="Text" />
+						<Binding ElementName="PortNumericUpDown" Path="Value" />
+						<Binding ElementName="ModeCb" Path="SelectedItem" />
+					</MultiBinding>
+				</Button.CommandParameter>
+			</Button>
+		</StackPanel>
+
+		<Grid ColumnDefinitions="*,*" ColumnSpacing="10" Grid.Row="1">
+			<StackPanel Spacing="5">
+				<TextBox InnerLeftContent="Address:" Name="addrTb" Text="D100" />
+				<NumericUpDown InnerLeftContent="Count:" Name="countNud" Value="1"/>
+				<TextBox InnerLeftContent="Value" Text="{Binding Value}"/>
+				<Button
+				Command="{Binding ReadCommand}"
+				Content="Read">
+					<Button.CommandParameter>
+						<MultiBinding Converter="{StaticResource MultiValueConverter}">
+							<Binding ElementName="addrTb" Path="Text" />
+							<Binding ElementName="countNud" Path="Value" />
+						</MultiBinding>
+					</Button.CommandParameter>
+				</Button>
+			</StackPanel>
+			<StackPanel Grid.Column="1" Spacing="5">
+				<TextBox InnerLeftContent="Address:" x:Name="addrTb1" Text="D100"/>
+				<TextBox InnerLeftContent="Value" x:Name="valTb" Text="100"/>
+				<Button Content="Write" Command="{Binding WriteCommand}">
+					<Button.CommandParameter>
+						<MultiBinding Converter="{StaticResource MultiValueConverter}">
+							<Binding ElementName="addrTb1" Path="Text" />
+							<Binding ElementName="valTb" Path="Text" />
+						</MultiBinding>
+					</Button.CommandParameter>
+				</Button>
+			</StackPanel>
+		</Grid>
+	</Grid>
+
+</UserControl>

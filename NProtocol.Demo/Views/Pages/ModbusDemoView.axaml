@@ -1,0 +1,168 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+			 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+			 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+			 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+			 mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+			 x:Class="NProtocol.Demo.Views.Pages.ModbusDemoView"
+			 xmlns:vm="using:NProtocol.Demo.ViewModels.Pages"
+			 x:DataType="vm:ModbusDemoViewModel"
+			 >
+
+
+	<UserControl.Styles>
+		<Style Selector="StackPanel ComboBox">
+			<Setter Property="Width" Value="150"/>
+		</Style>
+	</UserControl.Styles>
+
+	<Grid RowDefinitions="auto,*" RowSpacing="10">
+
+		<StackPanel Spacing="5">
+			<StackPanel Orientation="Horizontal" Spacing="5">
+				<TextBox InnerLeftContent="IP:" Text="127.0.0.1" Width="200" x:Name="IPTextBox" />
+				<NumericUpDown Increment="1" InnerLeftContent="Port:" Maximum="65535" Minimum="0" Value="502" Width="200" x:Name="PortNumericUpDown" />
+				<ComboBox ItemsSource="{Binding Modes}" Name="ModeCb" SelectedIndex="0" Width="150"/>
+
+			</StackPanel>
+
+			<StackPanel Orientation="Horizontal" Spacing="5">
+				<StackPanel Orientation="Horizontal">
+					<TextBlock Text="PortName"/>
+					<ComboBox ItemsSource="{Binding PortNames}" Name="PortNameCb" SelectedIndex="0"/>
+				</StackPanel>
+				<StackPanel  Orientation="Horizontal">
+					<TextBlock Text="BaudRate"/>
+					<ComboBox ItemsSource="{Binding BaudRates}" Name="BaudRatesCb" SelectedIndex="3"/>
+				</StackPanel>
+				<StackPanel  Orientation="Horizontal">
+					<TextBlock Text="DataBit"/>
+					<ComboBox ItemsSource="{Binding DataBits}" Name="DataBitCb" SelectedIndex="3"/>
+				</StackPanel>
+				<StackPanel  Orientation="Horizontal">
+					<TextBlock Text="Paritys"/>
+					<ComboBox ItemsSource="{Binding Paritys}" Name="ParitysCb" SelectedIndex="0"/>
+				</StackPanel>
+				<StackPanel  Orientation="Horizontal">
+					<TextBlock Text="StopBit"/>
+					<ComboBox ItemsSource="{Binding StopBits}" Name="StopBitCb" SelectedIndex="1"/>
+				</StackPanel>
+			</StackPanel>
+
+			<Button Command="{Binding ConnectCommand}" Content="{Binding ConnectStatus}">
+				<Button.CommandParameter>
+					<MultiBinding Converter="{StaticResource MultiValueConverter}">
+						<Binding ElementName="ModeCb" Path="SelectedItem" />
+						<Binding ElementName="IPTextBox" Path="Text" />
+						<Binding ElementName="PortNumericUpDown" Path="Value" />
+						<Binding ElementName="PortNameCb" Path="SelectedItem" />
+						<Binding ElementName="BaudRatesCb" Path="SelectedItem" />
+						<Binding ElementName="DataBitCb" Path="SelectedItem" />
+						<Binding ElementName="ParitysCb" Path="SelectedItem" />
+						<Binding ElementName="StopBitCb" Path="SelectedItem" />
+					</MultiBinding>
+				</Button.CommandParameter>
+			</Button>
+
+			<NumericUpDown  Name="StationNud" Value="1"  Increment="1" Minimum="1" InnerLeftContent="Station"/>
+		</StackPanel>
+
+
+		<Grid ColumnDefinitions="*,*" ColumnSpacing="10" Grid.Row="1">
+			<StackPanel Spacing="5">
+				<NumericUpDown InnerLeftContent="Address:" Name="AddrTb" Value="0" />
+				<NumericUpDown InnerLeftContent="Count:" Name="CountNud" Value="1"/>
+				<TextBox InnerLeftContent="Value" Text="{Binding Value}"/>
+				<StackPanel>
+					<Button Command="{Binding ReadCommand}" Content="ReadCoils">
+						<Button.CommandParameter>
+							<MultiBinding Converter="{StaticResource MultiValueConverter}">
+								<Binding Path="Content" RelativeSource="{RelativeSource Self}" />
+								<Binding ElementName="StationNud" Path="Value" />
+								<Binding ElementName="AddrTb" Path="Value" />
+								<Binding ElementName="CountNud" Path="Value" />
+							</MultiBinding>
+						</Button.CommandParameter>
+					</Button>
+					<Button Command="{Binding ReadCommand}" Content="ReadDiscreteInputs">
+						<Button.CommandParameter>
+							<MultiBinding Converter="{StaticResource MultiValueConverter}">
+								<Binding Path="Content" RelativeSource="{RelativeSource Self}" />
+								<Binding ElementName="StationNud" Path="Value" />
+								<Binding ElementName="AddrTb" Path="Value" />
+								<Binding ElementName="CountNud" Path="Value" />
+							</MultiBinding>
+						</Button.CommandParameter>
+					</Button>
+					<Button Command="{Binding ReadCommand}" Content="ReadHoldingRegisters">
+						<Button.CommandParameter>
+							<MultiBinding Converter="{StaticResource MultiValueConverter}">
+								<Binding Path="Content" RelativeSource="{RelativeSource Self}" />
+								<Binding ElementName="StationNud" Path="Value" />
+								<Binding ElementName="AddrTb" Path="Value" />
+								<Binding ElementName="CountNud" Path="Value" />
+							</MultiBinding>
+						</Button.CommandParameter>
+					</Button>
+					<Button Command="{Binding ReadCommand}" Content="ReadInputRegisters">
+						<Button.CommandParameter>
+							<MultiBinding Converter="{StaticResource MultiValueConverter}">
+								<Binding Path="Content" RelativeSource="{RelativeSource Self}" />
+								<Binding ElementName="StationNud" Path="Value" />
+								<Binding ElementName="AddrTb" Path="Value" />
+								<Binding ElementName="CountNud" Path="Value" />
+							</MultiBinding>
+						</Button.CommandParameter>
+					</Button>
+				</StackPanel>
+			</StackPanel>
+
+
+
+
+			<StackPanel Grid.Column="1" Spacing="5">
+				<NumericUpDown InnerLeftContent="Address:" Name="AddrTb1" Value="0" />
+				<TextBox InnerLeftContent="Value" x:Name="ValueTb" Text="100"/>
+				<Button Content="WriteSingleCoil" Command="{Binding WriteCommand}">
+					<Button.CommandParameter>
+						<MultiBinding Converter="{StaticResource MultiValueConverter}">
+							<Binding Path="Content" RelativeSource="{RelativeSource Self}" />
+							<Binding ElementName="StationNud" Path="Value" />
+							<Binding ElementName="AddrTb1" Path="Value" />
+							<Binding ElementName="ValueTb" Path="Text" />
+						</MultiBinding>
+					</Button.CommandParameter>
+				</Button>
+				<Button Content="WriteMultipleCoils" Command="{Binding WriteCommand}">
+					<Button.CommandParameter>
+						<MultiBinding Converter="{StaticResource MultiValueConverter}">
+							<Binding Path="Content" RelativeSource="{RelativeSource Self}" />
+							<Binding ElementName="StationNud" Path="Value" />
+							<Binding ElementName="AddrTb1" Path="Value" />
+							<Binding ElementName="ValueTb" Path="Text" />
+						</MultiBinding>
+					</Button.CommandParameter>
+				</Button>
+				<Button Content="WriteSingleRegister" Command="{Binding WriteCommand}">
+					<Button.CommandParameter>
+						<MultiBinding Converter="{StaticResource MultiValueConverter}">
+							<Binding Path="Content" RelativeSource="{RelativeSource Self}" />
+							<Binding ElementName="StationNud" Path="Value" />
+							<Binding ElementName="AddrTb1" Path="Value" />
+							<Binding ElementName="ValueTb" Path="Text" />
+						</MultiBinding>
+					</Button.CommandParameter>
+				</Button>
+				<Button Content="WriteMultipleRegisters" Command="{Binding WriteCommand}">
+					<Button.CommandParameter>
+						<MultiBinding Converter="{StaticResource MultiValueConverter}">
+							<Binding Path="Content" RelativeSource="{RelativeSource Self}" />
+							<Binding ElementName="StationNud" Path="Value" />
+							<Binding ElementName="AddrTb1" Path="Value" />
+							<Binding ElementName="ValueTb" Path="Text" />
+						</MultiBinding>
+					</Button.CommandParameter>
+				</Button>
+			</StackPanel>
+		</Grid>
+	</Grid>
+</UserControl>
