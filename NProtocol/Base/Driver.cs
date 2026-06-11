@@ -1,9 +1,9 @@
-﻿using NProtocol.Connectors;
+using NProtocol.Connectors;
 using NProtocol.Enums;
 using NProtocol.Exceptions;
 using System;
 using System.Buffers;
-using System.Threading;
+using System.Diagnostics;
 
 namespace NProtocol.Base
 {
@@ -115,14 +115,12 @@ namespace NProtocol.Base
         /// </summary>
         /// <param name="writeData"></param>
         /// <returns></returns>
-        /// <exception cref="Exception"></exception>
-        protected Result NoLockExecute(byte[] writeData)
+        protected ReadOnlySpan<byte> NoLockExecute(byte[] writeData)
         {
-            var result = new Result() { SendData = writeData };
+            long start = Stopwatch.GetTimestamp();
             Write(writeData);
             int offset = 0;
             var rentBuf = ArrayPool<byte>.Shared.Rent(ReceivedBufferSize);
-            var now = DateTime.Now;
             try
             {
                 while (true)
@@ -136,15 +134,13 @@ namespace NProtocol.Base
                         var readData = span.Slice(0, offset);
                         if (ValidateReceivedData(writeData, readData))
                         {
-                            result.ReceivedData = readData.ToArray();
-                            return result;
+                            return readData;
                         }
                     }
-                    else
-                    {
-                        Thread.Sleep(1);
-                    }
-                    ThrowLoopTimeoutException(now);
+
+                    long ticks = Stopwatch.GetTimestamp() - start;
+                    double totalMilliseconds = ticks * 1000.0 / Stopwatch.Frequency;
+                    ThrowLoopTimeoutException(totalMilliseconds);
                 }
             }
             finally
@@ -158,9 +154,9 @@ namespace NProtocol.Base
         /// </summary>
         /// <param name="inLoopTime"></param>
         /// <exception cref="LoopTimeoutException"></exception>
-        private void ThrowLoopTimeoutException(DateTime inLoopTime)
+        private void ThrowLoopTimeoutException(double totalMilliseconds)
         {
-            if ((DateTime.Now - inLoopTime).TotalMilliseconds > ReadTimeout)
+            if (totalMilliseconds > ReadTimeout)
             {
                 DiscardBuffer();
                 throw new LoopTimeoutException("Loop read data timed out.", DriverId);
@@ -171,12 +167,9 @@ namespace NProtocol.Base
         /// Execute an unconditional command not locked
         /// </summary>
         /// <param name="writeData"></param>
-        /// <returns></returns>
-        protected Result NoLockExecuteNoResponse(byte[] writeData)
+        protected void NoLockExecuteNoResponse(byte[] writeData)
         {
-            var result = new Result { SendData = writeData };
             connecter.Write(writeData);
-            return result;
         }
 
         public void Connect()

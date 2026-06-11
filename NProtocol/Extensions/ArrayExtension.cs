@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -21,7 +21,7 @@ namespace NProtocol.Extensions
             if (length == 0)
                 return Array.Empty<T>();
 
-            return array.AsSpan().Slice(start, length).ToArray();
+            return array.AsSpan(start, length).ToArray();
         }
 
         public static T[] Combine<T>(this T[] firstArray, T[] nextArray) where T : struct
